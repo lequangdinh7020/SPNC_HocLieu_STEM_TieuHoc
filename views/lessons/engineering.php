@@ -202,17 +202,6 @@ $_SESSION['engineering_visited'] = true;
                 Tự chế dụng cụ gấp áo thông minh và tiện lợi
             </p>
             
-            <div class="info-meta">
-                <div class="info-time">
-                    <i class="far fa-clock"></i>
-                    <span id="infoTime">25 phút</span>
-                </div>
-                <div class="info-xp">
-                    <i class="fas fa-bolt"></i>
-                    <span id="infoXp">30 XP</span>
-                </div>
-            </div>
-            
             <div class="activities-section">
                 <h4 class="activities-title">Hoạt động</h4>
                 <div class="activities-grid" id="activitiesGrid">
