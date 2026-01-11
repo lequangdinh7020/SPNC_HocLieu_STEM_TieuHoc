@@ -153,7 +153,8 @@ switch ($route) {
         break;
         
     case '/views/lessons/engineering_car_builder':
-        $lessonController->showCarBuilderGame();
+        // Chuyển sang engineering_water_pipe
+        $lessonController->showPipeGame();
         break;
 
     case '/views/lessons/engineering_water_filter':
@@ -181,14 +182,17 @@ switch ($route) {
         break;
     
     case '/views/lessons/engineering_tower_game':
+        // Route mới cho trò chơi xây tháp
         $lessonController->showTowerGame();
         break;
         
     case '/views/lessons/engineering_room_decor':
+        // Route mới cho trò sắp xếp căn phòng
         $lessonController->showRoomDecorGame();
         break;
 
     case '/views/lessons/engineering_water_pipe':
+        // Route mới cho hệ thống dẫn nước
         $lessonController->showPipeGame();
         break;
 

@@ -631,7 +631,7 @@ body {
     background: #6B7280;
     color: white;
     font-size: 0.6rem;
- display: none; }
+}
 
 @keyframes pulse-badge {
     0%, 100% { transform: scale(1); }

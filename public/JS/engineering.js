@@ -3,37 +3,37 @@ console.log('baseUrl(from DOM):', baseUrl, ' window.baseUrl:', window.baseUrl);
 
 const planets = {
     1: {
-        name: "DỤNG CỤ GẤP ÁO",
-        icon: "👕",
+        name: "XÂY THÁP (CÂY TRE TRĂM ĐỐT)",
+        icon: "🎋",
         status: "completed",
-        description: "Tự chế dụng cụ gấp áo thông minh và tiện lợi",
+        description: "Học cách xây tháp vững chắc từ câu chuyện Cây tre trăm đốt",
         time: "25 phút",
         xp: "30 XP",
         activities: [
             { 
                 type: "tutorial", 
-                name: "Hướng dẫn làm dụng cụ", 
-                icon: "📐", 
+                name: "Thử thách xây tháp", 
+                icon: "🏗️", 
                 xp: "30 XP", 
-                link: baseUrl + '/views/lessons/engineering_clothing_tool', 
+                link: baseUrl + '/views/lessons/engineering_tower_game', 
                 status: "completed" 
             }
         ]
     },
     2: {
-        name: "HOA YÊU THƯƠNG NỞ RỘ",
-        icon: "🌺",
+        name: "SẮP XẾP CĂN PHÒNG CỦA EM",
+        icon: "🏠",
         status: "current",
-        description: "Thiết kế hoa giấy cơ học nở rộ khi kéo dây",
+        description: "Thiết kế và sắp xếp không gian sống gọn gàng, hợp lý",
         time: "30 phút",
         xp: "60 XP",
         activities: [
             { 
                 type: "tutorial", 
-                name: "Thiết kế cơ cấu", 
+                name: "Thiết kế không gian", 
                 icon: "🎨", 
                 xp: "35 XP",
-                link: baseUrl + '/views/lessons/engineering_flower_mechanism', 
+                link: baseUrl + '/views/lessons/engineering_room_decor', 
                 status: "current" 
             }
         ]
@@ -42,14 +42,14 @@ const planets = {
         name: "XÂY CẦU", 
         icon: "🌉",
         status: "current",
-        description: "Thiết kế và xây dựng cầu",
+        description: "Thiết kế và xây dựng cầu từ giấy A4 chịu lực",
         time: "35 phút", 
         xp: "75 XP",
         activities: [
             { 
                 type: "challenge", 
                 name: "Thử thách cầu giấy", 
-                icon: "🏗️", 
+                icon: "🌉", 
                 xp: "35 XP",
                 link: baseUrl + '/views/lessons/engineering_bridge_game', 
                 status: "current" 
@@ -57,19 +57,19 @@ const planets = {
         ]
     },
     4: {
-        name: "CHẾ TẠO XE",
-        icon: "🚗",
+        name: "HỆ THỐNG DẪN NƯỚC",
+        icon: "🚰",
         status: "current",
-        description: "Tạo xe chạy bằng lực đẩy từ bong bóng xà phòng",
+        description: "Tìm hiểu và thiết kế hệ thống dẫn nước đơn giản",
         time: "28 phút",
         xp: "70 XP",
         activities: [
             { 
                 type: "experiment", 
-                name: "Trò chơi chế tạo xe", 
+                name: "Trò chơi dẫn nước", 
                 icon: "🧪", 
                 xp: "40 XP",
-                link: baseUrl + '/views/lessons/engineering_car_builder', 
+                link: baseUrl + '/views/lessons/engineering_water_pipe', 
                 status: "current" 
             }
         ]
@@ -164,9 +164,11 @@ function initEngineeringSystem() {
                     activityElement.classList.add('activity-completed');
                 } else if (activity.status === 'current') {
                     activityElement.classList.add('activity-current');
+                } else if (activity.status === 'upcoming') {
+                    activityElement.classList.add('activity-locked');
                 }
                 
-                if (activity.link) {
+                if (activity.link && activity.status !== 'upcoming') {
                     activityElement.classList.add('activity-clickable');
                     activityElement.style.cursor = 'pointer';
                 } else {
@@ -178,6 +180,8 @@ function initEngineeringSystem() {
                     statusBadge = '<div class="activity-status-badge completed-badge">✓</div>';
                 } else if (activity.status === 'current') {
                     statusBadge = '<div class="activity-status-badge current-badge">●</div>';
+                } else if (activity.status === 'upcoming') {
+                    statusBadge = '<div class="activity-status-badge locked-badge">🔒</div>';
                 }
                 
                 activityElement.innerHTML = `
@@ -196,7 +200,7 @@ function initEngineeringSystem() {
                     <div class="activity-xp">${activity.xp}</div>
                 `;
                 
-                if (activity.link && activity.status !== 'locked') {
+                if (activity.link && activity.status !== 'upcoming') {
                     activityElement.addEventListener('click', function(e) {
                         e.stopPropagation();
                         console.log(`🔧 Navigating to: ${activity.link}`);
