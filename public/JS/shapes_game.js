@@ -34,12 +34,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Các biểu tượng hình
     const shapeIcons = {
-        'square': '🟦',
-        'rectangle': '⬜',
-        'triangle': '🔺',
-        'trapezoid': '🔶',
-        'parallelogram': '🔷',
-        'rhombus': '💎'
+        'square': '□',
+        'rectangle': '▭',
+        'triangle': '△',
+        'trapezoid': '⏢',
+        'parallelogram': '▱',
+        'rhombus': '◇'
     };
     
     // Tên hình
@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updateDraggablePoints();
         
         // Reset feedback
-        showFeedback('👋', `Hãy tự do kéo các điểm để tạo ${shapeNames[currentChallenge.targetShape]}!`);
+        showFeedback('', `Hãy tự do kéo các điểm để tạo ${shapeNames[currentChallenge.targetShape]}!`);
         
         // Disable nút tiếp theo
         document.getElementById('nextChallengeBtn').disabled = true;
@@ -113,7 +113,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const facts = currentChallenge.knowledge.split('. ');
         const factsHtml = facts.map(fact => 
             `<div class="fact-item">
-                <span class="fact-icon">📚</span>
                 <div class="fact-text">${fact}.</div>
             </div>`
         ).join('');
@@ -137,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const nextIndex = currentChallengeIndex + 1;
         if (nextIndex < window.gameData.challenges.length) {
             const nextChallenge = window.gameData.challenges[nextIndex];
-            nextShapeIcon.textContent = shapeIcons[nextChallenge.targetShape] || '🔜';
+            nextShapeIcon.textContent = shapeIcons[nextChallenge.targetShape] || '→';
             nextShapeName.textContent = shapeNames[nextChallenge.targetShape];
             nextShapeDesc.textContent = nextChallenge.title;
         } else {
@@ -189,8 +188,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const uniquePoints = getUniquePoints(10);
         if (uniquePoints.length < 2) return;
         
-        ctx.fillStyle = 'rgba(66, 133, 244, 0.1)';
-        ctx.strokeStyle = '#4285f4';
+        // Màu tím cho hình
+        ctx.fillStyle = 'rgba(155, 89, 182, 0.1)';
+        ctx.strokeStyle = '#9b59b6';
         ctx.lineWidth = 3;
         ctx.lineJoin = 'round';
         
@@ -224,13 +224,14 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (!isUnique) continue; // Bỏ qua điểm trùng
             
-            ctx.fillStyle = '#4285f4';
+            // Màu tím cho điểm
+            ctx.fillStyle = '#9b59b6';
             ctx.beginPath();
             ctx.arc(points[i][0], points[i][1], 6, 0, Math.PI * 2);
             ctx.fill();
             
             // Vẽ nhãn A, B, C, D
-            ctx.fillStyle = '#3367d6';
+            ctx.fillStyle = '#8e44ad';
             ctx.font = 'bold 14px Quicksand';
             ctx.fillText(String.fromCharCode(65 + i), points[i][0] + 10, points[i][1] - 10);
         }
@@ -260,7 +261,7 @@ document.addEventListener('DOMContentLoaded', function() {
         pointsElements.forEach((point, index) => {
             const element = document.getElementById(`point${point}`);
             if (element && index < points.length) {
-                const offset = 10; // 20px / 2 = 10px
+                const offset = 10;
                 element.style.left = (points[index][0] - offset) + 'px';
                 element.style.top = (points[index][1] - offset) + 'px';
                 element.style.display = 'block';
@@ -341,43 +342,43 @@ document.addEventListener('DOMContentLoaded', function() {
             case 'rectangle':
                 isValid = checkRectangle();
                 message = isValid ? 
-                    '🎉 Chính xác! Bạn đã tạo được hình chữ nhật!' :
-                    `❌ Chưa đúng! Hiện tại là ${shapeNames[currentShapeType]}. Hình chữ nhật cần: 1) 4 góc vuông 2) Cạnh đối bằng nhau.`;
+                    'Chính xác! Bạn đã tạo được hình chữ nhật!' :
+                    `Chưa đúng! Hiện tại là ${shapeNames[currentShapeType]}. Hình chữ nhật cần: 1) 4 góc vuông 2) Cạnh đối bằng nhau.`;
                 break;
                 
             case 'triangle':
                 isValid = checkTriangle();
                 message = isValid ?
-                    '🎉 Tuyệt vời! Đây là tam giác!' :
-                    `❌ Chưa đúng! Hiện tại là ${shapeNames[currentShapeType]}. Tam giác cần có đúng 3 cạnh.`;
+                    'Tuyệt vời! Đây là tam giác!' :
+                    `Chưa đúng! Hiện tại là ${shapeNames[currentShapeType]}. Tam giác cần có đúng 3 cạnh.`;
                 break;
                 
             case 'trapezoid':
                 isValid = checkTrapezoid();
                 message = isValid ?
-                    '🎉 Xuất sắc! Đây là hình thang vuông!' :
-                    `❌ Chưa đúng! Hiện tại là ${shapeNames[currentShapeType]}. Hình thang vuông cần: 1) Có cặp cạnh song song 2) Có góc vuông.`;
+                    'Xuất sắc! Đây là hình thang vuông!' :
+                    `Chưa đúng! Hiện tại là ${shapeNames[currentShapeType]}. Hình thang vuông cần: 1) Có cặp cạnh song song 2) Có góc vuông.`;
                 break;
                 
             case 'parallelogram':
                 isValid = checkParallelogram();
                 message = isValid ?
-                    '🎉 Hoàn hảo! Đây là hình bình hành!' :
-                    `❌ Chưa đúng! Hiện tại là ${shapeNames[currentShapeType]}. Hình bình hành cần: 1) Các cạnh đối song song 2) Các cạnh đối bằng nhau.`;
+                    'Hoàn hảo! Đây là hình bình hành!' :
+                    `Chưa đúng! Hiện tại là ${shapeNames[currentShapeType]}. Hình bình hành cần: 1) Các cạnh đối song song 2) Các cạnh đối bằng nhau.`;
                 break;
                 
             case 'rhombus':
                 isValid = checkRhombus();
                 message = isValid ?
-                    '🎉 Tuyệt vời! Đây là hình thoi!' :
-                    `❌ Chưa đúng! Hiện tại là ${shapeNames[currentShapeType]}. Hình thoi cần 4 cạnh bằng nhau.`;
+                    'Tuyệt vời! Đây là hình thoi!' :
+                    `Chưa đúng! Hiện tại là ${shapeNames[currentShapeType]}. Hình thoi cần 4 cạnh bằng nhau.`;
                 break;
                 
             case 'square':
                 isValid = checkSquare();
                 message = isValid ?
-                    '🎉 Hoàn hảo! Đây là hình vuông!' :
-                    `❌ Chưa đúng! Hiện tại là ${shapeNames[currentShapeType]}. Hình vuông cần: 1) 4 cạnh bằng nhau 2) 4 góc vuông.`;
+                    'Hoàn hảo! Đây là hình vuông!' :
+                    `Chưa đúng! Hiện tại là ${shapeNames[currentShapeType]}. Hình vuông cần: 1) 4 cạnh bằng nhau 2) 4 góc vuông.`;
                 break;
         }
         
@@ -385,10 +386,10 @@ document.addEventListener('DOMContentLoaded', function() {
             score += 100;
             scoreElement.textContent = score;
             
-            showFeedback('✅', message);
+            showFeedback('✓', message);
             
             document.getElementById('nextChallengeBtn').disabled = false;
-            document.getElementById('nextChallengeBtn').innerHTML = '<span class="btn-icon">🎯</span><span class="btn-text">Thử thách tiếp theo</span>';
+            document.getElementById('nextChallengeBtn').innerHTML = '<span class="btn-icon">→</span><span class="btn-text">Thử thách tiếp theo</span>';
             
             updateProgress(currentChallenge.targetShape);
             
@@ -398,7 +399,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateCompletedCount();
             }
         } else {
-            showFeedback('❌', message);
+            showFeedback('✗', message);
         }
     }
     
@@ -497,6 +498,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         return allRightAngles;
     }
+    
     function distance(p1, p2) {
         const dx = p2[0] - p1[0];
         const dy = p2[1] - p1[1];
@@ -613,7 +615,7 @@ document.addEventListener('DOMContentLoaded', function() {
             points = JSON.parse(JSON.stringify(examples[currentChallenge.targetShape]));
             updateCanvas();
             updateDraggablePoints();
-            showFeedback('👁️', `Đây là MỘT cách tạo ${shapeNames[currentChallenge.targetShape]}. Bạn có thể tạo theo cách khác!`);
+            showFeedback(`Đây là MỘT cách tạo ${shapeNames[currentChallenge.targetShape]}. Bạn có thể tạo theo cách khác!`);
         }
     }
     
@@ -633,9 +635,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (currentChallengeIndex < window.gameData.challenges.length - 1) {
             currentChallengeIndex++;
             loadChallenge(currentChallengeIndex);
-            showFeedback('🎯', `Bắt đầu thử thách mới: ${window.gameData.challenges[currentChallengeIndex].title}`);
+            showFeedback('→', `Bắt đầu thử thách mới: ${window.gameData.challenges[currentChallengeIndex].title}`);
         } else {
-            showFeedback('🏆', 'Xuất sắc! Bạn đã hoàn thành tất cả thử thách!');
+            showFeedback('Xuất sắc! Bạn đã hoàn thành tất cả thử thách!');
         }
     }
     

@@ -1,25 +1,28 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../template/header.php';
 ?>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/shapes_game.css?v=<?php echo time(); ?>">
-<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/home.css">
+<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/shapes_game.css?v=<?= time() ?>">
+<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/home.css?v=<?= time() ?>">
 
 <div class="game-wrapper"> <br><br><br><br>
     <div class="game-stats-bar">
         <div class="stats-container">
             <div class="stat-item">
+                <span class="stat-icon"></span>
                 <span class="stat-label">Thời gian:</span>
                 <span class="stat-value" id="timer">00:00</span>
             </div>
             <div class="stat-item">
+                <span class="stat-icon"></span>
                 <span class="stat-label">Điểm:</span>
                 <span class="stat-value" id="score">0</span>
             </div>
             <div class="stat-item">
+                <span class="stat-icon"></span>
                 <span class="stat-label">Hoàn thành:</span>
                 <span class="stat-value" id="completedCount">0/6</span>
             </div>
@@ -39,7 +42,7 @@ require_once __DIR__ . '/../template/header.php';
                 
                 <div class="mission-content">
                     <div class="challenge-info">
-                        <div class="shape-icon-large" id="shapeIcon">🟦</div>
+                        <div class="shape-icon-large" id="shapeIcon">□</div>
                         <div class="challenge-text">
                             <h3 id="challengeTitle">Hình vuông</h3>
                             <p class="challenge-desc" id="challengeDesc">4 cạnh bằng nhau, 4 góc vuông</p>
@@ -55,6 +58,7 @@ require_once __DIR__ . '/../template/header.php';
                     
                     <div class="hint-section">
                         <button class="hint-btn" id="showHint">
+                            <span class="hint-icon"></span>
                             <span class="hint-text">Xem đặc điểm hình cần tạo</span>
                         </button>
                         <div class="hint-content" id="hintContent">
@@ -70,14 +74,16 @@ require_once __DIR__ . '/../template/header.php';
             </div>
             
             <div class="knowledge-card">
-                <h2>Kiến thức hình học</h2>
+                <h2><span class="icon"></span> Kiến thức hình học</h2>
                 <div class="knowledge-content" id="knowledgeContent">
                     <div class="fact-item">
+                        <span class="fact-icon"></span>
                         <div class="fact-text">
                             <strong>Hình vuông:</strong> 4 cạnh bằng nhau, 4 góc vuông
                         </div>
                     </div>
                     <div class="fact-item">
+                        <span class="fact-icon"></span>
                         <div class="fact-text">
                             <strong>Hình chữ nhật:</strong> Các cạnh đối bằng nhau, 4 góc vuông
                         </div>
@@ -134,6 +140,7 @@ require_once __DIR__ . '/../template/header.php';
                             <span class="btn-text">Bắt đầu lại</span>
                         </button>
                         <button id="showAnswerBtn" class="control-btn tertiary-btn">
+                            <span class="btn-icon"></span>
                             <span class="btn-text">Xem ví dụ</span>
                         </button>
                     </div>
@@ -141,8 +148,9 @@ require_once __DIR__ . '/../template/header.php';
                     <div class="feedback-container">
                         <div class="feedback-message" id="feedbackMessage">
                             <div class="feedback-content">
+                                <span class="feedback-icon"></span>
                                 <span class="feedback-text" id="feedbackText">
-                                    Hãy kéo các điểm màu xanh để biến hình vuông thành hình chữ nhật!
+                                    Hãy kéo các điểm để biến hình vuông thành hình chữ nhật!
                                 </span>
                             </div>
                         </div>
@@ -153,8 +161,9 @@ require_once __DIR__ . '/../template/header.php';
         
         <div class="right-panel">
             <div class="next-challenge-card">
-                <h2>Thử thách tiếp theo</h2>
+                <h2><span class="icon">→</span> Thử thách tiếp theo</h2>
                 <div class="next-challenge-info">
+                    <div class="next-shape-icon" id="nextShapeIcon">□</div>
                     <div class="next-challenge-details">
                         <h3 id="nextShapeName">Hình chữ nhật</h3>
                         <p class="next-challenge-desc" id="nextShapeDesc">
@@ -163,34 +172,41 @@ require_once __DIR__ . '/../template/header.php';
                     </div>
                 </div>
                 <button id="nextChallengeBtn" class="next-challenge-btn" disabled>
+                    <span class="btn-icon"></span>
                     <span class="btn-text">Mở khóa tiếp theo</span>
                 </button>
             </div>
             
             <div class="shape-progress">
-                <h2>Tiến độ học tập</h2>
+                <h2><span class="icon"></span> Tiến độ học tập</h2>
                 <div class="progress-grid">
                     <div class="progress-item completed" data-shape="square">
+                        <span class="progress-icon">□</span>
                         <span class="progress-name">Hình vuông</span>
                         <span class="progress-status">✓</span>
                     </div>
                     <div class="progress-item" data-shape="rectangle" id="progressRectangle">
+                        <span class="progress-icon">▭</span>
                         <span class="progress-name">Hình chữ nhật</span>
                         <span class="progress-status">•</span>
                     </div>
                     <div class="progress-item" data-shape="triangle" id="progressTriangle">
+                        <span class="progress-icon">△</span>
                         <span class="progress-name">Tam giác</span>
                         <span class="progress-status">•</span>
                     </div>
                     <div class="progress-item" data-shape="trapezoid" id="progressTrapezoid">
+                        <span class="progress-icon">⏢</span>
                         <span class="progress-name">Hình thang</span>
                         <span class="progress-status">•</span>
                     </div>
                     <div class="progress-item" data-shape="parallelogram" id="progressParallelogram">
+                        <span class="progress-icon">▱</span>
                         <span class="progress-name">Hình bình hành</span>
                         <span class="progress-status">•</span>
                     </div>
                     <div class="progress-item" data-shape="rhombus" id="progressRhombus">
+                        <span class="progress-icon">◇</span>
                         <span class="progress-name">Hình thoi</span>
                         <span class="progress-status">•</span>
                     </div>
@@ -198,7 +214,7 @@ require_once __DIR__ . '/../template/header.php';
             </div>
             
             <div class="shape-tips">
-                <h2>Mẹo nhận biết hình</h2>
+                <h2><span class="icon"></span> Mẹo nhận biết hình</h2>
                 <div class="tips-content" id="shapeTips">
                     <p><strong>Để nhận biết hình:</strong></p>
                     <ul>
@@ -304,7 +320,7 @@ require_once __DIR__ . '/../template/header.php';
         ]
     ]) ?>;
 </script>
-<script src="<?= $base_url ?>/public/JS/shapes_game.js"></script>
+<script src="<?= $base_url ?>/public/JS/shapes_game.js?v=<?= time() ?>"></script>
 
 <?php
 require_once __DIR__ . '/../template/footer.php';

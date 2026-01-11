@@ -79,11 +79,6 @@ if (!empty($_SESSION['user_id'])) {
                 </nav>
 
                 <div class="header-actions">
-                    <form class="search-bar" method="GET" action="<?= $base_url ?>/views/home.php">
-                        <input type="text" name="search" placeholder="Tìm bài học..." 
-                            value="<?= isset($_GET['search']) ? htmlspecialchars($_GET['search']) : '' ?>">
-                        <button type="submit" class="search-btn">🔍</button>
-                    </form>
                     <div class="user-menu">
                         <div class="user-avatar" id="userAvatar">
                             <?= $avatarHtml ?>
