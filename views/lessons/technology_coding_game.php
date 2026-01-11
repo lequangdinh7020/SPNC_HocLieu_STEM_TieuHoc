@@ -86,10 +86,7 @@
             <div id="result-icon"></div>
             <h2 id="result-title"></h2>
             <p id="result-message"></p>
-            <div class="star-rating" id="star-rating">
-                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-            </div>
-            <button id="next-level-btn" class="game-btn">Màn tiếp theo</button>
+            <button id="next-level-btn" class="game-btn next">Màn tiếp theo</button>
             <button id="retry-btn" class="game-btn reset">Thử lại</button>
         </div>
     </div>
