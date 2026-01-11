@@ -80,16 +80,8 @@ const planets = {
         status: "current",
         description: "Trò chơi học xem đồng hồ và quản lý thời gian",
         time: "28 phút",
-        xp: "75 XP",
+        xp: "45 XP",
         activities: [
-            { 
-                type: "game", 
-                name: "Trò chơi đồng hồ", 
-                icon: "🕹️", 
-                xp: "30 XP",
-                link: baseUrl + '/views/lessons/math_clock_game', 
-                status: "current" 
-            },
             { 
                 type: "game", 
                 name: "Quản lý thời gian", 
