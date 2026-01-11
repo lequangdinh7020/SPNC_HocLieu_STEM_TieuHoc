@@ -8,7 +8,7 @@ $math_data = [
     'gradient' => 'linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%)',
     'icon' => '🧮',
     'description' => 'Khám phá thế giới số học đầy màu sắc!',
-    'total_xp' => 320,
+    'total_xp' => 290,
     'completed_xp' => 80,
     'current_streak' => 6,
     'character' => [
@@ -117,14 +117,6 @@ $math_data = [
             'description' => 'Trò chơi học xem đồng hồ và quản lý thời gian',
             'learning_time' => '28 phút',
             'activities' => [
-                [
-                    'type' => 'game',
-                    'title' => 'TRÒ CHƠI ĐỒNG HỒ',
-                    'icon' => '🕹️',
-                    'description' => 'Trò chơi học xem giờ và đặt đồng hồ',
-                    'status' => 'upcoming',
-                    'xp' => 30
-                ],
                 [
                     'type' => 'game',
                     'title' => 'QUẢN LÝ THỜI GIAN',
