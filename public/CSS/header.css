@@ -55,8 +55,8 @@ header {
     font-size: 2rem;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-radius: 12px;
-    width: 50px;
-    height: 50px;
+    width: 70px;
+    height: 70px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -65,14 +65,14 @@ header {
 
 .logo-text h1 {
     font-family: 'Baloo 2', cursive;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     color: #e0e8f0;
     margin: 0;
     font-weight: 700;
 }
 
 .logo-text p {
-    font-size: 0.75rem;
+    font-size: 0.95rem;
     color: #7a8a9a;
     margin: 0;
     font-weight: 500;

@@ -3,7 +3,7 @@
         <div class="footer-content">
             <div class="footer-section">
                 <div class="footer-logo">
-                    <div class="logo-icon">⚡</div>
+                    <div class="logo-icon" style="width: 65px; height: 65px;"><img src="<?= $base_url ?>/public/images/logo.png" alt="STEM Universe Logo" style="width: 100%; height: 100%; object-fit: contain;"></div>
                     <span>STEM Universe</span>
                 </div>
                 <p>Khám phá thế giới STEM đầy sáng tạo. Nền tảng học liệu tương tác cho học sinh tiểu học Việt Nam.</p>

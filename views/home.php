@@ -171,7 +171,7 @@ if (!empty($_SESSION['user_id'])) {
                 <div class="hero-content">
                     <div class="hero-text">
                         <h2>Chào mừng đến với <span class="highlight">STEM Universe!</span></h2>
-                        <p>Nơi những ý tưởng nhỏ trở thành phát minh lớn. Cùng khám phá thế giới STEM đầy màu sắc!</p>
+                        <p>Khám phá thế giới STEM đầy sáng tạo. Nền tảng học liệu tương tác cho học sinh tiểu học Việt Nam.</p>
                         <div class="hero-stats">
                             <div class="stat">
                                 <div class="stat-number"><?php echo $total; ?></div>

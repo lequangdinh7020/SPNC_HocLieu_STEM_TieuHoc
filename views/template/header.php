@@ -65,7 +65,7 @@ if (!empty($_SESSION['user_id'])) {
         <div class="container">
             <div class="header-content">
                 <div class="logo" onclick="window.history.back()">
-                    <div class="logo-icon">🌟</div>
+                    <div class="logo-icon"><img src="<?= $base_url ?>/public/images/logo.png" alt="STEM Universe Logo" style="width: 100%; height: 100%; object-fit: contain;"></div>
                     <div class="logo-text">
                         <h1>STEM Universe</h1>
                         <p>Hành trình khám phá tri thức</p>
