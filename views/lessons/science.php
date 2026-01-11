@@ -177,17 +177,6 @@ $_SESSION['science_visited'] = true;
                 Khám phá bí mật của màu sắc qua các hoạt động thú vị và trò chơi pha màu
             </p>
             
-            <div class="info-meta">
-                <div class="info-time">
-                    <i class="far fa-clock"></i>
-                    <span id="infoTime">15 phút</span>
-                </div>
-                <div class="info-xp">
-                    <i class="fas fa-bolt"></i>
-                    <span id="infoXp">50 XP</span>
-                </div>
-            </div>
-            
             <div class="activities-section">
                 <h4 class="activities-title">Hoạt động</h4>
                 <div class="activities-grid" id="activitiesGrid">

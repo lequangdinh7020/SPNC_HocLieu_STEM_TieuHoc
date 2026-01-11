@@ -91,15 +91,13 @@ function initScienceSystem() {
     const infoName = document.getElementById('infoName');
     const infoStatus = document.getElementById('infoStatus');
     const infoDescription = document.getElementById('infoDescription');
-    const infoTime = document.getElementById('infoTime');
-    const infoXp = document.getElementById('infoXp');
     const activitiesGrid = document.getElementById('activitiesGrid');
     const closeInfo = document.getElementById('closeInfo');
     const characterBtn = document.getElementById('characterBtn');
 
     const elements = {
         planetInfoOverlay, infoIcon, infoName, infoStatus, infoDescription,
-        infoTime, infoXp, activitiesGrid, closeInfo, characterBtn
+        activitiesGrid, closeInfo, characterBtn
     };
 
     for (const [name, element] of Object.entries(elements)) {
@@ -128,8 +126,6 @@ function initScienceSystem() {
             infoIcon.textContent = currentPlanetData.icon;
             infoName.textContent = currentPlanetData.name;
             infoDescription.textContent = currentPlanetData.description;
-            infoTime.textContent = currentPlanetData.time;
-            infoXp.textContent = currentPlanetData.xp;
             
             let statusText = '';
             let statusClass = '';
