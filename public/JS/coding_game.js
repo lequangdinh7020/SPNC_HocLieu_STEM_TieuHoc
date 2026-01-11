@@ -29,11 +29,29 @@ document.addEventListener("DOMContentLoaded", () => {
     // *** Biến lưu trạng thái bản đồ hiện tại ***
     let currentMapState = []; 
 
-    // --- KHỞI TẠO ---
-    startBtn.onclick = () => {
-        storyModal.style.display = 'none';
-        startTimer();
-    };
+    // --- KHỞI TẠO & CỐT TRUYỆN ---
+    
+    // Kiểm tra xem đã xem cốt truyện chưa
+    const hasSeenIntro = sessionStorage.getItem('hasSeenCodingIntro');
+
+    if (levelData.id === 1 && !hasSeenIntro) {
+        // Nếu là Màn 1 và chưa xem -> Hiện modal cốt truyện
+        if (storyModal) storyModal.style.display = 'flex';
+    } else {
+        // Các trường hợp khác (Màn 2, 3... hoặc đã xem) -> Ẩn modal và Tự động bắt đầu
+        if (storyModal) storyModal.style.display = 'none';
+        startTimer(); 
+    }
+
+    // Sự kiện nút "Giúp Sơn Tinh ngay!"
+    if (startBtn) {
+        startBtn.onclick = () => {
+            if (storyModal) storyModal.style.display = 'none';
+            // Lưu lại trạng thái đã xem
+            sessionStorage.setItem('hasSeenCodingIntro', 'true');
+            startTimer();
+        };
+    }
 
     function initMap() {
         gridMap.innerHTML = '';
@@ -70,11 +88,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function startTimer() {
+        // Nếu game đang chạy hoặc đã kết thúc thì không start lại timer chồng chéo
+        clearInterval(timerInterval);
+        
         timeLeft = 0;
         const maxTime = timeLimit;
         timerBar.style.width = '0%';
         
-        clearInterval(timerInterval);
         timerInterval = setInterval(() => {
             timeLeft++;
             const percentage = (timeLeft / maxTime) * 100;
@@ -342,14 +362,30 @@ document.addEventListener("DOMContentLoaded", () => {
     function showWin() {
         resultTitle.innerText = "THÀNH CÔNG!";
         resultTitle.style.color = "#2ecc71";
-        resultMsg.innerText = `Bạn đã lấy được ${levelData.target_img.replace('.png', '').replace(/\d+/g, ' ')}!`;
+        
+        // Lấy đường dẫn ảnh
+        const imgSrc = `${baseUrl}/public/images/coding/${levelData.target_img}`;
+        
+        // Lấy tên vật phẩm từ mission (Ví dụ: "Tìm Voi chín ngà" -> "Voi chín ngà")
+        const itemName = levelData.mission ? levelData.mission.replace('Tìm ', '') : 'Sính lễ';
+
+        // Hiển thị cả Chữ và Ảnh
+        resultMsg.innerHTML = `
+            <p>Bạn đã lấy được <strong>${itemName}</strong>!</p>
+            <img src="${imgSrc}" alt="${itemName}" 
+                 style="width: 100px; height: auto; margin-top: 10px; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.3));">
+        `;
         
         if (levelData.id < totalLevels) {
             nextBtn.style.display = 'inline-block';
-            nextBtn.onclick = () => window.location.href = `${baseUrl}/views/lessons/coding-game?level=${levelData.id + 1}`;
+            nextBtn.onclick = () => {
+                // Chuyển màn bằng cách thay đổi tham số GET 'level' trên URL hiện tại
+                const currentPath = window.location.pathname; 
+                window.location.href = `${currentPath}?level=${levelData.id + 1}`;
+            };
         } else {
             nextBtn.style.display = 'none';
-            resultMsg.innerText += " Chúc mừng bạn đã hoàn thành tất cả thử thách!";
+            resultMsg.innerHTML += "<p style='margin-top:10px; color:#e67e22'>Chúc mừng bạn đã hoàn thành tất cả thử thách!</p>";
         }
         resultModal.style.display = 'flex';
     }

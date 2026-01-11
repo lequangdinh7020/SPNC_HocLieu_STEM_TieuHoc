@@ -10,11 +10,11 @@ $subjects = [
         'gradient' => 'linear-gradient(135deg, #2d7a3e 0%, #4a9d5f 100%)',
         'icon' => '🔬',
         'lessons' => [
-            ['title' => 'Thế giới màu sắc', 'type' => 'Trò chơi', 'has_video' => true, 'status' => 'complete'],
-            ['title' => 'Bí kíp ăn uống lành mạnh', 'type' => 'Trò chơi', 'has_video' => true, 'status' => 'complete'],
-            ['title' => 'Ngày và đêm', 'type' => 'Trả lời câu hỏi', 'has_video' => true, 'status' => 'complete'],
-            ['title' => 'Thùng rác thân thiện', 'type' => 'Trò chơi', 'has_video' => false, 'status' => 'incomplete'],
-            ['title' => 'Các bộ phận của cây', 'type' => 'Trò chơi', 'has_video' => true, 'status' => 'complete'],
+            ['title' => 'Thế giới màu sắc', 'type' => 'Trò chơi', 'has_video' => true, 'status' => 'complete', 'url' => 'science_color_game'],
+            ['title' => 'Bí kíp ăn uống lành mạnh', 'type' => 'Trò chơi', 'has_video' => true, 'status' => 'complete', 'url' => 'science_nutrition_game'],
+            ['title' => 'Ngày và đêm', 'type' => 'Trả lời câu hỏi', 'has_video' => true, 'status' => 'complete', 'url' => 'science_day_night'],
+            ['title' => 'Thùng rác thân thiện', 'type' => 'Trò chơi', 'has_video' => false, 'status' => 'incomplete', 'url' => 'science_trash_game'],
+            ['title' => 'Các bộ phận của cây', 'type' => 'Trò chơi', 'has_video' => true, 'status' => 'complete', 'url' => 'science_plant_game'],
         ]
     ],
     'cong_nghe' => [
@@ -23,11 +23,11 @@ $subjects = [
         'gradient' => 'linear-gradient(135deg, #0d5a7d 0%, #1a7db0 100%)',
         'icon' => '💻',
         'lessons' => [
-            ['title' => 'Cây gia đình', 'type' => 'Trò chơi', 'has_video' => true, 'status' => 'complete'],
-            ['title' => 'Em là họa sĩ máy tính', 'type' => 'Chia sẻ tác phẩm', 'has_video' => true, 'status' => 'complete'],
-            ['title' => 'Em là người đánh máy', 'type' => 'Trò chơi', 'has_video' => false, 'status' => 'incomplete'],
-            ['title' => 'Sơn Tinh (lập trình khối)', 'type' => 'Trò chơi', 'has_video' => false, 'status' => 'incomplete'],
-            ['title' => 'Các bộ phận của máy tính', 'type' => 'Trò chơi', 'has_video' => false, 'status' => 'incomplete'],
+            ['title' => 'Cây gia đình', 'type' => 'Trò chơi', 'has_video' => true, 'status' => 'complete', 'url' => 'technology_family_tree_game'],
+            ['title' => 'Em là họa sĩ máy tính', 'type' => 'Chia sẻ tác phẩm', 'has_video' => true, 'status' => 'complete', 'url' => 'technology_painter_game'],
+            ['title' => 'Em là người đánh máy', 'type' => 'Trò chơi', 'has_video' => false, 'status' => 'incomplete', 'url' => 'technology_typing_thach_sanh'],
+            ['title' => 'Sơn Tinh (lập trình khối)', 'type' => 'Trò chơi', 'has_video' => false, 'status' => 'incomplete', 'url' => 'technology_coding_game'],
+            ['title' => 'Các bộ phận của máy tính', 'type' => 'Trò chơi', 'has_video' => false, 'status' => 'incomplete', 'url' => 'technology_computer_parts'],
         ]
     ],
     'ky_thuat' => [
@@ -36,11 +36,11 @@ $subjects = [
         'gradient' => 'linear-gradient(135deg, #b8620e 0%, #d9792e 100%)',
         'icon' => '⚙️',
         'lessons' => [
-            ['title' => 'Dụng cụ gấp áo', 'type' => 'Trò chơi', 'has_video' => true, 'status' => 'complete'],
-            ['title' => 'Hoa yêu thương nở rộ', 'type' => 'Trò chơi - TLCH', 'has_video' => true, 'status' => 'complete'],
-            ['title' => 'Xây cầu giấy', 'type' => 'Trò chơi', 'has_video' => false, 'status' => 'incomplete'],
-            ['title' => 'Chế tạo xe bong bóng', 'type' => 'Trò chơi', 'has_video' => false, 'status' => 'incomplete'],
-            ['title' => 'Hệ thống lọc nước cơ bản', 'type' => 'Trò chơi', 'has_video' => false, 'status' => 'incomplete'],
+            ['title' => 'Xây tháp', 'type' => 'Trò chơi', 'has_video' => true, 'status' => 'complete', 'url' => 'engineering_tower_game'],
+            ['title' => 'Sắp xếp căn phòng của em', 'type' => 'Trò chơi', 'has_video' => true, 'status' => 'complete', 'url' => 'engineering_room_decor'],
+            ['title' => 'Xây cầu', 'type' => 'Trò chơi', 'has_video' => false, 'status' => 'incomplete', 'url' => 'engineering_bridge_game'],
+            ['title' => 'Hệ thống dẫn nước', 'type' => 'Trò chơi', 'has_video' => false, 'status' => 'incomplete', 'url' => 'engineering_water_pipe'],
+            ['title' => 'Hệ thống lọc nước cơ bản', 'type' => 'Trò chơi', 'has_video' => false, 'status' => 'incomplete', 'url' => 'engineering_water_filter'],
         ]
     ],
     'toan' => [
@@ -49,11 +49,11 @@ $subjects = [
         'gradient' => 'linear-gradient(135deg, #5a1f72 0%, #7a389a 100%)',
         'icon' => '🔢',
         'lessons' => [
-            ['title' => 'Hậu Nghệ bắn mặt trời', 'type' => 'Trò chơi', 'has_video' => false, 'status' => 'incomplete'],
-            ['title' => 'Nhận biết hình học', 'type' => 'Trò chơi', 'has_video' => false, 'status' => 'incomplete'],
-            ['title' => 'Tangram 3D', 'type' => 'Trò chơi', 'has_video' => false, 'status' => 'incomplete'],
-            ['title' => 'Đếm số thông minh', 'type' => 'Trò chơi', 'has_video' => false, 'status' => 'incomplete'],
-            ['title' => 'Đồng hồ và thời gian', 'type' => 'Trò chơi', 'has_video' => false, 'status' => 'incomplete'],
+            ['title' => 'Hậu Nghệ bắn mặt trời', 'type' => 'Trò chơi', 'has_video' => false, 'status' => 'incomplete', 'url' => 'math_angle_game'],
+            ['title' => 'Nhận biết hình học', 'type' => 'Trò chơi', 'has_video' => false, 'status' => 'incomplete', 'url' => 'math_shapes_challenge'],
+            ['title' => 'Tangram 3D', 'type' => 'Trò chơi', 'has_video' => false, 'status' => 'incomplete', 'url' => 'math_tangram_3d'],
+            ['title' => 'Đếm số thông minh', 'type' => 'Trò chơi', 'has_video' => false, 'status' => 'incomplete', 'url' => 'math_number_game'],
+            ['title' => 'Đồng hồ và thời gian', 'type' => 'Trò chơi', 'has_video' => false, 'status' => 'incomplete', 'url' => 'math_time_game'],
         ]
     ]
 ];
@@ -239,7 +239,7 @@ if (!empty($_SESSION['user_id'])) {
                                         <div class="lessons-list">
                                             <?php foreach ($subject['lessons'] as $index => $lesson): ?>
                                                 <div class="lesson-item <?php echo $lesson['status']; ?>" 
-                                                     onclick="openLesson('<?php echo $lesson['title']; ?>')">
+                                                     onclick="openLesson('<?php echo $lesson['url']; ?>')">
                                                     <div class="lesson-preview"></div>
                                                     <div class="lesson-details">
                                                         <h4><?php echo $lesson['title']; ?></h4>
@@ -307,7 +307,7 @@ if (!empty($_SESSION['user_id'])) {
     <script src="<?php echo $base_url; ?>/public/JS/main_lesson.js?v=<?php echo time(); ?>"></script>
     <script>
     function openLesson(lessonTitle) {
-        window.location.href = `lesson.php?title=${encodeURIComponent(lessonTitle)}`;
+        window.location.href = `lessons/${encodeURIComponent(lessonTitle)}`;
     }
     </script>
 </body>

@@ -3,7 +3,7 @@
 <link rel="stylesheet" href="<?= $base_url ?>/public/CSS/home.css">
 <link rel="stylesheet" href="<?= $base_url ?>/public/CSS/coding_game.css?v=<?php echo time(); ?>">
 
-<div id="story-modal" class="modal" style="display: flex;">
+<div id="story-modal" class="modal" style="display: none;">
     <div class="modal-content story-content">
         <img src="<?= $base_url ?>/public/images/coding/sontinh.png" class="story-avatar">
         <h2>Cốt truyện</h2>
