@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const resp = await fetch(`${baseUrl}/views/lessons/update-plant-score`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'commit', game_id: 5 })
+                    body: JSON.stringify({ action: 'commit' })
                 });
                 
                 const ct = resp.headers.get('content-type') || '';

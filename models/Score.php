@@ -17,7 +17,7 @@ class Score {
 	 * Lưu điểm (theo %) và đánh dấu hoàn thành nếu đạt `passing_score`.
 	 * Trả về mảng kết quả: success, completed (bool), completed_count, total_games, certificate_awarded
 	 */
-	public function saveScoreAndMarkCompletion(int $userId, int $gameId, int $scorePercentage) {
+	public function saveScoreAndMarkCompletion(int $userId, int $gameId, int $scorePercentage, int $xpAwarded = 0) {
 		if (empty($userId) || empty($gameId)) {
 			return ['success' => false, 'message' => 'Missing user_id or game_id'];
 		}
@@ -25,13 +25,14 @@ class Score {
 		try {
 			$this->conn->beginTransaction();
 
-			// Insert vào bảng scores (store percentage)
-			// Lấy ngưỡng passing (sử dụng cột `passing_score`) và topic của game
-			$stmt = $this->conn->prepare("SELECT passing_score, topic_id FROM games WHERE id = :gid LIMIT 1");
+			// Insert vào bảng scores (store percentage) and determine xp from games.xp
+			// Lấy ngưỡng passing (sử dụng cột `passing_score`) và topic của game và xp
+			$stmt = $this->conn->prepare("SELECT passing_score, topic_id, xp FROM games WHERE id = :gid LIMIT 1");
 			$stmt->execute([':gid' => $gameId]);
 			$row = $stmt->fetch(PDO::FETCH_ASSOC);
 			$passingScore = $row && $row['passing_score'] !== null ? (int)$row['passing_score'] : null;
 			$gameTopicId = $row && $row['topic_id'] !== null ? (int)$row['topic_id'] : null;
+			$gameXp = $row && isset($row['xp']) ? (int)$row['xp'] : 0;
 
 			// So sánh với passing_score (nếu có). passing_score được xem là phần trăm (0-100).
 			$isCompleted = false;
@@ -45,11 +46,17 @@ class Score {
 				$prevCount = (int)$prevStmt->fetch(PDO::FETCH_ASSOC)['cnt'];
 			}
 
-			// Insert the new score record now
-			$insStmt = $this->conn->prepare("INSERT INTO scores (user_id, game_id, score_percentage) VALUES (:uid, :gid, :score)");
-			$insStmt->execute([':uid' => $userId, ':gid' => $gameId, ':score' => $scorePercentage]);
+			// Use provided xpAwarded (passed from controller/session), cap to game's xp
+			$xp_awarded = max(0, (int)$xpAwarded);
+			if (isset($gameXp) && $xp_awarded > $gameXp) {
+				$xp_awarded = $gameXp;
+			}
+
+			// Insert the new score record now (including xp_awarded)
+			$insStmt = $this->conn->prepare("INSERT INTO scores (user_id, game_id, score_percentage, xp_awarded) VALUES (:uid, :gid, :score, :xp)");
+			$insStmt->execute([':uid' => $userId, ':gid' => $gameId, ':score' => $scorePercentage, ':xp' => $xp_awarded]);
 			// Debug log for troubleshooting
-			error_log(sprintf('Score saved: user=%d game=%d score=%d', $userId, $gameId, $scorePercentage));
+			error_log(sprintf('Score saved: user=%d game=%d score=%d xp=%d', $userId, $gameId, $scorePercentage, $xp_awarded));
 
 			// If this score reaches/passes the threshold and there was no previous
 			// qualifying score, mark this as a newly completed game for the user.
@@ -120,6 +127,7 @@ class Score {
 				} catch (Exception $e) {
 					error_log('Certificate awarding error: ' . $e->getMessage());
 				}
+				// Note: users.xp is not auto-updated here; UI should compute XP from scores (max xp_awarded per game)
 			}
 
 			return [
@@ -139,9 +147,9 @@ class Score {
 	}
 
 	// Static helper
-	public static function saveAndMark(int $userId, int $gameId, int $scorePercentage) {
+	public static function saveAndMark(int $userId, int $gameId, int $scorePercentage, int $xpAwarded = 0) {
 		$s = new self();
-		return $s->saveScoreAndMarkCompletion($userId, $gameId, $scorePercentage);
+		return $s->saveScoreAndMarkCompletion($userId, $gameId, $scorePercentage, $xpAwarded);
 	}
 }
 

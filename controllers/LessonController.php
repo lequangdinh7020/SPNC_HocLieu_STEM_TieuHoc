@@ -64,6 +64,7 @@ class LessonController {
 
         $lessonName = $data['lesson'];
         $score = (int)$data['score'];
+        $xp = isset($data['xp']) ? (int)$data['xp'] : 0;
 
         try {
             require_once __DIR__ . '/../models/Database.php';
@@ -91,7 +92,7 @@ class LessonController {
 
             $userId = (int)$_SESSION['user_id'];
             $scorePct = max(0, min(100, (int)$score));
-            $res = Score::saveAndMark($userId, $gameId, $scorePct);
+            $res = Score::saveAndMark($userId, $gameId, $scorePct, $xp);
 
             echo json_encode($res);
             return;
@@ -113,17 +114,37 @@ class LessonController {
         if (!isset($_SESSION['total_score'])) {
             $_SESSION['total_score'] = 0;
         }
+        if (!isset($_SESSION['total_xp'])) {
+            $_SESSION['total_xp'] = 0;
+        }
+
+        // Handle explicit end request (force finish game and go to result)
+        if (isset($_GET['end'])) {
+            // Clear remaining targets so controller treats game as finished
+            $_SESSION['available_targets'] = [];
+            unset($_SESSION['current_target']);
+            unset($_SESSION['current_attempt']);
+        }
 
         // 2. XỬ LÝ KHI QUA CÂU HỎI MỚI (hoặc chơi lại)
         if (isset($_GET['next'])) {
             if (isset($_GET['points'])) {
                 $_SESSION['total_score'] += (int)$_GET['points'];
             }
+            if (isset($_GET['xp'])) {
+                if (!isset($_SESSION['total_xp'])) $_SESSION['total_xp'] = 0;
+                $_SESSION['total_xp'] += (int)$_GET['xp'];
+            }
             unset($_SESSION['current_target']);
             unset($_SESSION['current_attempt']);
+            // Allow replaying and re-committing: clear commit flag when user explicitly restarts
+            if (isset($_SESSION['color_game_committed'])) {
+                unset($_SESSION['color_game_committed']);
+            }
             if (empty($_SESSION['available_targets']) && !isset($_GET['points'])) {
                 $_SESSION['total_score'] = 0;
                 unset($_SESSION['available_targets']);
+                if (isset($_SESSION['total_xp'])) unset($_SESSION['total_xp']);
             }
         }
 
@@ -206,8 +227,23 @@ class LessonController {
                         if ($percentage > 100) $percentage = 100;
                         if ($percentage < 0) $percentage = 0;
                     }
+
+                    // XP: accumulate from session (per-question xp passed from JS). Cap to game's xp if set.
+                    $rawXp = isset($_SESSION['total_xp']) ? (int)$_SESSION['total_xp'] : 0;
+                    $xpAwarded = $rawXp;
                     if (!empty($gameId)) {
-                        $completionResult = Score::saveAndMark($userId, $gameId, $percentage);
+                        // fetch game's xp cap
+                        $gstmt = $db->prepare("SELECT xp FROM games WHERE id = :gid LIMIT 1");
+                        $gstmt->execute([':gid' => $gameId]);
+                        $gRow = $gstmt->fetch(PDO::FETCH_ASSOC);
+                        if ($gRow && isset($gRow['xp'])) {
+                            $gameXpCap = (int)$gRow['xp'];
+                            if ($xpAwarded > $gameXpCap) $xpAwarded = $gameXpCap;
+                        }
+                    }
+
+                    if (!empty($gameId)) {
+                        $completionResult = Score::saveAndMark($userId, $gameId, $percentage, $xpAwarded);
                     } else {
                         // completionResult already set above when game not found
                     }
@@ -223,7 +259,8 @@ class LessonController {
         // compute final percentage for view (even if user not logged in)
         if (!isset($percentage)) {
             $rawScore = isset($_SESSION['total_score']) ? (int)$_SESSION['total_score'] : 0;
-            $maxPoints = count($targets) * 25;
+            // JS awards up to 10 points per question, keep calculations consistent
+            $maxPoints = count($targets) * 10;
             $percentage = 0;
             if ($maxPoints > 0) {
                 $percentage = (int)round(($rawScore / $maxPoints) * 100);
@@ -391,23 +428,35 @@ class LessonController {
                         if ($passingScore <= 0) $passingScore = 50;
                     }
 
-                    // Only save when user meets or exceeds passing_score
-                    if ($pct >= $passingScore) {
-                        $res = Score::saveAndMark($userId, $gameId, $pct);
-                        // If save succeeded, reset session score to avoid duplicate saves
-                        if (is_array($res) && !empty($res['success'])) {
-                            $_SESSION['nutrition_score'] = 0;
-                            // include newScore in response so client can update UI
-                            $res['newScore'] = 0;
-                        }
+                    // For this game we treat a commit/finish as completion regardless of
+                    // the raw points; award a flat 20 XP on commit (per request).
+                    // Prevent duplicate commits within the same session.
+                    if (!empty($_SESSION['nutrition_committed'])) {
                         header('Content-Type: application/json');
-                        echo json_encode($res);
-                        exit();
-                    } else {
-                        header('Content-Type: application/json');
-                        echo json_encode(['success' => false, 'message' => 'Chưa đủ điểm để hoàn thành', 'newScore' => $pct, 'required' => $passingScore]);
+                        echo json_encode(['success' => true, 'message' => 'Already committed', 'newScore' => 0]);
                         exit();
                     }
+
+                    $xpAwarded = 20; // default XP for completing this non-question game
+
+                    try {
+                        $res = Score::saveAndMark($userId, $gameId, $pct, $xpAwarded);
+                    } catch (Exception $e) {
+                        header('Content-Type: application/json');
+                        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+                        exit();
+                    }
+
+                    // If save succeeded, reset session score and mark committed
+                    if (is_array($res) && !empty($res['success'])) {
+                        $_SESSION['nutrition_score'] = 0;
+                        $_SESSION['nutrition_committed'] = true;
+                        $res['newScore'] = 0;
+                    }
+
+                    header('Content-Type: application/json');
+                    echo json_encode($res);
+                    exit();
                 } catch (Exception $e) {
                     header('Content-Type: application/json');
                     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
@@ -586,33 +635,63 @@ class LessonController {
             exit();
         }
 
-        // Allow caller to provide game_id, but default to 5 for Plant game
-        $gameId = isset($data['game_id']) ? (int)$data['game_id'] : 5;
+        // Allow caller to provide game_id; otherwise resolve by game name
+        $gameId = isset($data['game_id']) ? (int)$data['game_id'] : null;
 
         try {
             $db = (new Database())->getConnection();
-            // Ensure game exists; if not, try to find a games record with topic_id=2
-            $gstmt = $db->prepare('SELECT id FROM games WHERE id = :gid LIMIT 1');
-            $gstmt->execute([':gid' => $gameId]);
-            $grow = $gstmt->fetch(PDO::FETCH_ASSOC);
-            if (!$grow) {
-                $tstmt = $db->prepare('SELECT id FROM games WHERE topic_id = :tid LIMIT 1');
-                $tstmt->execute([':tid' => 2]);
-                $trow = $tstmt->fetch(PDO::FETCH_ASSOC);
-                if ($trow) $gameId = (int)$trow['id'];
+            // If game_id not provided, look up the game by its canonical name 'Lắp ghép bộ phận'
+            if (empty($gameId)) {
+                try {
+                    $gstmt = $db->prepare("SELECT id FROM games WHERE game_name = :name LIMIT 1");
+                    $gstmt->execute([':name' => 'Lắp ghép bộ phận']);
+                    $gRow = $gstmt->fetch(PDO::FETCH_ASSOC);
+                    if ($gRow) {
+                        $gameId = (int)$gRow['id'];
+                    } else {
+                        // looser match
+                        $gstmt2 = $db->prepare("SELECT id FROM games WHERE game_name LIKE :like LIMIT 1");
+                        $gstmt2->execute([':like' => '%Lắp ghép bộ phận%']);
+                        $gRow2 = $gstmt2->fetch(PDO::FETCH_ASSOC);
+                        if ($gRow2) $gameId = (int)$gRow2['id'];
+                    }
+                } catch (Exception $e) {
+                    // ignore, will validate gameId later
+                }
             }
 
             $pct = 100;
 
-            // Prevent duplicate commits in session
-            if (!empty($_SESSION['plant_committed'])) {
-                echo json_encode(['success' => true, 'message' => 'Already committed', 'newScore' => $pct]);
+            // Ensure gameId resolved
+            if (empty($gameId)) {
+                echo json_encode(['success' => false, 'message' => 'Game "Lắp ghép bộ phận" not registered']);
                 exit();
             }
 
-            $res = Score::saveAndMark((int)$userId, $gameId, $pct);
+            // Allow multiple commits; do not block repeated saves from the same session
+
+            // Determine XP to award: prefer client-provided `xp`, otherwise use game's xp value or default 20
+            $xpAwarded = 20;
+            if (isset($data['xp'])) {
+                $xpAwarded = (int)$data['xp'];
+            } else {
+                try {
+                    if (!empty($gameId)) {
+                        $gstmt = $db->prepare('SELECT xp FROM games WHERE id = :gid LIMIT 1');
+                        $gstmt->execute([':gid' => $gameId]);
+                        $grow = $gstmt->fetch(PDO::FETCH_ASSOC);
+                        if ($grow && isset($grow['xp'])) {
+                            $xpAwarded = (int)$grow['xp'];
+                        }
+                    }
+                } catch (Exception $e) {
+                    // fallback to default xpAwarded
+                }
+            }
+
+            $res = Score::saveAndMark((int)$userId, $gameId, $pct, $xpAwarded);
             if (is_array($res) && !empty($res['success'])) {
-                $_SESSION['plant_committed'] = true;
+                // keep plant_score in session or reset as needed; do not mark committed
             }
             echo json_encode($res);
             exit();
@@ -713,8 +792,8 @@ class LessonController {
 
                 header('Content-Type: application/json');
 
-                if (empty($userId) || empty($gameId)) {
-                    echo json_encode(['success' => false, 'message' => 'User not logged in or missing game_id']);
+                if (empty($userId)) {
+                    echo json_encode(['success' => false, 'message' => 'User not logged in']);
                     exit();
                 }
 
@@ -737,14 +816,36 @@ class LessonController {
                     if ($pct > 100) $pct = 100;
                     if ($pct < 0) $pct = 0;
 
+                    // If game_id not provided, find the game by its canonical name 'Thùng rác thân thiện'
+                    if (empty($gameId)) {
+                        try {
+                            $gstmt = $db->prepare("SELECT id FROM games WHERE game_name = :name LIMIT 1");
+                            $gstmt->execute([':name' => 'Thùng rác thân thiện']);
+                            $gRow = $gstmt->fetch(PDO::FETCH_ASSOC);
+                            if ($gRow) {
+                                $gameId = (int)$gRow['id'];
+                            } else {
+                                // looser match
+                                $gstmt2 = $db->prepare("SELECT id FROM games WHERE game_name LIKE :like LIMIT 1");
+                                $gstmt2->execute([':like' => '%Thùng rác thân thiện%']);
+                                $gRow2 = $gstmt2->fetch(PDO::FETCH_ASSOC);
+                                if ($gRow2) $gameId = (int)$gRow2['id'];
+                            }
+                        } catch (Exception $e) {
+                            // ignore here; we'll check gameId existence below
+                        }
+                    }
+
                     // Get passing_score from games table (if set)
                     $passingScore = null;
                     try {
-                        $pstmt = $db->prepare("SELECT passing_score FROM games WHERE id = :gid LIMIT 1");
-                        $pstmt->execute([':gid' => $gameId]);
-                        $prow = $pstmt->fetch(PDO::FETCH_ASSOC);
-                        if ($prow && $prow['passing_score'] !== null) {
-                            $passingScore = (int)$prow['passing_score'];
+                        if (!empty($gameId)) {
+                            $pstmt = $db->prepare("SELECT passing_score FROM games WHERE id = :gid LIMIT 1");
+                            $pstmt->execute([':gid' => $gameId]);
+                            $prow = $pstmt->fetch(PDO::FETCH_ASSOC);
+                            if ($prow && $prow['passing_score'] !== null) {
+                                $passingScore = (int)$prow['passing_score'];
+                            }
                         }
                     } catch (Exception $e) {
                         // ignore and fall back
@@ -755,21 +856,50 @@ class LessonController {
                         $passingScore = 50;
                     }
 
-                    // Only save to DB if percentage meets or exceeds passing score
-                    if ($pct >= $passingScore) {
-                        $res = Score::saveAndMark($userId, $gameId, $pct);
-                        // If save succeeded, reset session score to avoid duplicate saves
-                        if (is_array($res) && !empty($res['success'])) {
-                            $_SESSION['trash_score'] = 0;
-                            // include newScore in response so client can update UI
-                            $res['newScore'] = 0;
+                        // Ensure we have a valid game id resolved (looked up by name if needed)
+                        if (empty($gameId)) {
+                            echo json_encode(['success' => false, 'message' => 'Game "Thùng rác thân thiện" not registered']);
+                            exit();
                         }
-                        echo json_encode($res);
-                        exit();
+
+                    // For this game we allow committing regardless of percentage.
+                    // Allow multiple commits for trash game; do not block repeated saves
+
+                    // Determine XP to award: prefer client-provided `xp`, otherwise use game's xp value or default 20
+                    $xpAwarded = 20;
+                    if (isset($data['xp'])) {
+                        $xpAwarded = (int)$data['xp'];
                     } else {
-                        echo json_encode(['success' => false, 'message' => 'Chưa đủ điểm để hoàn thành', 'newScore' => $pct, 'required' => $passingScore]);
+                        try {
+                            if (!empty($gameId)) {
+                                $gstmt = $db->prepare("SELECT xp FROM games WHERE id = :gid LIMIT 1");
+                                $gstmt->execute([':gid' => $gameId]);
+                                $grow = $gstmt->fetch(PDO::FETCH_ASSOC);
+                                if ($grow && isset($grow['xp'])) {
+                                    $xpAwarded = (int)$grow['xp'];
+                                }
+                            }
+                        } catch (Exception $e) {
+                            // ignore and keep default xpAwarded
+                        }
+                    }
+
+                    try {
+                        $res = Score::saveAndMark($userId, $gameId, $pct, $xpAwarded);
+                    } catch (Exception $e) {
+                        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
                         exit();
                     }
+
+                    // If save succeeded, reset session score and mark committed
+                    if (is_array($res) && !empty($res['success'])) {
+                        // reset session score after successful save; do not mark committed so multiple saves allowed
+                        $_SESSION['trash_score'] = 0;
+                        $res['newScore'] = 0;
+                        $res['xp_awarded'] = $xpAwarded;
+                    }
+                    echo json_encode($res);
+                    exit();
                 } catch (Exception $e) {
                     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
                     exit();

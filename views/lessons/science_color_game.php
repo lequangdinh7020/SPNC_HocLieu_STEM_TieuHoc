@@ -57,8 +57,10 @@
         
         <script src="<?= $base_url ?>/public/JS/color_mixing_game.js"></script>
 
+        <!-- reset and complete handled in color_mixing_game.js -->
+
     <?php else: ?>
-        <p class="question">🎉 Chúc mừng! Bạn đã hoàn thành tất cả các câu hỏi!</p>
+        <p class="question">Trò chơi đã kết thúc!</p>
         <?php
             // Hiển thị trạng thái hoàn thành nếu có kết quả commit
             if (isset($completionResult) && is_array($completionResult)) {
@@ -74,11 +76,19 @@
                 }
             }
         ?>
-
-        <div class="final-actions">
-            <a href="<?= $base_url ?>/science/color-game?next=1" class="play-again">Chơi lại từ đầu</a>
-            <a href="<?= $base_url ?>/views/lessons/science.php" class="back-btn">Quay lại</a>
-        </div>
+        <script>
+            // Ensure the header 'Chơi lại' button works on the final screen
+            (function(){
+                const resetBtn = document.getElementById('resetGameButton');
+                if (resetBtn) {
+                    resetBtn.addEventListener('click', function(e){
+                        e.preventDefault();
+                        window.location.href = `${baseUrl}/science/color-game?next=1`;
+                    });
+                }
+            })();
+        </script>
+        
     <?php endif; ?>
 </div>
 

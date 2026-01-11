@@ -253,9 +253,30 @@ require_once './template/header.php';
                                     $subject_completed = (int)($cc['cnt'] ?? 0);
                                 }
 
-                                // XP estimate (optional): assume 10 XP per game
-                                $subject_earned_xp = $subject_completed * 10;
-                                $subject_xp = $subject_lessons * 10;
+                                // XP: sum best xp_awarded per game for this user in the topic
+                                if (!empty($currentUserId)) {
+                                    $xpStmt = $db->prepare(<<<'SQL'
+                                        SELECT IFNULL(SUM(b.best_xp),0) as total_xp FROM (
+                                          SELECT s.game_id, MAX(s.xp_awarded) as best_xp
+                                          FROM scores s
+                                          WHERE s.user_id = :uid
+                                          GROUP BY s.game_id
+                                        ) b JOIN games g ON b.game_id = g.id
+                                        WHERE g.topic_id = :tid
+                                    SQL
+                                    );
+                                    $xpStmt->execute([':uid' => $currentUserId, ':tid' => $topicId]);
+                                    $sx = $xpStmt->fetch(PDO::FETCH_ASSOC);
+                                    $subject_earned_xp = (int)($sx['total_xp'] ?? 0);
+                                } else {
+                                    $subject_earned_xp = 0;
+                                }
+
+                                // Total possible XP for topic: sum games.xp
+                                $xpTotalStmt = $db->prepare('SELECT IFNULL(SUM(xp),0) as totxp FROM games WHERE topic_id = :tid');
+                                $xpTotalStmt->execute([':tid' => $topicId]);
+                                $xpTotRow = $xpTotalStmt->fetch(PDO::FETCH_ASSOC);
+                                $subject_xp = (int)($xpTotRow['totxp'] ?? 0);
                             } catch (Exception $e) {
                                 error_log('main_lesson: error fetching subject stats: ' . $e->getMessage());
                                 // fallback to static

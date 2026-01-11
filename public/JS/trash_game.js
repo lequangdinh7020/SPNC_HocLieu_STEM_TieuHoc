@@ -161,7 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             const resp = await fetch(`${window.baseUrl || ''}/science/update-trash-score`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ action: 'commit', game_id: 4, total_drops: totalDrops })
+                                body: JSON.stringify({ action: 'commit', total_drops: totalDrops, xp: 20 })
                             });
 
                             if (!resp.ok) {
@@ -265,7 +265,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const resp = await fetch(`${window.baseUrl || ''}/science/update-trash-score`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'commit', game_id: 4, total_drops: totalDrops })
+                    body: JSON.stringify({ action: 'commit', total_drops: totalDrops, xp: 20 })
                 });
 
                 if (!resp.ok) {

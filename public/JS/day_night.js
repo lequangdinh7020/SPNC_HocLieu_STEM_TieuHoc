@@ -1,5 +1,7 @@
 let currentQuestionIndex = 0;
 let score = 0;
+let totalXp = 0;
+const attempts = [];
 const quizContentEl = document.getElementById('quizContent');
 const finalResultEl = document.getElementById('finalResult');
 const progressFillEl = document.getElementById('progressFill');
@@ -25,6 +27,9 @@ function loadQuestion(index) {
 
     const question = quizData[index];
     
+    // initialize attempts counter for this question
+    attempts[index] = attempts[index] || 0;
+
     let optionsHTML = '';
     for (const [key, value] of Object.entries(question.options)) {
         optionsHTML += `<button class="option-btn" onclick="checkAnswer(this, '${key}')">${value}</button>`;
@@ -52,11 +57,16 @@ function checkAnswer(selectedBtn, selectedOption) {
     const correctOption = currentQuizData.correct;
     const allOptions = document.querySelectorAll('.option-btn');
 
-    allOptions.forEach(btn => btn.disabled = true);
+    // increment attempt count for this question
+    attempts[currentQuestionIndex] = (attempts[currentQuestionIndex] || 0) + 1;
 
     if (selectedOption === correctOption) {
         selectedBtn.classList.add('correct');
         score += 10;
+        // award XP only if this is the first attempt for the question
+        if (attempts[currentQuestionIndex] === 1) {
+            totalXp += 4; // 4 XP for first-try correct (5 questions total -> 20 XP)
+        }
         showFeedback('correct', 'Chính xác!');
     } else {
         selectedBtn.classList.add('wrong');
@@ -134,6 +144,8 @@ function showFinalResult() {
                 score: percentage,
                 rawScore: score,
                 totalScore: totalQuestions * 10
+                ,
+                xp: totalXp
             })
         }).then(r => r.json()).then(data => {
             if (data && data.success) {

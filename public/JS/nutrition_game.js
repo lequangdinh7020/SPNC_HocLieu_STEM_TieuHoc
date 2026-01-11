@@ -324,9 +324,20 @@ document.addEventListener("DOMContentLoaded", () => {
                         const droppedItems = document.querySelectorAll('.food-item.dropped');
                         if (droppedItems.length === 27) {
                             // Phát âm thanh pháo hoa chúc mừng
-                            setTimeout(() => {
+                            setTimeout(async () => {
                                 playCelebrationSound();
                                 showFinishModal(parseInt(scoreDisplay.textContent || '0', 10));
+
+                                // Auto-commit score to server when all items are placed.
+                                try {
+                                    await fetch(`${window.baseUrl}/science/update-score`, {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ action: 'commit', total_drops: 27 })
+                                    });
+                                } catch (err) {
+                                    console.error('Auto commit error:', err);
+                                }
                             }, 500);
                         }
                     

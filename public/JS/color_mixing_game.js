@@ -31,18 +31,27 @@ paletteColors.forEach(c => {
 
 if (resetGameButton) {
     resetGameButton.addEventListener("click", () => {
-        location.reload();
+        window.location.href = `${baseUrl}/science/color-game?next=1`;
     });
 }
 if (completeButton) {
     completeButton.addEventListener("click", () => {
-        console.log('Complete button clicked');
-        const currentScore = parseInt(totalScoreSpan.innerText) || 0;
-        console.log('Current score:', currentScore);
-        showFinishModal(currentScore);
-        
-        completeButton.disabled = true;
-        completeButton.innerHTML = 'Đang lưu...';
+        // If the user already answered the current question and the next button is visible,
+        // include pending points/xp into the request before ending.
+        if (nextButton && nextButton.style.display !== 'none' && nextButton.href) {
+            try {
+                const url = new URL(nextButton.href);
+                url.searchParams.set('end', '1');
+                window.location.href = url.toString();
+                return;
+            } catch (e) {
+                window.location.href = nextButton.href + '&end=1';
+                return;
+            }
+        }
+
+        // Otherwise end immediately
+        window.location.href = `${baseUrl}/science/color-game?end=1`;
     });
 }
 canvas.addEventListener("mousedown", startDrawing);
@@ -175,11 +184,14 @@ function checkResult() {
  */
 function handleCorrectAnswer() {
     let points = 0;
+    let xpEarned = 0;
     if (currentAttempt === 1) {
         points = 10;
+        xpEarned = 5; // award 5 XP for correct on first try
     } else if (currentAttempt === 2) {
         points = 5;
-    } // Lần 3 (currentAttempt === 3) hoặc hơn, points = 0
+        xpEarned = 0; // no xp if not first try
+    } // Lần 3 (currentAttempt === 3) hoặc hơn, points = 0 and no xp
 
     resultBox.innerHTML = `Chính xác! Bạn nhận được ${points} điểm!`;
     resultBox.style.color = "green";
@@ -188,7 +200,7 @@ function handleCorrectAnswer() {
     totalScoreSpan.innerText = parseInt(totalScoreSpan.innerText) + points;
 
     // Đường dẫn route đúng (router defines /science/color-game)
-    nextButton.href = `${baseUrl}/science/color-game?next=1&points=${points}`;
+    nextButton.href = `${baseUrl}/science/color-game?next=1&points=${points}&xp=${xpEarned}`;
     
     // Hiển thị nút next
     nextButton.style.display = "inline-block";

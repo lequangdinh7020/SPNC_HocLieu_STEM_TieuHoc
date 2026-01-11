@@ -87,6 +87,57 @@ class Database {
                 error_log(' ensureUserNotes phone error: ' . $e3->getMessage());
             }
         }
+
+        // Ensure users.xp column exists
+        try {
+            $cXp = $this->conn->query("SHOW COLUMNS FROM users LIKE 'xp'")->fetch();
+            if (!$cXp) {
+                $this->conn->exec("ALTER TABLE users ADD COLUMN `xp` INT DEFAULT 0");
+            }
+        } catch (Exception $e) {
+            try {
+                $cXp2 = $this->conn->query("SHOW COLUMNS FROM users LIKE 'xp'")->fetch();
+                if (!$cXp2) {
+                    $this->conn->exec("ALTER TABLE users ADD COLUMN `xp` INT DEFAULT 0");
+                }
+            } catch (Exception $e4) {
+                error_log(' ensureUserNotes xp user error: ' . $e4->getMessage());
+            }
+        }
+
+        // Ensure games.xp exists
+        try {
+            $cGxp = $this->conn->query("SHOW COLUMNS FROM games LIKE 'xp'")->fetch();
+            if (!$cGxp) {
+                $this->conn->exec("ALTER TABLE games ADD COLUMN `xp` INT DEFAULT 20");
+            }
+        } catch (Exception $e) {
+            try {
+                $cGxp2 = $this->conn->query("SHOW COLUMNS FROM games LIKE 'xp'")->fetch();
+                if (!$cGxp2) {
+                    $this->conn->exec("ALTER TABLE games ADD COLUMN `xp` INT DEFAULT 20");
+                }
+            } catch (Exception $e5) {
+                error_log(' ensureUserNotes xp games error: ' . $e5->getMessage());
+            }
+        }
+
+        // Ensure scores.xp_awarded exists
+        try {
+            $cSxp = $this->conn->query("SHOW COLUMNS FROM scores LIKE 'xp_awarded'")->fetch();
+            if (!$cSxp) {
+                $this->conn->exec("ALTER TABLE scores ADD COLUMN `xp_awarded` INT DEFAULT 0");
+            }
+        } catch (Exception $e) {
+            try {
+                $cSxp2 = $this->conn->query("SHOW COLUMNS FROM scores LIKE 'xp_awarded'")->fetch();
+                if (!$cSxp2) {
+                    $this->conn->exec("ALTER TABLE scores ADD COLUMN `xp_awarded` INT DEFAULT 0");
+                }
+            } catch (Exception $e6) {
+                error_log(' ensureUserNotes xp scores error: ' . $e6->getMessage());
+            }
+        }
     }
 
     // Tạo database mới
@@ -134,6 +185,7 @@ class Database {
                 last_name VARCHAR(100),
                 class VARCHAR(50),
                 phone VARCHAR(25) DEFAULT NULL,
+                xp INT DEFAULT 0,
                 notes TEXT NULL DEFAULT '',
                 role ENUM('admin', 'user') NOT NULL DEFAULT 'user',
                 avatar VARCHAR(255),
@@ -162,6 +214,7 @@ class Database {
                 game_name VARCHAR(255) NOT NULL,
                 description TEXT,
                 passing_score INT DEFAULT NULL,
+                xp INT DEFAULT 20,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (topic_id) REFERENCES stem_fields(id) ON DELETE SET NULL
             )",
@@ -184,6 +237,7 @@ class Database {
                 user_id INT,
                 game_id INT,
                 score_percentage INT NOT NULL,
+                xp_awarded INT DEFAULT 0,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
                 FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
