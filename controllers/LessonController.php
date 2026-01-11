@@ -1054,7 +1054,6 @@ class LessonController {
         $currentLevel = $levels[$currentLevelId] ?? $levels[1];
         $totalLevels = count($levels);
 
-        // Tải view mới
         require_once __DIR__ . '/../views/lessons/technology_coding_game.php';
     }
 
