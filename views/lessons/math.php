@@ -210,17 +210,6 @@ $_SESSION['math_visited'] = true;
                 Chế tạo máy bắn đá mini học về lực và góc bắn
             </p>
             
-            <div class="info-meta">
-                <div class="info-time">
-                    <i class="far fa-clock"></i>
-                    <span id="infoTime">22 phút</span>
-                </div>
-                <div class="info-xp">
-                    <i class="fas fa-bolt"></i>
-                    <span id="infoXp">35 XP</span>
-                </div>
-            </div>
-            
             <div class="activities-section">
                 <h4 class="activities-title">Hoạt động</h4>
                 <div class="activities-grid" id="activitiesGrid">
