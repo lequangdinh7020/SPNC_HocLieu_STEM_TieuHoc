@@ -17,16 +17,16 @@
             <div class="footer-section">
                 <h4>Kết nối</h4>
                 <div class="social-links">
-                    <a href="#" class="social-link" title="Facebook">
+                    <a href="https://www.facebook.com/" class="social-link" title="Facebook">
                         <i class="fab fa-facebook-f"></i>
                     </a>
-                    <a href="#" class="social-link" title="Instagram">
+                    <a href="https://www.instagram.com/" class="social-link" title="Instagram">
                         <i class="fab fa-instagram"></i>
                     </a>
-                    <a href="#" class="social-link" title="YouTube">
+                    <a href="https://www.youtube.com/" class="social-link" title="YouTube">
                         <i class="fab fa-youtube"></i>
                     </a>
-                    <a href="#" class="social-link" title="LinkedIn">
+                    <a href="https://www.linkedin.com/" class="social-link" title="LinkedIn">
                         <i class="fab fa-linkedin-in"></i>
                     </a>
                 </div>
