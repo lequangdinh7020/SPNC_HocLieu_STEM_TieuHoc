@@ -134,14 +134,6 @@ $technology_data = [
             'learning_time' => '22 phút',
             'activities' => [
                 [
-                    'type' => 'video',
-                    'title' => 'GIỚI THIỆU BỘ PHẬN MÁY TÍNH',
-                    'icon' => '📺',
-                    'description' => 'Xem video về các bộ phận máy tính',
-                    'status' => 'upcoming',
-                    'xp' => 25
-                ],
-                [
                     'type' => 'game',
                     'title' => 'GHÉP BỘ PHẬN MÁY TÍNH',
                     'icon' => '🧩',

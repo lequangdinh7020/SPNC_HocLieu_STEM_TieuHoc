@@ -84,14 +84,6 @@ const planets = {
         xp: "60 XP",
         activities: [
             { 
-                type: "video", 
-                name: "Giới thiệu bộ phận máy tính", 
-                icon: "📺", 
-                xp: "25 XP",
-                link: baseUrl + '/views/lessons/technology_computer_parts_video', 
-                status: "current" 
-            },
-            { 
                 type: "game", 
                 name: "Ghép bộ phận máy tính", 
                 icon: "🧩", 
