@@ -12,7 +12,6 @@
                 <h4>Khám phá</h4>
                 <a href="#">Tất cả bài học</a>
                 <a href="#">Thử thách STEM</a>
-                <a href="#">Dự án sáng tạo</a>
                 <a href="#">Tài nguyên giáo viên</a>
             </div>
             <div class="footer-section">
@@ -34,7 +33,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2024 STEM Universe. Được phát triển với ❤️ dành cho giáo dục STEM Việt Nam.</p>
+            <p>&copy; 2026 STEM Universe. Được phát triển với ❤️ dành cho giáo dục STEM Việt Nam.</p>
         </div>
     </div>
 </footer>
