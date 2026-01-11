@@ -476,31 +476,6 @@ body {
     font-size: 0.95rem;
 }
 
-.info-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-    padding: 15px;
-    background: var(--bg-card);
-    border-radius: 15px;
-}
-
-.info-time, .info-xp {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 600;
-}
-
-.info-time {
-    color: var(--text-accent);
-}
-
-.info-xp {
-    color: var(--accent);
-}
-
 .activities-section {
     margin-bottom: 25px;
 }

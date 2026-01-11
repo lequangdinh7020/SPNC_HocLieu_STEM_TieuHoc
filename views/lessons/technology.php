@@ -342,17 +342,6 @@ $_SESSION['technology_visited'] = true;
                 Tìm hiểu về các mối quan hệ gia đình qua cây phả hệ
             </p>
             
-            <div class="info-meta">
-                <div class="info-time">
-                    <i class="far fa-clock"></i>
-                    <span id="infoTime">20 phút</span>
-                </div>
-                <div class="info-xp">
-                    <i class="fas fa-bolt"></i>
-                    <span id="infoXp">25 XP</span>
-                </div>
-            </div>
-            
             <div class="activities-section">
                 <h4 class="activities-title">Hoạt động</h4>
                 <div class="activities-grid" id="activitiesGrid">
