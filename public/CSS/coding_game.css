@@ -238,10 +238,13 @@
     font-weight: bold;
     cursor: pointer;
     box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+    background-color: #27ae60;
+    
 }
 .game-btn.run { background: #27ae60; }
 .game-btn.run:hover { background: #2ecc71; }
 .game-btn.reset { background: #c0392b; width: 100%; margin-top: 10px;}
+.game-btn.next { width: 100%; margin-top: 10px;}
 .game-btn.reset:hover { background: #e74c3c; }
 
 /* Modal */
