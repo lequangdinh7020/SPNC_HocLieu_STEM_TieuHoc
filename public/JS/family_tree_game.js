@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const nextLevelBtn = document.getElementById('next-level-btn');
     const restartGameBtn = document.getElementById('restart-game-btn');
     const backToTechnologyBtn = document.getElementById('back-to-technology-btn');
+    const backToMenuBtn = document.getElementById('back-to-menu-btn');
     const treeCanvas = document.getElementById('tree-canvas');
 
     // Game Variables
@@ -47,6 +48,11 @@ document.addEventListener("DOMContentLoaded", () => {
         if(restartGameBtn) {
             restartGameBtn.onclick = () => {
                 window.location.reload(); 
+            };
+        }
+        if(backToMenuBtn) {
+            backToMenuBtn.onclick = () => {
+                window.location.href = `${BASE_URL}/views/lessons/technology.php`;
             };
         }
         if(gameOverModal) gameOverModal.style.display = 'none';
@@ -360,6 +366,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 window.location.reload(); 
             };
             
+            // Đảm bảo nút Quay về Menu luôn hiển thị và có sự kiện
+            if(backToMenuBtn) {
+                backToMenuBtn.style.display = 'inline-block';
+                backToMenuBtn.onclick = () => {
+                    window.location.href = `${BASE_URL}/views/lessons/technology.php`;
+                };
+            }
+            
         } else { 
             modalTitle.textContent = "Thất bại...";
             modalTitle.style.color = "#e74c3c"; 
@@ -372,6 +386,11 @@ document.addEventListener("DOMContentLoaded", () => {
             restartGameBtn.onclick = () => { 
                 window.location.reload();
             };
+            
+            // Ẩn nút Quay về Menu khi thua
+            if(backToMenuBtn) {
+                backToMenuBtn.style.display = 'none';
+            }
         }
 
         gameOverModal.style.display = 'flex';

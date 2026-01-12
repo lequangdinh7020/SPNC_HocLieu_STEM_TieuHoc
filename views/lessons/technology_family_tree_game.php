@@ -117,6 +117,7 @@
             <button id="next-level-btn" class="game-btn" style="display: none;">Cấp độ tiếp theo</button>
             
             <button id="restart-game-btn" class="game-btn">Chơi lại</button>
+            <button id="back-to-menu-btn" class="game-btn" style="margin-top:8px;">Quay về Menu</button>
             <button id="back-to-technology-btn" class="game-btn" style="display:none; margin-top:8px;">Quay lại</button>
         </div>
     </div>
@@ -126,6 +127,6 @@
     const currentLevelData = <?= json_encode($currentLevel) ?>;
     const totalGameLevels = <?= $totalLevels ?>;
 </script>
-<script src="<?= $base_url ?>/public/JS/family_tree_game.js"></script>
+<script src="<?= $base_url ?>/public/JS/family_tree_game.js?v=<?php echo time(); ?>"></script>
 
 <?php require_once __DIR__ . '/../template/footer.php'; ?>
