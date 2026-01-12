@@ -386,6 +386,28 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
             nextBtn.style.display = 'none';
             resultMsg.innerHTML += "<p style='margin-top:10px; color:#e67e22'>Chúc mừng bạn đã hoàn thành tất cả thử thách!</p>";
+
+            // Commit final completion to server and award XP
+            try {
+                fetch(`${baseUrl}/views/lessons/update-coding-score`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'commit' })
+                })
+                .then(r => r.json())
+                .then(j => {
+                    console.log('coding game commit response', j);
+                    if (j && j.success) {
+                        const info = document.createElement('div');
+                        info.className = 'server-info';
+                        info.textContent = 'Điểm đã được lưu: 100% - XP +' + (j.xp_awarded || 20);
+                        resultMsg.appendChild(info);
+                    }
+                })
+                .catch(err => console.error('Error committing coding score', err));
+            } catch (e) {
+                console.error('Commit error', e);
+            }
         }
         resultModal.style.display = 'flex';
     }

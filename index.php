@@ -100,6 +100,11 @@ switch ($route) {
     case '/views/lessons/technology_coding_game':
         $lessonController->showCodingGame();
         break;
+    case '/views/lessons/update-coding-score':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $lessonController->updateCodingScore();
+        }
+        break;
 
     case '/science/commit-quiz':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {

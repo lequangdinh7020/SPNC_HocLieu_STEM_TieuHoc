@@ -293,7 +293,6 @@ class Database {
             )"
         ];
 
-        // Thực thi từng câu lệnh SQL
         foreach ($sql as $statement) {
             try {
                 $this->conn->exec($statement);
@@ -302,14 +301,12 @@ class Database {
             }
         }
 
-        // Chèn dữ liệu mẫu
         $this->insertSampleData();
     }
 
     // Chèn dữ liệu mẫu
     private function insertSampleData() {
         try {
-            // Kiểm tra xem đã có dữ liệu chưa
             $check = $this->conn->query("SELECT COUNT(*) as count FROM users")->fetch(PDO::FETCH_ASSOC);
             
             if ($check['count'] == 0) {
