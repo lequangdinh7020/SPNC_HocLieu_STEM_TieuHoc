@@ -2,8 +2,7 @@
 
 **Đề tài:** Tìm hiểu và xây dựng học liệu điện tử môn STEM cho học sinh tiểu học  
 **Môn:** Sản phẩm nghiên cứu  
-**Nhóm thực hiện:**  
-- Nguyễn Thảo Anh	        48.01.104.008
+**Nhóm thực hiện:** 
 - Lê Quang Định	            48.01.104.026
 - Phạm Thị Thu Giang	    48.01.104.038
 - Nguyễn Trần Nam Phương	48.01.104.107
