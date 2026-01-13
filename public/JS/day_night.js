@@ -43,7 +43,7 @@ function loadQuestion(index) {
             </div>
             <div class="explanation-box" id="explanation-${index}">
                 <div class="explanation-title">Giải thích:</div>
-                <span id="explanation-text-${index}"></span>
+                <span id="explanation-text-${index}" class="explanation-text"></span>
             </div>
             <button class="next-btn" id="nextBtn-${index}" onclick="nextQuestion()">
                 <span class="btn-icon">→</span> Câu tiếp theo
