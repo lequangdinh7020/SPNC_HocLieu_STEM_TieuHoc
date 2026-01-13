@@ -702,11 +702,102 @@ class LessonController {
     }
 
     public function showMathShapesGame() {
-         // khởi tạo session score nếu cần
-         if (!isset($_SESSION['angle_score'])) {
-             $_SESSION['angle_score'] = 0;
-         }
-         require_once __DIR__ . '/../views/lessons/math_shapes_challenge.php';
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+        // initialize a session score for shapes game
+        if (!isset($_SESSION['shapes_score'])) {
+            $_SESSION['shapes_score'] = 0;
+        }
+        // track a commit flag to avoid double-insert if desired by views
+        if (!isset($_SESSION['shapes_committed'])) {
+            $_SESSION['shapes_committed'] = false;
+        }
+
+        require_once __DIR__ . '/../views/lessons/math_shapes_challenge.php';
+    }
+
+    /**
+     * API: Commit score for Math Shapes challenge when all levels completed
+     * Game name in DB: 'Trò chơi Hình dạng'
+     */
+    public function updateShapesScore() {
+        if (session_status() == PHP_SESSION_NONE) session_start();
+        header('Content-Type: application/json');
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!$data || !isset($data['action']) || $data['action'] !== 'commit') {
+            echo json_encode(['success' => false, 'message' => 'Unsupported action']);
+            return;
+        }
+
+        $userId = $_SESSION['user_id'] ?? null;
+        if (empty($userId)) {
+            echo json_encode(['success' => false, 'message' => 'User not logged in']);
+            return;
+        }
+
+        $scorePct = isset($data['score_pct']) ? (int)$data['score_pct'] : null;
+        $gameId = isset($data['game_id']) ? (int)$data['game_id'] : null;
+
+        try {
+            require_once __DIR__ . '/../models/Database.php';
+            require_once __DIR__ . '/../models/Score.php';
+
+            $db = (new Database())->getConnection();
+
+            if (empty($gameId)) {
+                // Prefer exact game name 'Trò chơi Hình dạng'
+                $pstmt = $db->prepare('SELECT id FROM games WHERE game_name = :name LIMIT 1');
+                $pstmt->execute([':name' => 'Trò chơi Hình dạng']);
+                $pr = $pstmt->fetch(PDO::FETCH_ASSOC);
+                if ($pr) {
+                    $gameId = (int)$pr['id'];
+                } else {
+                    // Looser match by keyword 'Hình dạng'
+                    $lstmt = $db->prepare('SELECT id FROM games WHERE game_name LIKE :like LIMIT 1');
+                    $lstmt->execute([':like' => '%Hình dạng%']);
+                    $lr = $lstmt->fetch(PDO::FETCH_ASSOC);
+                    if ($lr) $gameId = (int)$lr['id'];
+                }
+            }
+
+            if (empty($gameId)) {
+                echo json_encode(['success' => false, 'message' => 'Game "Trò chơi Hình dạng" not registered']);
+                return;
+            }
+
+            // Derive percentage: prefer client-sent percentage, else try to derive from session
+            $pct = 0;
+            if ($scorePct !== null) {
+                $pct = max(0, min(100, $scorePct));
+            } else {
+                $raw = isset($_SESSION['shapes_score']) ? (int)$_SESSION['shapes_score'] : 0;
+                // JS awards 100 points per challenge; determine total challenges from posted param if available
+                $totalChallenges = isset($data['total_challenges']) ? (int)$data['total_challenges'] : 6;
+                $maxPoints = max(1, $totalChallenges) * 100;
+                $pct = ($maxPoints > 0) ? (int) round((($raw / $maxPoints) * 100)) : 0;
+                if ($pct > 100) $pct = 100;
+                if ($pct < 0) $pct = 0;
+            }
+
+            $xpAwarded = 20;
+            if (isset($data['xp'])) $xpAwarded = (int)$data['xp'];
+
+            $res = Score::saveAndMark((int)$userId, $gameId, $pct, $xpAwarded);
+            if (is_array($res)) {
+                $res['xp_awarded'] = $xpAwarded;
+            }
+
+            // Mark committed in session to avoid duplicate if desired by UI
+            $_SESSION['shapes_committed'] = true;
+
+            echo json_encode($res);
+            return;
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            return;
+        }
     }
 
     public function showMathNumberGame() {
@@ -1826,6 +1917,152 @@ class LessonController {
     }
 
     /**
+     * API: Commit score for Math Angle game when final level completed
+     * Saves 100% for the user for the game named 'Trò chơi Góc và đo lường'
+     */
+    public function updateAngleGameScore() {
+        if (session_status() == PHP_SESSION_NONE) session_start();
+        header('Content-Type: application/json');
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!$data || !isset($data['action']) || $data['action'] !== 'commit') {
+            echo json_encode(['success' => false, 'message' => 'Unsupported action']);
+            return;
+        }
+
+        $userId = $_SESSION['user_id'] ?? null;
+        if (empty($userId)) {
+            echo json_encode(['success' => false, 'message' => 'User not logged in']);
+            return;
+        }
+
+        $gameId = isset($data['game_id']) ? (int)$data['game_id'] : null;
+
+        try {
+            require_once __DIR__ . '/../models/Database.php';
+            require_once __DIR__ . '/../models/Score.php';
+
+            $db = (new Database())->getConnection();
+
+            if (empty($gameId)) {
+                // Prefer exact game name 'Trò chơi Góc và đo lường'
+                $pstmt = $db->prepare('SELECT id FROM games WHERE game_name = :name LIMIT 1');
+                $pstmt->execute([':name' => 'Trò chơi Góc và đo lường']);
+                $pr = $pstmt->fetch(PDO::FETCH_ASSOC);
+                if ($pr) {
+                    $gameId = (int)$pr['id'];
+                } else {
+                    $lstmt = $db->prepare('SELECT id FROM games WHERE game_name LIKE :like LIMIT 1');
+                    $lstmt->execute([':like' => '%Góc%']);
+                    $lr = $lstmt->fetch(PDO::FETCH_ASSOC);
+                    if ($lr) $gameId = (int)$lr['id'];
+                }
+            }
+
+            if (empty($gameId)) {
+                echo json_encode(['success' => false, 'message' => 'Game "Trò chơi Góc và đo lường" not registered']);
+                return;
+            }
+
+            // Allow repeated plays and saves; do not block by session flag.
+            $pct = 100;
+            $xpAwarded = 20;
+            $res = Score::saveAndMark((int)$userId, $gameId, $pct, $xpAwarded);
+            if (is_array($res)) {
+                $res['xp_awarded'] = $xpAwarded;
+            }
+            echo json_encode($res);
+            return;
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            return;
+        }
+    }
+
+    /**
+     * API: Commit score for Math Number game when user completes activity
+     * Game name: 'Trò chơi Số học'
+     */
+    public function updateNumberScore() {
+        if (session_status() == PHP_SESSION_NONE) session_start();
+        header('Content-Type: application/json');
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!$data || !isset($data['action']) || $data['action'] !== 'commit') {
+            echo json_encode(['success' => false, 'message' => 'Unsupported action']);
+            return;
+        }
+
+        $userId = $_SESSION['user_id'] ?? null;
+        if (empty($userId)) {
+            echo json_encode(['success' => false, 'message' => 'User not logged in']);
+            return;
+        }
+
+        $scorePct = isset($data['score_pct']) ? (int)$data['score_pct'] : null;
+        $gameId = isset($data['game_id']) ? (int)$data['game_id'] : null;
+
+        try {
+            require_once __DIR__ . '/../models/Database.php';
+            require_once __DIR__ . '/../models/Score.php';
+
+            $db = (new Database())->getConnection();
+
+            if (empty($gameId)) {
+                // Prefer exact game name 'Trò chơi Số học'
+                $pstmt = $db->prepare('SELECT id FROM games WHERE game_name = :name LIMIT 1');
+                $pstmt->execute([':name' => 'Trò chơi Số học']);
+                $pr = $pstmt->fetch(PDO::FETCH_ASSOC);
+                if ($pr) {
+                    $gameId = (int)$pr['id'];
+                } else {
+                    // Looser match by keyword 'Số'
+                    $lstmt = $db->prepare('SELECT id FROM games WHERE game_name LIKE :like LIMIT 1');
+                    $lstmt->execute([':like' => '%Số%']);
+                    $lr = $lstmt->fetch(PDO::FETCH_ASSOC);
+                    if ($lr) $gameId = (int)$lr['id'];
+                }
+            }
+
+            if (empty($gameId)) {
+                echo json_encode(['success' => false, 'message' => 'Game "Trò chơi Số học" not registered']);
+                return;
+            }
+
+            // Allow repeated plays and saves; do not block by session flag.
+            $pct = 0;
+            if ($scorePct !== null) {
+                $pct = max(0, min(100, $scorePct));
+            } else {
+                // try to derive from session if available
+                $raw = isset($_SESSION['number_score']) ? (int)$_SESSION['number_score'] : 0;
+                // assume max 200 points by design (20 inputs * 10)
+                $maxPoints = 20 * 10;
+                if ($maxPoints > 0) {
+                    $pct = (int)round(($raw / $maxPoints) * 100);
+                    if ($pct > 100) $pct = 100;
+                    if ($pct < 0) $pct = 0;
+                }
+            }
+
+            $xpAwarded = 20;
+            // Allow client to override xp if provided
+            if (isset($data['xp'])) $xpAwarded = (int)$data['xp'];
+
+            $res = Score::saveAndMark((int)$userId, $gameId, $pct, $xpAwarded);
+            if (is_array($res)) {
+                $res['xp_awarded'] = $xpAwarded;
+            }
+
+            echo json_encode($res);
+            return;
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            return;
+        }
+    }
+
+    /**
      * TRÒ CHƠI TANGRAM
      */
     public function showTangramGame() {
@@ -1987,6 +2224,132 @@ class LessonController {
     }
 
     /**
+     * API: Commit score for Tangram game when user completes activity
+     * Game name in DB: 'Tangram'
+     */
+    public function updateTangramScore() {
+        if (session_status() == PHP_SESSION_NONE) session_start();
+        header('Content-Type: application/json');
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!$data || !isset($data['action']) || $data['action'] !== 'commit') {
+            echo json_encode(['success' => false, 'message' => 'Unsupported action']);
+            return;
+        }
+
+        $userId = $_SESSION['user_id'] ?? null;
+        if (empty($userId)) {
+            echo json_encode(['success' => false, 'message' => 'User not logged in']);
+            return;
+        }
+
+        $scorePct = isset($data['score_pct']) ? (int)$data['score_pct'] : 0;
+        $gameId = isset($data['game_id']) ? (int)$data['game_id'] : null;
+
+        try {
+            require_once __DIR__ . '/../models/Database.php';
+            require_once __DIR__ . '/../models/Score.php';
+
+            $db = (new Database())->getConnection();
+
+            if (empty($gameId)) {
+                $pstmt = $db->prepare('SELECT id FROM games WHERE game_name = :name LIMIT 1');
+                $pstmt->execute([':name' => 'Tangram']);
+                $pr = $pstmt->fetch(PDO::FETCH_ASSOC);
+                if ($pr) {
+                    $gameId = (int)$pr['id'];
+                } else {
+                    $lstmt = $db->prepare('SELECT id FROM games WHERE game_name LIKE :like LIMIT 1');
+                    $lstmt->execute([':like' => '%Tangram%']);
+                    $lr = $lstmt->fetch(PDO::FETCH_ASSOC);
+                    if ($lr) $gameId = (int)$lr['id'];
+                }
+            }
+
+            if (empty($gameId)) {
+                echo json_encode(['success' => false, 'message' => 'Game "Tangram" not registered']);
+                return;
+            }
+
+            $pct = max(0, min(100, $scorePct));
+            $xpAwarded = 20;
+
+            $res = Score::saveAndMark((int)$userId, $gameId, $pct, $xpAwarded);
+            if (is_array($res)) {
+                $res['xp_awarded'] = $xpAwarded;
+            }
+            echo json_encode($res);
+            return;
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            return;
+        }
+    }
+
+    /**
+     * API: Commit score for Tower game (Trò chơi Tháp)
+     */
+    public function updateTowerScore() {
+        if (session_status() == PHP_SESSION_NONE) session_start();
+        header('Content-Type: application/json');
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!$data || !isset($data['action']) || $data['action'] !== 'commit') {
+            echo json_encode(['success' => false, 'message' => 'Unsupported action']);
+            return;
+        }
+
+        $userId = $_SESSION['user_id'] ?? null;
+        if (empty($userId)) {
+            echo json_encode(['success' => false, 'message' => 'User not logged in']);
+            return;
+        }
+
+        $scorePct = isset($data['score_pct']) ? (int)$data['score_pct'] : 0;
+        $gameId = isset($data['game_id']) ? (int)$data['game_id'] : null;
+
+        try {
+            require_once __DIR__ . '/../models/Database.php';
+            require_once __DIR__ . '/../models/Score.php';
+
+            $db = (new Database())->getConnection();
+
+            if (empty($gameId)) {
+                $pstmt = $db->prepare('SELECT id FROM games WHERE game_name = :name LIMIT 1');
+                $pstmt->execute([':name' => 'Trò chơi Tháp']);
+                $pr = $pstmt->fetch(PDO::FETCH_ASSOC);
+                if ($pr) {
+                    $gameId = (int)$pr['id'];
+                } else {
+                    $lstmt = $db->prepare('SELECT id FROM games WHERE game_name LIKE :like LIMIT 1');
+                    $lstmt->execute([':like' => '%Tháp%']);
+                    $lr = $lstmt->fetch(PDO::FETCH_ASSOC);
+                    if ($lr) $gameId = (int)$lr['id'];
+                }
+            }
+
+            if (empty($gameId)) {
+                echo json_encode(['success' => false, 'message' => 'Game "Trò chơi Tháp" not registered']);
+                return;
+            }
+
+            $pct = max(0, min(100, $scorePct));
+            // default xp for tower
+            $xpAwarded = 20;
+
+            $res = Score::saveAndMark((int)$userId, $gameId, $pct, $xpAwarded);
+            if (is_array($res)) {
+                $res['xp_awarded'] = $xpAwarded;
+            }
+            echo json_encode($res);
+            return;
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            return;
+        }
+    }
+
+    /**
      * TRÒ CHƠI LỌC NƯỚC
      */
     public function showWaterFilterGame() {
@@ -2066,6 +2429,69 @@ class LessonController {
     }
 
     /**
+     * API: Commit score for Time game when user completes activity
+     * Game name: 'Trò chơi Thời gian'
+     */
+    public function updateTimeScore() {
+        if (session_status() == PHP_SESSION_NONE) session_start();
+        header('Content-Type: application/json');
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!$data || !isset($data['action']) || $data['action'] !== 'commit') {
+            echo json_encode(['success' => false, 'message' => 'Unsupported action']);
+            return;
+        }
+
+        $userId = $_SESSION['user_id'] ?? null;
+        if (empty($userId)) {
+            echo json_encode(['success' => false, 'message' => 'User not logged in']);
+            return;
+        }
+
+        $scorePct = isset($data['score_pct']) ? (int)$data['score_pct'] : 0;
+        $gameId = isset($data['game_id']) ? (int)$data['game_id'] : null;
+
+        try {
+            require_once __DIR__ . '/../models/Database.php';
+            require_once __DIR__ . '/../models/Score.php';
+
+            $db = (new Database())->getConnection();
+
+            if (empty($gameId)) {
+                $pstmt = $db->prepare('SELECT id FROM games WHERE game_name = :name LIMIT 1');
+                $pstmt->execute([':name' => 'Trò chơi Thời gian']);
+                $pr = $pstmt->fetch(PDO::FETCH_ASSOC);
+                if ($pr) {
+                    $gameId = (int)$pr['id'];
+                } else {
+                    $lstmt = $db->prepare('SELECT id FROM games WHERE game_name LIKE :like LIMIT 1');
+                    $lstmt->execute([':like' => '%Thời gian%']);
+                    $lr = $lstmt->fetch(PDO::FETCH_ASSOC);
+                    if ($lr) $gameId = (int)$lr['id'];
+                }
+            }
+
+            if (empty($gameId)) {
+                echo json_encode(['success' => false, 'message' => 'Game "Trò chơi Thời gian" not registered']);
+                return;
+            }
+
+            $pct = max(0, min(100, $scorePct));
+            $xpAwarded = 20;
+
+            $res = Score::saveAndMark((int)$userId, $gameId, $pct, $xpAwarded);
+            if (is_array($res)) {
+                $res['xp_awarded'] = $xpAwarded;
+            }
+            echo json_encode($res);
+            return;
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            return;
+        }
+    }
+
+    /**
      * XÂY THÁP
      */
     public function showTowerGame() {
@@ -2132,6 +2558,7 @@ class LessonController {
         
         $currentId = isset($_GET['level']) ? (int)$_GET['level'] : 1;
         $currentLevel = $levels[$currentId] ?? $levels[1];
+        $totalLevels = count($levels);
 
         require_once __DIR__ . '/../views/lessons/engineering_tower_game.php';
     }

@@ -275,10 +275,40 @@ function checkWin(event) {
 
     if (allHit) {
         isWon = true;
-        Runner.stop(runner); 
-        setTimeout(() => { 
-            document.getElementById('result-modal').style.display = 'flex'; 
-        }, 500);
+        Runner.stop(runner);
+        // If not final level, just show result modal and let user proceed to next level.
+        const completedLevels = (typeof currentLevelId !== 'undefined') ? currentLevelId : 1;
+        const totalLevels = (typeof totalTowerLevels !== 'undefined') ? totalTowerLevels : 1;
+
+        if (completedLevels < totalLevels) {
+            setTimeout(() => { document.getElementById('result-modal').style.display = 'flex'; }, 500);
+            return;
+        }
+
+        // Final level: compute percentage and commit to server
+        const pct = totalLevels > 0 ? Math.round((completedLevels / totalLevels) * 100) : 0;
+
+        fetch(`${baseUrl}/views/lessons/update-tower-score`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'commit', score_pct: pct })
+        }).then(r => r.json()).then(json => {
+            // Update modal message with server response if available
+            const modal = document.getElementById('result-modal');
+            const title = modal.querySelector('h2');
+            const para = modal.querySelector('p');
+            if (json && json.success) {
+                title.innerText = 'HOÀN THÀNH!';
+                para.innerText = `Bạn hoàn thành ${completedLevels}/${totalLevels} màn. Độ hoàn thành: ${pct}%` + (json.xp_awarded ? `\nBạn nhận +${json.xp_awarded} XP` : '');
+            } else {
+                title.innerText = 'HOÀN THÀNH! (Không lưu được)';
+                para.innerText = `Bạn hoàn thành ${completedLevels}/${totalLevels} màn. Độ hoàn thành: ${pct}%. \nLỗi: ${json && json.message ? json.message : 'Không thể lưu điểm'}`;
+            }
+            setTimeout(() => { modal.style.display = 'flex'; }, 500);
+        }).catch(err => {
+            console.error('Tower commit error', err);
+            setTimeout(() => { document.getElementById('result-modal').style.display = 'flex'; }, 500);
+        });
     }
 }
 

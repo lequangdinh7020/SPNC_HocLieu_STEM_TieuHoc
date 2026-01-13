@@ -47,13 +47,18 @@
 
         <div class="controls">
             <button id="check-btn" class="game-btn check">Kiểm Tra</button>
+            <button id="complete-btn" class="game-btn check">Hoàn Thành</button>
         </div>
         
         <div id="result-modal" class="modal">
             <div class="modal-content">
                 <h2 id="modal-title"></h2>
                 <p id="modal-message"></p>
-                <button id="next-btn" class="game-btn">Tiếp tục</button>
+                <div id="modal-actions">
+                    <button id="next-btn" class="game-btn">Tiếp tục</button>
+                    <button id="play-again-btn" class="game-btn" style="display:none;">Chơi lại</button>
+                    <button id="back-btn" class="game-btn" style="display:none;">Quay lại</button>
+                </div>
             </div>
         </div>
 

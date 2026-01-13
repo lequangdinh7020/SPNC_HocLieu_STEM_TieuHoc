@@ -36,6 +36,10 @@
             <canvas id="gameCanvas" width="800" height="600"></canvas>
         </div>
 
+        <div class="controls">
+            <button id="complete-btn" class="game-btn check">Hoàn Thành</button>
+        </div>
+
         <div id="result-modal" class="modal">
             <div class="modal-content">
                 <h2 id="modal-title"></h2>
@@ -43,6 +47,8 @@
                 <div class="modal-buttons">
                      <button id="next-level-btn" class="game-btn next">Màn tiếp theo</button>
                      <button id="retry-btn" class="game-btn reset">Chơi lại</button>
+                     <button id="play-again-btn" class="game-btn" style="display:none;">Chơi lại</button>
+                     <button id="back-btn" class="game-btn" style="display:none;">Quay lại</button>
                 </div>
             </div>
         </div>

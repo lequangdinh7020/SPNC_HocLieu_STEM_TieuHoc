@@ -39,7 +39,7 @@ require_once __DIR__ . '/../template/header.php';
         </div>
         <div class="stat-box timer">
             <span class="stat-label">THỜI GIAN</span>
-            <span id="timer" class="stat-value">03:51</span>
+            <span id="timer" class="stat-value">05:00</span>
         </div>
         <div class="stat-box progress">
             <span class="stat-label">TIẾN ĐỘ</span>

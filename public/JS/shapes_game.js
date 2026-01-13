@@ -397,6 +397,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 currentChallenge.completed = true;
                 completedChallenges++;
                 updateCompletedCount();
+                // If all challenges completed, commit score to server
+                if (completedChallenges >= (window.gameData.challenges ? window.gameData.challenges.length : 6)) {
+                    commitShapesScore();
+                }
             }
         } else {
             showFeedback('✗', message);
@@ -638,7 +642,40 @@ document.addEventListener('DOMContentLoaded', function() {
             showFeedback('→', `Bắt đầu thử thách mới: ${window.gameData.challenges[currentChallengeIndex].title}`);
         } else {
             showFeedback('Xuất sắc! Bạn đã hoàn thành tất cả thử thách!');
+            // when user advances past last challenge (or arrives here), ensure commit
+            if (completedChallenges >= (window.gameData.challenges ? window.gameData.challenges.length : 6)) {
+                commitShapesScore();
+            }
         }
+    }
+
+    function commitShapesScore() {
+        // avoid duplicate commits by disabling further commits quickly
+        if (window._shapesCommitInProgress) return;
+        window._shapesCommitInProgress = true;
+
+        const totalChallenges = window.gameData.challenges ? window.gameData.challenges.length : 6;
+        const maxPoints = totalChallenges * 100; // JS awards 100 per challenge
+        const pct = maxPoints > 0 ? Math.max(0, Math.min(100, Math.round((score / maxPoints) * 100))) : 0;
+
+        fetch(window.baseUrl + '/views/lessons/update-shapes-score', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'commit', score_pct: pct, total_challenges: totalChallenges, total_time: totalTime })
+        }).then(r => r.json()).then(res => {
+            // Optionally show result
+            if (res && res.success) {
+                showFeedback('🏆', 'Điểm đã được lưu: ' + pct + '%');
+            } else {
+                showFeedback('⚠️', (res && res.message) ? res.message : 'Không lưu được điểm');
+            }
+        }).catch(err => {
+            console.error('commitShapesScore error', err);
+            showFeedback('⚠️', 'Lỗi khi lưu điểm');
+        }).finally(() => {
+            // allow small delay before allowing another commit
+            setTimeout(() => { window._shapesCommitInProgress = false; }, 2000);
+        });
     }
     
     function updateProgress(shape) {

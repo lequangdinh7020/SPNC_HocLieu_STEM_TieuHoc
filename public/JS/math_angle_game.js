@@ -175,13 +175,35 @@ document.addEventListener("DOMContentLoaded", () => {
                 nextBtn.innerText = "Màn tiếp theo";
                 nextBtn.onclick = () => window.location.href = `${baseUrl}/views/lessons/math_angle_game?level=${levelData.id + 1}`;
             } else {
-                // HẾT MÀN: Hiện nút "Về bài học"
-                nextBtn.style.display = 'inline-block';
-                nextBtn.innerText = "Về trang bài học";
-                // Chuyển hướng về trang math.php
-                nextBtn.onclick = () => window.location.href = `${baseUrl}/views/lessons/math.php`;
-                
-                modalMsg.innerText += " Bạn đã hoàn thành xuất sắc nhiệm vụ!";
+                    // HẾT MÀN: Hiện nút "Về bài học" và commit điểm
+                    nextBtn.style.display = 'inline-block';
+                    nextBtn.innerText = 'Về trang bài học';
+                    // Chuyển hướng về trang math.php
+                    nextBtn.onclick = () => window.location.href = `${baseUrl}/views/lessons/math.php`;
+
+                    modalMsg.innerText += " Bạn đã hoàn thành xuất sắc nhiệm vụ!";
+
+                    // Commit completion to server and show awarded XP
+                    try {
+                        fetch(`${baseUrl}/views/lessons/update-angle-score`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ action: 'commit' })
+                        })
+                        .then(r => r.json())
+                        .then(j => {
+                            console.log('angle game commit', j);
+                            if (j && j.success) {
+                                const info = document.createElement('div');
+                                info.className = 'server-info';
+                                info.textContent = 'Điểm đã được lưu: 100% - XP +' + (j.xp_awarded || 20);
+                                modalMsg.appendChild(info);
+                            }
+                        })
+                        .catch(err => console.error('Error committing angle score', err));
+                    } catch (e) {
+                        console.error('Commit error', e);
+                    }
             }
         } else {
             // === THUA ===

@@ -26,7 +26,7 @@
                     <h2>HOÀN THÀNH!</h2>
                     <p>Bạn đã chinh phục thử thách!</p>
                     <div class="modal-buttons">
-                        <?php if ($currentLevel['id'] < 2): ?>
+                        <?php if ($currentLevel['id'] < ($totalLevels ?? 1)): ?>
                             <a href="engineering_tower_game?level=<?= $currentLevel['id'] + 1 ?>" class="game-btn next">Tiếp theo</a>
                         <?php else: ?>
                             <button onclick="window.location.reload()" class="game-btn">Chơi lại</button>
@@ -69,6 +69,9 @@
 
     <script>
         const levelConfig = <?= json_encode($currentLevel['config']) ?>;
+        const currentLevelId = <?= $currentLevel['id'] ?>;
+        const totalTowerLevels = <?= $totalLevels ?? 1 ?>;
+        const baseUrl = '<?= $base_url ?>';
     </script>
     <script src="<?= $base_url ?>/public/JS/tower_game.js"></script>
 </body>

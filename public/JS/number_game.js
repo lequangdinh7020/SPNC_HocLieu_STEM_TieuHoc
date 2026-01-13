@@ -284,6 +284,28 @@ document.addEventListener('DOMContentLoaded', function() {
         
         showFeedback(`Hoàn thành! Điểm số: ${gameState.correct} đúng, ${gameState.wrong} sai. Độ chính xác: ${accuracy}%`, 
                     accuracy >= 70 ? 'correct' : 'wrong');
+
+        // Commit to server: allow repeated saves and award XP (server will return xp_awarded)
+        try {
+            fetch('/views/lessons/update-number-score', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'commit', score_pct: accuracy })
+            }).then(resp => resp.json()).then(json => {
+                if (json && json.success) {
+                    if (json.xp_awarded) {
+                        showFeedback('Hoàn thành - Bạn nhận được +' + json.xp_awarded + ' XP!', 'correct');
+                    }
+                } else {
+                    // show server message if any
+                    if (json && json.message) showFeedback('Lưu điểm: ' + json.message, 'neutral');
+                }
+            }).catch(err => {
+                console.error('Commit error', err);
+            });
+        } catch (e) {
+            console.error('Commit exception', e);
+        }
     }
     
     function resetGame() {

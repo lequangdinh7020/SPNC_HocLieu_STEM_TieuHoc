@@ -169,21 +169,52 @@ switch ($route) {
     case '/views/lessons/math_angle_game':
         $lessonController->showMathAngleGame();
         break;
+    case '/views/lessons/update-angle-score':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $lessonController->updateAngleGameScore();
+        }
+        break;
 
     case '/views/lessons/math_shapes_challenge':
         $lessonController->showMathShapesGame();
+        break;
+    case '/views/lessons/update-shapes-score':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $lessonController->updateShapesScore();
+        }
         break;
 
     case '/views/lessons/math_number_game':
         $lessonController->showMathNumberGame();
         break;
+    case '/views/lessons/update-number-score':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $lessonController->updateNumberScore();
+        }
+        break;
 
     case '/views/lessons/math_tangram_3d':
         $lessonController->showTangramGame();
         break;
+    case '/views/lessons/update-tangram-score':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $lessonController->updateTangramScore();
+        }
+        break;
+
+    case '/views/lessons/update-tower-score':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $lessonController->updateTowerScore();
+        }
+        break;
 
     case '/views/lessons/math_time_game':
         $lessonController->showTimeGame();
+        break;
+    case '/views/lessons/update-time-score':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $lessonController->updateTimeScore();
+        }
         break;
     
     case '/views/lessons/engineering_tower_game':

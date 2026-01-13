@@ -12,6 +12,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const modalMsg = document.getElementById('modal-message');
     const nextBtn = document.getElementById('next-level-btn');
     const retryBtn = document.getElementById('retry-btn');
+    const playAgainBtn = document.getElementById('play-again-btn');
+    const backBtn = document.getElementById('back-btn');
+    const completeBtn = document.getElementById('complete-btn');
 
     // --- 1. ĐỊNH NGHĨA CÁC MẢNH TANGRAM CHUẨN ---
     // Đơn vị chuẩn hóa, sẽ được scale lên khi vẽ.
@@ -273,6 +276,60 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    
+
+    // Commit điểm: dùng chung cho nút Complete và cho auto-commit màn cuối
+    function commitScore(opts) {
+        // opts: { pct, mode: 'pieces'|'level', correctCount, completedLevels, totalLevels }
+        const pct = opts.pct ?? 0;
+        fetch(`${baseUrl}/views/lessons/update-tangram-score`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'commit', score_pct: pct })
+        }).then(r => r.json()).then(json => {
+            // Show result modal and reveal play-again/back buttons
+            modal.style.display = 'flex';
+            if (json && json.success) {
+                modalTitle.innerText = 'Tổng kết hoàn thành';
+                modalTitle.style.color = '#2ecc71';
+                if (opts.mode === 'level') {
+                    modalMsg.innerText = `Bạn hoàn thành ${opts.completedLevels}/${opts.totalLevels} màn. Độ hoàn thành: ${pct}%`;
+                } else {
+                    modalMsg.innerText = `Bạn ghép đúng ${opts.correctCount}/${pieces.length}. Độ chính xác: ${pct}%`;
+                }
+                if (json.xp_awarded) modalMsg.innerText += `\nBạn nhận được +${json.xp_awarded} XP`;
+            } else {
+                modalTitle.innerText = 'Lưu điểm thất bại';
+                modalTitle.style.color = '#e74c3c';
+                modalMsg.innerText = (json && json.message) ? json.message : 'Không thể lưu điểm';
+            }
+
+            // UI buttons
+            nextBtn.style.display = 'none';
+            retryBtn.style.display = 'none';
+            if (playAgainBtn) { playAgainBtn.style.display = 'inline-block'; playAgainBtn.onclick = () => { modal.style.display = 'none'; window.location.reload(); } }
+            if (backBtn) { backBtn.style.display = 'inline-block'; backBtn.onclick = () => { window.location.href = `${baseUrl}/views/lessons/math.php`; } }
+        }).catch(err => {
+            console.error('Commit error', err);
+            modal.style.display = 'flex';
+            modalTitle.innerText = 'Lưu điểm thất bại';
+            modalTitle.style.color = '#e74c3c';
+            modalMsg.innerText = 'Không thể kết nối tới server';
+            nextBtn.style.display = 'none';
+            retryBtn.style.display = 'inline-block';
+        });
+    }
+
+    // Hoàn thành nhanh: tổng kết số mảnh đúng và gửi lên server
+    if (completeBtn) {
+        completeBtn.addEventListener('click', () => {
+            // Treat completion as finishing current level (count levels completed)
+            const completedLevels = levelData.id;
+            const pct = totalLevels > 0 ? Math.round((completedLevels / totalLevels) * 100) : 0;
+            commitScore({ pct: pct, mode: 'level', completedLevels: completedLevels, totalLevels: totalLevels });
+        });
+    }
+
     // --- 5. LOGIC GAME ---
 
     // Kiểm tra xem mảnh có gần vị trí đúng để "hít" vào không
@@ -323,17 +380,25 @@ document.addEventListener("DOMContentLoaded", () => {
         modal.style.display = 'flex';
         modalTitle.innerText = "HOÀN THÀNH! 🎉";
         modalMsg.innerText = "Bạn đã ghép thành công hình này!";
-        
-        retryBtn.onclick = () => window.location.reload();
+        // Restart whole game from level 1
+        retryBtn.onclick = () => window.location.href = `${baseUrl}/views/lessons/math_tangram_3d?level=1`;
 
+        // After winning, allow user to proceed to next level OR commit via Complete button
         if (levelData.id < totalLevels) {
             nextBtn.style.display = 'inline-block';
             nextBtn.onclick = () => window.location.href = `${baseUrl}/views/lessons/math_tangram_3d?level=${levelData.id + 1}`;
         } else {
-            nextBtn.innerText = "Về menu bài học 📚";
-            nextBtn.onclick = () => window.location.href = `${baseUrl}/views/lessons/math.php`;
-            modalMsg.innerText += " Bạn đã phá đảo tất cả các màn Tangram!";
+            // Final level: auto-commit the perfect score
+            const correctCount = pieces.filter(p => p.isSnapped).length;
+            const pct = pieces.length > 0 ? Math.round((correctCount / pieces.length) * 100) : 0;
+            // commitScore will show modal and relevant buttons
+            commitScore({ pct: pct, mode: 'pieces', correctCount: correctCount });
+            return;
         }
+
+        // Ensure play-again/back hidden until explicit commit
+        if (playAgainBtn) playAgainBtn.style.display = 'none';
+        if (backBtn) backBtn.style.display = 'none';
     }
 
     // Vẽ lần đầu khi tải trang

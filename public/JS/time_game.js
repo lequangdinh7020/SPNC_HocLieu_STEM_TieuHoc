@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let questions = levelData.questions;
     let currentQIndex = 0;
+    let answersCorrect = new Array(questions.length).fill(false);
     
     // Góc hiện tại của kim (tính bằng radian, 12h = -PI/2)
     let hourAngle = -Math.PI / 2;   // Mặc định 12h
@@ -218,11 +219,73 @@ document.addEventListener("DOMContentLoaded", () => {
         const isHourCorrect = hourDiff < 15 || (360 - hourDiff) < 15;
 
         if (isMinCorrect && isHourCorrect) {
+            answersCorrect[currentQIndex] = true;
             showModal(true);
         } else {
+            answersCorrect[currentQIndex] = false;
             showModal(false);
         }
     });
+
+    // Complete button: summarize correct answers and commit score
+    const completeBtn = document.getElementById('complete-btn');
+    if (completeBtn) {
+        completeBtn.addEventListener('click', () => {
+            // count correct
+            const correctCount = answersCorrect.filter(c => c).length;
+            const pct = questions.length > 0 ? Math.round((correctCount / questions.length) * 100) : 0;
+
+            // send to server
+            fetch(`${baseUrl}/views/lessons/update-time-score`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'commit', score_pct: pct })
+            }).then(r => r.json()).then(json => {
+                if (json && json.success) {
+                    // show modal with xp info
+                    modal.style.display = 'flex';
+                    modalTitle.innerText = 'Tổng kết hoàn thành';
+                    modalTitle.style.color = '#2ecc71';
+                    modalMsg.innerText = `Bạn trả lời đúng ${correctCount}/${questions.length}. Độ chính xác: ${pct}%`;
+                    // show play again and back
+                    document.getElementById('next-btn').style.display = 'none';
+                    const pa = document.getElementById('play-again-btn');
+                    const back = document.getElementById('back-btn');
+                    pa.style.display = 'inline-block';
+                    back.style.display = 'inline-block';
+                    pa.onclick = () => {
+                        modal.style.display = 'none';
+                        // reset answers and reload first question
+                        answersCorrect = new Array(questions.length).fill(false);
+                        loadQuestion(0);
+                    };
+                    back.onclick = () => window.location.href = `${baseUrl}/views/lessons/math.php`;
+                    // optionally show xp awarded
+                    if (json.xp_awarded) {
+                        setTimeout(() => {
+                            modalMsg.innerText += `\nBạn nhận được +${json.xp_awarded} XP`;
+                        }, 200);
+                    }
+                } else {
+                    modal.style.display = 'flex';
+                    modalTitle.innerText = 'Lưu điểm thất bại';
+                    modalTitle.style.color = '#e74c3c';
+                    modalMsg.innerText = (json && json.message) ? json.message : 'Không thể lưu điểm';
+                    document.getElementById('next-btn').style.display = 'none';
+                    document.getElementById('play-again-btn').style.display = 'inline-block';
+                    document.getElementById('back-btn').style.display = 'inline-block';
+                    document.getElementById('play-again-btn').onclick = () => {
+                        modal.style.display = 'none';
+                        answersCorrect = new Array(questions.length).fill(false);
+                        loadQuestion(0);
+                    };
+                    document.getElementById('back-btn').onclick = () => window.location.href = `${baseUrl}/views/lessons/math.php`;
+                }
+            }).catch(err => {
+                console.error('Commit error', err);
+            });
+        });
+    }
 
     function showModal(isWin) {
         modal.style.display = 'flex';
@@ -230,6 +293,9 @@ document.addEventListener("DOMContentLoaded", () => {
             modalTitle.innerText = "Chính Xác!";
             modalTitle.style.color = "#2ecc71";
             modalMsg.innerText = "Em rất giỏi xem giờ!";
+            nextBtn.style.display = 'inline-block';
+            document.getElementById('play-again-btn').style.display = 'none';
+            document.getElementById('back-btn').style.display = 'none';
             nextBtn.onclick = () => {
                 modal.style.display = 'none';
                 loadQuestion(currentQIndex + 1);
@@ -238,6 +304,9 @@ document.addEventListener("DOMContentLoaded", () => {
             modalTitle.innerText = "Chưa đúng rồi";
             modalTitle.style.color = "#e74c3c";
             modalMsg.innerText = "Hãy kiểm tra lại vị trí các kim nhé.";
+            nextBtn.style.display = 'inline-block';
+            document.getElementById('play-again-btn').style.display = 'none';
+            document.getElementById('back-btn').style.display = 'none';
             nextBtn.onclick = () => modal.style.display = 'none';
         }
     }
@@ -247,13 +316,57 @@ document.addEventListener("DOMContentLoaded", () => {
         modalTitle.innerText = "HOÀN THÀNH CẤP ĐỘ!";
         modalTitle.style.color = "#f1c40f";
         modalMsg.innerText = "Em đã hoàn thành tất cả câu hỏi.";
-        
-        if (levelData.id < totalGameLevels) {
-            nextBtn.innerText = "Cấp độ tiếp theo";
-            nextBtn.onclick = () => window.location.href = `${baseUrl}/views/lessons/math-time-game?level=${levelData.id + 1}`;
-        } else {
-            nextBtn.innerText = "Về trang bài học";
-            nextBtn.onclick = () => window.location.href = `${baseUrl}/views/lessons/math.php`;
-        }
+        // Compute summary and auto-commit to server
+        const correctCount = answersCorrect.filter(c => c).length;
+        const pct = questions.length > 0 ? Math.round((correctCount / questions.length) * 100) : 0;
+
+        // Hide next button and show Play again / Back after commit
+        document.getElementById('next-btn').style.display = 'none';
+        const pa = document.getElementById('play-again-btn');
+        const back = document.getElementById('back-btn');
+        pa.style.display = 'none';
+        back.style.display = 'none';
+
+        fetch(`${baseUrl}/views/lessons/update-time-score`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'commit', score_pct: pct })
+        }).then(r => r.json()).then(json => {
+            // Show play again and back regardless of success, include xp if present
+            pa.style.display = 'inline-block';
+            back.style.display = 'inline-block';
+            pa.onclick = () => {
+                modal.style.display = 'none';
+                answersCorrect = new Array(questions.length).fill(false);
+                loadQuestion(0);
+            };
+            back.onclick = () => window.location.href = `${baseUrl}/views/lessons/math.php`;
+
+            if (json && json.success) {
+                modalTitle.innerText = 'Tổng kết hoàn thành';
+                modalTitle.style.color = '#2ecc71';
+                modalMsg.innerText = `Bạn trả lời đúng ${correctCount}/${questions.length}. Độ chính xác: ${pct}%`;
+                if (json.xp_awarded) {
+                    modalMsg.innerText += `\nBạn nhận được +${json.xp_awarded} XP`;
+                }
+            } else {
+                modalTitle.innerText = 'Lưu điểm thất bại';
+                modalTitle.style.color = '#e74c3c';
+                modalMsg.innerText = (json && json.message) ? json.message : 'Không thể lưu điểm';
+            }
+        }).catch(err => {
+            console.error('Commit error', err);
+            pa.style.display = 'inline-block';
+            back.style.display = 'inline-block';
+            pa.onclick = () => {
+                modal.style.display = 'none';
+                answersCorrect = new Array(questions.length).fill(false);
+                loadQuestion(0);
+            };
+            back.onclick = () => window.location.href = `${baseUrl}/views/lessons/math.php`;
+            modalTitle.innerText = 'Lưu điểm thất bại';
+            modalTitle.style.color = '#e74c3c';
+            modalMsg.innerText = 'Không thể lưu điểm do lỗi kết nối';
+        });
     }
 });

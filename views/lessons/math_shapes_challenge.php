@@ -143,6 +143,10 @@ require_once __DIR__ . '/../template/header.php';
                             <span class="btn-icon"></span>
                             <span class="btn-text">Xem ví dụ</span>
                         </button>
+                        <button id="backToLessonsBtn" class="control-btn tertiary-btn" onclick="window.location.href='<?= $base_url ?>/views/lessons/math.php'">
+                            <span class="btn-icon"></span>
+                            <span class="btn-text">Quay lại</span>
+                        </button>
                     </div>
                     
                     <div class="feedback-container">
