@@ -346,12 +346,11 @@ class Database {
                 (3, 'Em là người đánh máy', 'Rèn luyện kỹ năng đánh máy nhanh và chính xác', 50),
 
                 -- Kỹ thuật (topic_id = 4)
-                (4, 'Hoa yêu thương nở rộ', 'Thiết kế hoa giấy cơ học nở rộ khi kéo dây', 50),
                 (4, 'Cầu kỹ thuật (Bridge)', 'Thiết kế cầu và thử tải', 50),
-                (4, 'Chế tạo xe (Car Builder)', 'Lắp ráp và tối ưu xe cho bài toán', 50),
                 (4, 'Bộ lọc nước', 'Thiết kế bộ lọc đơn giản để làm sạch nước', 50),
                 (4, 'Trò chơi Tháp', 'Thử thách xây tháp bền vững', 50),
-                (4, 'Trang trí phòng (Room Decor)', 'Thiết kế trang trí phòng sáng tạo', 50)
+                (4, 'Trang trí phòng (Room Decor)', 'Thiết kế trang trí phòng sáng tạo', 50),
+                (4, 'Hệ thống dẫn nước', 'Thiết kế hệ thống ống dẫn nước hiệu quả', 50)
                 ");
 
 

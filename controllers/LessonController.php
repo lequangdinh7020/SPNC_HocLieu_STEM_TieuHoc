@@ -2375,6 +2375,84 @@ class LessonController {
     }
 
     /**
+     * API: Commit score for Water Filter game
+     */
+    public function updateWaterFilterScore() {
+        if (session_status() == PHP_SESSION_NONE) session_start();
+        header('Content-Type: application/json');
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!$data || !isset($data['action']) || $data['action'] !== 'commit') {
+            echo json_encode(['success' => false, 'message' => 'Unsupported action']);
+            return;
+        }
+
+        $userId = $_SESSION['user_id'] ?? null;
+        if (empty($userId)) {
+            echo json_encode(['success' => false, 'message' => 'User not logged in']);
+            return;
+        }
+
+        $scorePct = isset($data['score_pct']) ? (int)$data['score_pct'] : 100;
+        $gameId = isset($data['game_id']) ? (int)$data['game_id'] : null;
+
+        try {
+            require_once __DIR__ . '/../models/Database.php';
+            require_once __DIR__ . '/../models/Score.php';
+
+            $db = (new Database())->getConnection();
+
+            if (empty($gameId)) {
+                // Prefer exact name 'Bộ lọc nước'
+                $stmt = $db->prepare('SELECT id FROM games WHERE game_name = :name LIMIT 1');
+                $stmt->execute([':name' => 'Bộ lọc nước']);
+                $r = $stmt->fetch(PDO::FETCH_ASSOC);
+                if ($r) {
+                    $gameId = (int)$r['id'];
+                } else {
+                    $stmt2 = $db->prepare('SELECT id FROM games WHERE game_name LIKE :like LIMIT 1');
+                    $stmt2->execute([':like' => '%lọc nước%']);
+                    $r2 = $stmt2->fetch(PDO::FETCH_ASSOC);
+                    if ($r2) $gameId = (int)$r2['id'];
+                }
+            }
+
+            if (empty($gameId)) {
+                echo json_encode(['success' => false, 'message' => 'Game "Bộ lọc nước" not registered']);
+                return;
+            }
+
+            $pct = max(0, min(100, $scorePct));
+
+            // Determine xp: allow client to pass xp, otherwise use game's xp or default 20
+            $xpAwarded = 20;
+            if (isset($data['xp'])) {
+                $xpAwarded = (int)$data['xp'];
+            } else {
+                try {
+                    $gstmt = $db->prepare('SELECT xp FROM games WHERE id = :gid LIMIT 1');
+                    $gstmt->execute([':gid' => $gameId]);
+                    $grow = $gstmt->fetch(PDO::FETCH_ASSOC);
+                    if ($grow && isset($grow['xp'])) $xpAwarded = (int)$grow['xp'];
+                } catch (Exception $e) {
+                    // ignore
+                }
+            }
+
+            $res = Score::saveAndMark((int)$userId, $gameId, $pct, $xpAwarded);
+            if (is_array($res)) {
+                $res['xp_awarded'] = $xpAwarded;
+            }
+
+            echo json_encode($res);
+            return;
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            return;
+        }
+    }
+
+    /**
      * Bây giờ là mấy giờ
      */
     public function showTimeGame() {
@@ -2661,6 +2739,73 @@ class LessonController {
         require_once __DIR__ . '/../views/lessons/engineering_room_decor.php';
     }
 
+    /**
+     * API: Commit score for Room Decor (full score by default)
+     */
+    public function updateRoomDecorScore() {
+        if (session_status() == PHP_SESSION_NONE) session_start();
+        header('Content-Type: application/json');
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!$data || !isset($data['action']) || $data['action'] !== 'commit') {
+            echo json_encode(['success' => false, 'message' => 'Unsupported action']);
+            return;
+        }
+
+        $userId = $_SESSION['user_id'] ?? null;
+        if (empty($userId)) {
+            echo json_encode(['success' => false, 'message' => 'User not logged in']);
+            return;
+        }
+
+        $scorePct = isset($data['score_pct']) ? (int)$data['score_pct'] : 100;
+        $gameId = isset($data['game_id']) ? (int)$data['game_id'] : null;
+
+        try {
+            require_once __DIR__ . '/../models/Database.php';
+            require_once __DIR__ . '/../models/Score.php';
+
+            $db = (new Database())->getConnection();
+
+            if (empty($gameId)) {
+                $pstmt = $db->prepare('SELECT id FROM games WHERE game_name = :name LIMIT 1');
+                $pstmt->execute([':name' => 'Trang trí phòng (Room Decor)']);
+                $pr = $pstmt->fetch(PDO::FETCH_ASSOC);
+                if ($pr) {
+                    $gameId = (int)$pr['id'];
+                } else {
+                    $lstmt = $db->prepare('SELECT id FROM games WHERE game_name LIKE :like LIMIT 1');
+                    $lstmt->execute([':like' => '%Room Decor%']);
+                    $lr = $lstmt->fetch(PDO::FETCH_ASSOC);
+                    if ($lr) $gameId = (int)$lr['id'];
+                }
+            }
+
+            if (empty($gameId)) {
+                echo json_encode(['success' => false, 'message' => 'Game "Trang trí phòng (Room Decor)" not registered']);
+                return;
+            }
+
+            $pct = max(0, min(100, $scorePct));
+            // award full xp based on games.xp
+            $xpAwarded = 0;
+            $gstmt = $db->prepare("SELECT xp FROM games WHERE id = :gid LIMIT 1");
+            $gstmt->execute([':gid' => $gameId]);
+            $gRow = $gstmt->fetch(PDO::FETCH_ASSOC);
+            if ($gRow && isset($gRow['xp'])) $xpAwarded = (int)$gRow['xp'];
+
+            $res = Score::saveAndMark((int)$userId, $gameId, $pct, $xpAwarded);
+            if (is_array($res)) {
+                $res['xp_awarded'] = $xpAwarded;
+            }
+            echo json_encode($res);
+            return;
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            return;
+        }
+    }
+
     public function showPipeGame() {
         if (session_status() == PHP_SESSION_NONE) { session_start(); }
         
@@ -2741,5 +2886,82 @@ class LessonController {
         $totalLevels = count($levels);
 
         require_once __DIR__ . '/../views/lessons/engineering_water_pipe.php';
+    }
+
+    /**
+     * API: Commit score for Water Pipe game (Hệ thống dẫn nước)
+     */
+    public function updateWaterPipeScore() {
+        if (session_status() == PHP_SESSION_NONE) session_start();
+        header('Content-Type: application/json');
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!$data || !isset($data['action']) || $data['action'] !== 'commit') {
+            echo json_encode(['success' => false, 'message' => 'Unsupported action']);
+            return;
+        }
+
+        $userId = $_SESSION['user_id'] ?? null;
+        if (empty($userId)) {
+            echo json_encode(['success' => false, 'message' => 'User not logged in']);
+            return;
+        }
+
+        $scorePct = isset($data['score_pct']) ? (int)$data['score_pct'] : 100;
+        $gameId = isset($data['game_id']) ? (int)$data['game_id'] : null;
+
+        try {
+            require_once __DIR__ . '/../models/Database.php';
+            require_once __DIR__ . '/../models/Score.php';
+
+            $db = (new Database())->getConnection();
+
+            if (empty($gameId)) {
+                // Prefer exact name in DB
+                $stmt = $db->prepare('SELECT id FROM games WHERE game_name = :name LIMIT 1');
+                $stmt->execute([':name' => 'Hệ thống dẫn nước']);
+                $r = $stmt->fetch(PDO::FETCH_ASSOC);
+                if ($r) {
+                    $gameId = (int)$r['id'];
+                } else {
+                    $stmt2 = $db->prepare('SELECT id FROM games WHERE game_name LIKE :like LIMIT 1');
+                    $stmt2->execute([':like' => '%dẫn nước%']);
+                    $r2 = $stmt2->fetch(PDO::FETCH_ASSOC);
+                    if ($r2) $gameId = (int)$r2['id'];
+                }
+            }
+
+            if (empty($gameId)) {
+                echo json_encode(['success' => false, 'message' => 'Game "Hệ thống dẫn nước" not registered']);
+                return;
+            }
+
+            $pct = max(0, min(100, $scorePct));
+
+            $xpAwarded = 20;
+            if (isset($data['xp'])) {
+                $xpAwarded = (int)$data['xp'];
+            } else {
+                try {
+                    $gstmt = $db->prepare('SELECT xp FROM games WHERE id = :gid LIMIT 1');
+                    $gstmt->execute([':gid' => $gameId]);
+                    $grow = $gstmt->fetch(PDO::FETCH_ASSOC);
+                    if ($grow && isset($grow['xp'])) $xpAwarded = (int)$grow['xp'];
+                } catch (Exception $e) {
+                    // ignore
+                }
+            }
+
+            $res = Score::saveAndMark((int)$userId, $gameId, $pct, $xpAwarded);
+            if (is_array($res)) {
+                $res['xp_awarded'] = $xpAwarded;
+            }
+
+            echo json_encode($res);
+            return;
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            return;
+        }
     }
 }

@@ -147,6 +147,25 @@ document.addEventListener("DOMContentLoaded", () => {
                 3. <b>Than:</b> Khử độc, khử mùi.<br>
                 4. <b>Bông (Dưới cùng):</b> Lọc sạch cặn cuối cùng.
             `;
+            // Make text clearly readable (black)
+            modalMsg.style.color = '#000';
+            modalExp.style.color = '#000';
+
+            // Auto-commit full score (100%) to server for water filter
+            fetch(`${baseUrl}/views/lessons/update-water-filter-score`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'commit', score_pct: 100 })
+            }).then(r => r.json()).then(json => {
+                // optional: show xp awarded in modal
+                if (json && json.success && json.xp_awarded) {
+                    const add = document.createElement('div');
+                    add.style.marginTop = '10px';
+                    add.style.color = '#000';
+                    add.innerText = `Bạn nhận được +${json.xp_awarded} XP.`;
+                    modal.querySelector('.modal-content').appendChild(add);
+                }
+            }).catch(err => console.error('Water filter commit error', err));
         } else {
             modalTitle.innerText = "THẤT BẠI";
             modalTitle.style.color = "#e74c3c";

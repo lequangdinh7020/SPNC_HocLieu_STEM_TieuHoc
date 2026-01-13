@@ -41,6 +41,7 @@
 
         <div class="controls-panel">
             <button id="test-btn" class="game-btn run">Đổ Nước Bẩn</button>
+            <button class="game-btn" onclick="window.location.href='<?= $base_url ?>/views/lessons/engineering.php'">Quay lại</button>
             <button id="reset-btn" class="game-btn reset">Làm Lại</button>
         </div>
 

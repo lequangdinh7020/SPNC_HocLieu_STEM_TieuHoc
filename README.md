@@ -23,8 +23,8 @@ Dự án xây dựng website học liệu điện tử STEM trực quan cho họ
 1. Sao chép dự án vào thư mục `htdocs` trong XAMPP
 2. Tải Composer từ https://getcomposer.org/download/
 3. Sau khi clone code về, chạy lệnh sau trong terminal thư mục của project: composer install
-4. Mở `http://localhost/SPNC_HocLieu_STEM_TieuHoc/views/signin.php` trên trình duyệt
-5. Đăng nhập bằng tài khoản mẫu (hiện tại có các user là admin,student1,student2 pass đều là 123456)
+4. Mở `http://localhost/SPNC_HocLieu_STEM_TieuHoc/views/index.php` trên trình duyệt
+5. Đăng nhập bằng tài khoản mẫu (hiện tại có các user là admin,student1,student2@stem.edu.vn pass đều là 123456)
 
 ## 📚 Chức năng chính
 - Giao diện học sinh (game, học liệu, video)  

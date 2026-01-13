@@ -200,11 +200,26 @@ document.addEventListener("DOMContentLoaded", () => {
                 nextBtn.onclick = () => window.location.href = `${baseUrl}/views/lessons/engineering_water_pipe?level=${levelData.id + 1}`;
             } else {
                 // Màn cuối (Level 5) -> CHỈ hiện nút "Về Trang Chủ"
-                nextBtn.innerText = "Về Trang Chủ";
-                nextBtn.onclick = () => window.location.href = `${baseUrl}/views/main_lesson.php`;
-                
-                // Đảm bảo nút Retry bị ẩn
-                retryBtn.style.display = 'none';
+                    nextBtn.innerText = "Về Trang Chủ";
+                    nextBtn.onclick = () => window.location.href = `${baseUrl}/views/main_lesson.php`;
+
+                    // Auto-commit full score (100%) to server for final-level completion
+                    fetch(`${baseUrl}/views/lessons/update-water-pipe-score`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'commit', score_pct: 100 })
+                    }).then(r => r.json()).then(json => {
+                        if (json && json.success && json.xp_awarded) {
+                            const add = document.createElement('div');
+                            add.style.marginTop = '10px';
+                            add.style.color = '#000';
+                            add.innerText = `Bạn nhận được +${json.xp_awarded} XP.`;
+                            resultModal.querySelector('.modal-content').appendChild(add);
+                        }
+                    }).catch(err => console.error('Water pipe commit error', err));
+
+                    // Đảm bảo nút Retry bị ẩn
+                    retryBtn.style.display = 'none';
             }
         } else {
             // --- THUA ---

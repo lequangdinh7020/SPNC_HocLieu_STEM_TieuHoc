@@ -226,10 +226,27 @@ switch ($route) {
         // Route mới cho trò sắp xếp căn phòng
         $lessonController->showRoomDecorGame();
         break;
+    case '/views/lessons/update-room-decor-score':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $lessonController->updateRoomDecorScore();
+        }
+        break;
+
+    case '/views/lessons/update-water-filter-score':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $lessonController->updateWaterFilterScore();
+        }
+        break;
 
     case '/views/lessons/engineering_water_pipe':
         // Route mới cho hệ thống dẫn nước
         $lessonController->showPipeGame();
+        break;
+
+    case '/views/lessons/update-water-pipe-score':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $lessonController->updateWaterPipeScore();
+        }
         break;
 
     // --- FORGOT PASSWORD VIEW ---

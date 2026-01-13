@@ -42,6 +42,8 @@
             <div class="room-title">Phòng Của Em</div>
             <div class="actions">
                 <button class="tool-btn" onclick="clearRoom()"><i class="fas fa-broom"></i> Dọn sạch</button>
+                <button class="tool-btn" onclick="window.location.href='<?= $base_url ?>/views/lessons/engineering.php'"><i class="fas fa-arrow-left"></i> Quay lại</button>
+                <button class="tool-btn" id="complete-room-btn"><i class="fas fa-check"></i> Hoàn thành</button>
                 <button class="tool-btn highlight" id="save-btn"><i class="fas fa-camera"></i> Chụp ảnh</button>
             </div>
         </div>
@@ -70,6 +72,30 @@
 </script>
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <script src="<?= $base_url ?>/public/JS/room_decor.js"></script>
+
+<script>
+    // Complete button: commit full score (100%) for Room Decor
+    (function(){
+        const btn = document.getElementById('complete-room-btn');
+        if (!btn) return;
+        btn.addEventListener('click', function(){
+            fetch(`${baseUrl}/views/lessons/update-room-decor-score`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'commit', score_pct: 100 })
+            }).then(r => r.json()).then(json => {
+                if (json && json.success) {
+                    alert('Hoàn thành đã được lưu — Bạn nhận đầy đủ điểm và XP.');
+                } else {
+                    alert('Lưu điểm thất bại: ' + (json && json.message ? json.message : 'Không rõ'));
+                }
+            }).catch(err => {
+                console.error('Commit room decor error', err);
+                alert('Lỗi kết nối. Không thể lưu điểm');
+            });
+        });
+    })();
+</script>
 
 </body>
 </html>
