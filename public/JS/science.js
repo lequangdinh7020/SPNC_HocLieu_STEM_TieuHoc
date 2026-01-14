@@ -70,6 +70,76 @@ const planets = {
     }
 };
 
+// Fetch completed games for current user and update planet/activity statuses
+(function updatePlanetStatuses() {
+    try {
+        const endpoint = (typeof baseUrl !== 'undefined' ? baseUrl : '') + '/public/api/get_topic_status.php';
+        fetch(endpoint, { credentials: 'same-origin' })
+            .then(response => response.json())
+                .then(data => {
+                    const completedItems = (data && data.completed_games) ? data.completed_games : [];
+
+                    // JS slugify (remove diacritics, replace non-alnum with hyphens)
+                    const slugify = (s) => {
+                        if (!s) return '';
+                        return s.toString().normalize('NFD').replace(/\p{Diacritic}/gu, '')
+                            .replace(/[^a-zA-Z0-9]+/g, '-')
+                            .replace(/(^-|-$)/g, '').toLowerCase();
+                    };
+
+                    const completedNames = completedItems.map(ci => (typeof ci === 'string' ? ci : (ci.name || '')).toLowerCase());
+                    const completedSlugs = completedItems.map(ci => (typeof ci === 'string' ? slugify(ci) : (ci.slug || slugify(ci.name || ''))));
+
+                    for (const id in planets) {
+                        if (!Object.prototype.hasOwnProperty.call(planets, id)) continue;
+                        const p = planets[id];
+                        const pName = (p.name || '').toLowerCase();
+                        const pSlug = slugify(p.name || '');
+
+                        const matchedByName = completedNames.indexOf(pName) !== -1;
+                        const matchedBySlug = completedSlugs.indexOf(pSlug) !== -1;
+                        p.status = (matchedByName || matchedBySlug) ? 'completed' : 'current';
+
+                        p.activities.forEach(a => {
+                            const aName = (a.name || '').toLowerCase();
+                            const aSlugFromName = slugify(a.name || '');
+                            // attempt match by name or slug
+                            const matchedAByName = completedNames.findIndex(g => g && (aName.includes(g) || g.includes(aName))) !== -1;
+                            const matchedABySlug = completedSlugs.indexOf(aSlugFromName) !== -1;
+                            a.status = (matchedAByName || matchedABySlug) ? 'completed' : 'current';
+                        });
+
+                        // If any activity is completed, mark the whole planet as completed
+                        if (Array.isArray(p.activities) && p.activities.some(act => act.status === 'completed')) {
+                            p.status = 'completed';
+                        }
+                    }
+                console.log('✅ Planet statuses updated from server');
+
+                // Apply classes to planet DOM elements so CSS rules take effect
+                document.querySelectorAll('.planet').forEach(el => {
+                    const pid = el.getAttribute('data-planet');
+                    const pdata = planets[pid];
+                    if (!pdata) return;
+                    el.classList.remove('completed', 'current', 'locked');
+                    if (pdata.status === 'completed') {
+                        el.classList.add('completed');
+                        el.style.opacity = '';
+                        el.style.filter = '';
+                    } else if (pdata.status === 'current') {
+                        el.classList.add('current');
+                    } else {
+                        el.classList.add('locked');
+                    }
+                });
+            })
+            .catch(err => {
+                console.warn('⚠️ Could not load game statuses:', err);
+            });
+    } catch (e) {
+        console.warn('⚠️ updatePlanetStatuses error:', e);
+    }
+})();
 // Unlock all activities in the science panel so they become available
 // (Converts any 'locked' status into 'current' so items become clickable)
 for (const pid in planets) {

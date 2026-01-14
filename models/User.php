@@ -11,6 +11,7 @@ class User {
     public $full_name;
     public $class;
     public $avatar;
+    public $xp;
     public $email_verified;
     public $verification_code;
     public $verification_expires;
@@ -20,7 +21,7 @@ class User {
     }
     
     public function login($username, $password, $remember = false) {
-       $query = "SELECT id, username, email, password, role, first_name, last_name, class, avatar, email_verified 
+      $query = "SELECT id, username, email, password, role, first_name, last_name, class, avatar, xp, email_verified 
             FROM " . $this->table_name . " 
             WHERE username = :username OR email = :username";
         
@@ -47,6 +48,7 @@ class User {
                     $this->full_name = $row['first_name'] . ' ' . $row['last_name'];
                     $this->class = $row['class'];
                     $this->avatar = $row['avatar'];
+                    $this->xp = isset($row['xp']) ? (int)$row['xp'] : 0;
 
                     // Xử lý ghi nhớ đăng nhập với cơ chế selector/validator
                     if ($remember) {
@@ -124,6 +126,34 @@ class User {
         return false;
     }
 }
+
+    /**
+     * Recalculate total XP for a user based on their highest xp_awarded per game.
+     * If $userId is null, use $this->id. Returns total XP (int) or false on error.
+     */
+    public function recalculateXp($userId = null) {
+        $uid = $userId ?: $this->id;
+        if (!$uid) return false;
+        try {
+            $sql = "SELECT COALESCE(SUM(mx),0) AS total FROM (SELECT game_id, MAX(xp_awarded) AS mx FROM scores WHERE user_id = :uid GROUP BY game_id) t";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([':uid' => $uid]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $total = isset($row['total']) ? (int)$row['total'] : 0;
+
+            $upd = $this->conn->prepare("UPDATE " . $this->table_name . " SET xp = :xp WHERE id = :id");
+            $upd->execute([':xp' => $total, ':id' => $uid]);
+
+            if ($this->id && (int)$this->id === (int)$uid) {
+                $this->xp = $total;
+            }
+
+            return $total;
+        } catch (PDOException $e) {
+            error_log('recalculateXp error: ' . $e->getMessage());
+            return false;
+        }
+    }
 
 
     public function register($username, $email, $password, $fullName, $class = null, $phone = null) {

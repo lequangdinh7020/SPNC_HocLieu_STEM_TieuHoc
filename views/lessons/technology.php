@@ -292,7 +292,7 @@ $_SESSION['technology_visited'] = true;
                 
                 <div class="mission-stats">
                     <div class="stat-orb xp-orb">
-                        <div class="stat-value">75</div>
+                        <div class="stat-value">100</div>
                         <div class="stat-label">XP</div>
                     </div>
                 </div>

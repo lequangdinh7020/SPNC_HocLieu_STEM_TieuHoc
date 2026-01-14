@@ -14,9 +14,9 @@ $skill_trees = [
                 'icon' => '🌿',
                 'color' => '#4CAF50',
                 'lessons' => [
-                    ['title' => 'Thế giới màu sắc', 'type' => 'TLCH - TC', 'xp' => 10, 'completed' => true],
-                    ['title' => 'Mô hình các bộ phận của cây', 'type' => 'TC', 'xp' => 15, 'completed' => true],
-                    ['title' => 'Ngày và đêm', 'type' => 'TLCH', 'xp' => 10, 'completed' => true]
+                    ['title' => 'Thế giới màu sắc', 'type' => 'TLCH - TC', 'xp' => 20, 'completed' => true],
+                    ['title' => 'Mô hình các bộ phận của cây', 'type' => 'TC', 'xp' => 20, 'completed' => true],
+                    ['title' => 'Ngày và đêm', 'type' => 'TLCH', 'xp' => 20, 'completed' => true]
                 ]
             ],
             [
@@ -25,7 +25,7 @@ $skill_trees = [
                 'color' => '#FF9800',
                 'lessons' => [
                     ['title' => 'Cẩm nang phòng tránh hỏa hoạn', 'type' => 'TC', 'xp' => 20, 'completed' => false],
-                    ['title' => 'Bí kíp ăn uống lành mạnh', 'type' => 'TC', 'xp' => 15, 'completed' => false]
+                    ['title' => 'Bí kíp ăn uống lành mạnh', 'type' => 'TC', 'xp' => 20, 'completed' => false]
                 ]
             ],
             [
@@ -33,9 +33,9 @@ $skill_trees = [
                 'icon' => '👤',
                 'color' => '#2196F3',
                 'lessons' => [
-                    ['title' => 'Các cơ quan trong cơ thể', 'type' => 'TC', 'xp' => 25, 'completed' => false],
+                    ['title' => 'Các cơ quan trong cơ thể', 'type' => 'TC', 'xp' => 20, 'completed' => false],
                     ['title' => 'Khung xương kì diệu', 'type' => 'TC', 'xp' => 20, 'completed' => false],
-                    ['title' => 'Thùng rác thân thiện', 'type' => 'TC', 'xp' => 15, 'completed' => false]
+                    ['title' => 'Thùng rác thân thiện', 'type' => 'TC', 'xp' => 20, 'completed' => false]
                 ]
             ]
         ]
@@ -53,8 +53,8 @@ $skill_trees = [
                 'icon' => '🖥️',
                 'color' => '#2196F3',
                 'lessons' => [
-                    ['title' => 'Các bộ phận của máy tính', 'type' => 'TC', 'xp' => 10, 'completed' => true],
-                    ['title' => 'Em là người đánh máy', 'type' => 'TC', 'xp' => 15, 'completed' => false]
+                    ['title' => 'Các bộ phận của máy tính', 'type' => 'TC', 'xp' => 20, 'completed' => true],
+                    ['title' => 'Em là người đánh máy', 'type' => 'TC', 'xp' => 20, 'completed' => false]
                 ]
             ],
             [
@@ -63,7 +63,7 @@ $skill_trees = [
                 'color' => '#9C27B0',
                 'lessons' => [
                     ['title' => 'Em là họa sĩ máy tính', 'type' => 'Chia sẻ tác phẩm', 'xp' => 20, 'completed' => true],
-                    ['title' => 'Tạo thiệp điện tử', 'type' => 'Chia sẻ tác phẩm', 'xp' => 25, 'completed' => false]
+                    ['title' => 'Tạo thiệp điện tử', 'type' => 'Chia sẻ tác phẩm', 'xp' => 20, 'completed' => false]
                 ]
             ],
             [
@@ -71,7 +71,7 @@ $skill_trees = [
                 'icon' => '🌐',
                 'color' => '#FF9800',
                 'lessons' => [
-                    ['title' => 'Lập trình viên nhí với Scratch', 'type' => 'TC', 'xp' => 30, 'completed' => false],
+                    ['title' => 'Lập trình viên nhí với Scratch', 'type' => 'TC', 'xp' => 20, 'completed' => false],
                     ['title' => 'An toàn trên Internet', 'type' => 'TLCH', 'xp' => 20, 'completed' => false]
                 ]
             ]
@@ -90,8 +90,8 @@ $skill_trees = [
                 'icon' => '🛠️',
                 'color' => '#FF9800',
                 'lessons' => [
-                    ['title' => 'Dụng cụ gấp áo', 'type' => 'TC', 'xp' => 10, 'completed' => true],
-                    ['title' => 'Hoa yêu thương nở rộ', 'type' => 'TC - TLCH', 'xp' => 15, 'completed' => true]
+                    ['title' => 'Dụng cụ gấp áo', 'type' => 'TC', 'xp' => 20, 'completed' => true],
+                    ['title' => 'Hoa yêu thương nở rộ', 'type' => 'TC - TLCH', 'xp' => 20, 'completed' => true]
                 ]
             ],
             [
@@ -99,7 +99,7 @@ $skill_trees = [
                 'icon' => '🏗️',
                 'color' => '#795548',
                 'lessons' => [
-                    ['title' => 'Xây cầu giấy', 'type' => 'TC', 'xp' => 25, 'completed' => false],
+                    ['title' => 'Xây cầu giấy', 'type' => 'TC', 'xp' => 20, 'completed' => false],
                     ['title' => 'Tháp giấy cao nhất', 'type' => 'TC', 'xp' => 20, 'completed' => false]
                 ]
             ],
@@ -108,8 +108,8 @@ $skill_trees = [
                 'icon' => '💡',
                 'color' => '#4CAF50',
                 'lessons' => [
-                    ['title' => 'Chế tạo xe bong bóng', 'type' => 'TC', 'xp' => 30, 'completed' => false],
-                    ['title' => 'Hệ thống lọc nước', 'type' => 'TC', 'xp' => 35, 'completed' => false]
+                    ['title' => 'Chế tạo xe bong bóng', 'type' => 'TC', 'xp' => 20, 'completed' => false],
+                    ['title' => 'Hệ thống lọc nước', 'type' => 'TC', 'xp' => 20, 'completed' => false]
                 ]
             ]
         ]
@@ -127,8 +127,8 @@ $skill_trees = [
                 'icon' => '123',
                 'color' => '#9C27B0',
                 'lessons' => [
-                    ['title' => 'Đếm số', 'type' => 'TC', 'xp' => 10, 'completed' => false],
-                    ['title' => 'Phép cộng kỳ diệu', 'type' => 'TC', 'xp' => 15, 'completed' => false]
+                    ['title' => 'Đếm số', 'type' => 'TC', 'xp' => 20, 'completed' => false],
+                    ['title' => 'Phép cộng kỳ diệu', 'type' => 'TC', 'xp' => 20, 'completed' => false]
                 ]
             ],
             [
@@ -137,7 +137,7 @@ $skill_trees = [
                 'color' => '#2196F3',
                 'lessons' => [
                     ['title' => 'Nhận biết hình học', 'type' => 'TC', 'xp' => 20, 'completed' => false],
-                    ['title' => 'Tangram 3D', 'type' => 'TC', 'xp' => 25, 'completed' => false]
+                    ['title' => 'Tangram 3D', 'type' => 'TC', 'xp' => 20, 'completed' => false]
                 ]
             ],
             [
@@ -145,8 +145,8 @@ $skill_trees = [
                 'icon' => '🛒',
                 'color' => '#4CAF50',
                 'lessons' => [
-                    ['title' => 'Siêu thị của bé', 'type' => 'TC', 'xp' => 30, 'completed' => false],
-                    ['title' => 'Máy bắn đá mini', 'type' => 'TC', 'xp' => 35, 'completed' => false]
+                    ['title' => 'Siêu thị của bé', 'type' => 'TC', 'xp' => 20, 'completed' => false],
+                    ['title' => 'Máy bắn đá mini', 'type' => 'TC', 'xp' => 20, 'completed' => false]
                 ]
             ]
         ]

@@ -8,13 +8,13 @@ const planets = {
         status: "completed",
         description: "Tìm hiểu về các mối quan hệ gia đình qua cây phả hệ",
         time: "20 phút",
-        xp: "25 XP",
+        xp: "20 XP",
         activities: [
             { 
                 type: "game", 
                 name: "Trò chơi cây gia đình", 
                 icon: "🎮", 
-                xp: "25 XP", 
+                xp: "20 XP", 
                 link: baseUrl + '/views/lessons/technology_family_tree_game', 
                 status: "completed" 
             }
@@ -27,7 +27,7 @@ const planets = {
         status: "current",
         description: "Khám phá các công cụ vẽ đơn giản trên máy tính",
         time: "25 phút",
-        xp: "50 XP",
+        xp: "20 XP",
         activities: [
             { 
                 type: "share", 
@@ -45,13 +45,13 @@ const planets = {
         status: "current",
         description: "Rèn luyện kỹ năng đánh máy nhanh và chính xác",
         time: "35 phút",
-        xp: "75 XP",
+        xp: "20 XP",
         activities: [
             { 
                 type: "game", 
                 name: "Trò chơi đánh máy", 
                 icon: "🎮", 
-                xp: "40 XP",
+                xp: "20 XP",
                 link: baseUrl + '/views/lessons/technology_typing_thach_sanh', 
                 status: "current" 
             }
@@ -63,13 +63,13 @@ const planets = {
         status: "current",
         description: "Làm quen với lập trình các khối lệnh",
         time: "30 phút",
-        xp: "70 XP",
+        xp: "20 XP",
         activities: [
             { 
                 type: "game", 
                 name: "Thực hành Scratch", 
                 icon: "🎮", 
-                xp: "40 XP",
+                xp: "20 XP",
                 link: baseUrl + '/views/lessons/technology_coding_game', 
                 status: "current" 
             }
@@ -81,19 +81,90 @@ const planets = {
         status: "current",
         description: "Tìm hiểu các thành phần cơ bản của máy tính",
         time: "22 phút",
-        xp: "60 XP",
+        xp: "20 XP",
         activities: [
             { 
                 type: "game", 
                 name: "Ghép bộ phận máy tính", 
                 icon: "🧩", 
-                xp: "35 XP",
+                xp: "20 XP",
                 link: baseUrl + '/views/lessons/technology_computer_parts', 
                 status: "current" 
             }
         ]
     }
 };
+
+// Fetch completed games for current user and update planet/activity statuses
+(function updatePlanetStatuses() {
+    try {
+        const endpoint = (typeof baseUrl !== 'undefined' ? baseUrl : '') + '/public/api/get_topic_status.php';
+        fetch(endpoint, { credentials: 'same-origin' })
+            .then(response => response.json())
+            .then(data => {
+                const completedItems = (data && data.completed_games) ? data.completed_games : [];
+
+                const slugify = (s) => {
+                    if (!s) return '';
+                    return s.toString().normalize('NFD').replace(/\p{Diacritic}/gu, '')
+                        .replace(/[^a-zA-Z0-9]+/g, '-')
+                        .replace(/(^-|-$)/g, '').toLowerCase();
+                };
+
+                const completedNames = completedItems.map(ci => (typeof ci === 'string' ? ci : (ci.name || '')).toLowerCase());
+                const completedSlugs = completedItems.map(ci => (typeof ci === 'string' ? slugify(ci) : (ci.slug || slugify(ci.name || ''))));
+
+                for (const id in planets) {
+                    if (!Object.prototype.hasOwnProperty.call(planets, id)) continue;
+                    const p = planets[id];
+                    const pName = (p.name || '').toLowerCase();
+                    const pSlug = slugify(p.name || '');
+
+                    const matchedByName = completedNames.indexOf(pName) !== -1;
+                    const matchedBySlug = completedSlugs.indexOf(pSlug) !== -1;
+                    p.status = (matchedByName || matchedBySlug) ? 'completed' : 'current';
+
+                    p.activities.forEach(a => {
+                        const aName = (a.name || '').toLowerCase();
+                        const aSlugFromName = slugify(a.name || '');
+                        const matchedAByName = completedNames.findIndex(g => g && (aName.includes(g) || g.includes(aName))) !== -1;
+                        const matchedABySlug = completedSlugs.indexOf(aSlugFromName) !== -1;
+                        a.status = (matchedAByName || matchedABySlug) ? 'completed' : 'current';
+                    });
+
+                    // If any activity is completed, mark the whole planet as completed
+                    if (Array.isArray(p.activities) && p.activities.some(act => act.status === 'completed')) {
+                        p.status = 'completed';
+                    }
+                }
+
+                // Apply classes to planet DOM elements so CSS rules take effect
+                document.querySelectorAll('.planet').forEach(el => {
+                    const pid = el.getAttribute('data-planet');
+                    const pdata = planets[pid];
+                    if (!pdata) return;
+                    el.classList.remove('completed', 'current', 'locked');
+                    // add class matching status
+                    if (pdata.status === 'completed') {
+                        el.classList.add('completed');
+                        // clear any dimming if present via attribute selectors
+                        el.style.opacity = '';
+                        el.style.filter = '';
+                    } else if (pdata.status === 'current') {
+                        el.classList.add('current');
+                    } else {
+                        el.classList.add('locked');
+                    }
+                });
+                console.log('✅ Planet statuses updated from server');
+            })
+            .catch(err => {
+                console.warn('⚠️ Could not load game statuses:', err);
+            });
+    } catch (e) {
+        console.warn('⚠️ updatePlanetStatuses error:', e);
+    }
+})();
 
 function initTechnologySystem() {
     console.log('🚀 Initializing Technology System...');

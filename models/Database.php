@@ -325,32 +325,32 @@ class Database {
 
                 $this->conn->exec("INSERT INTO games (topic_id, game_name, description, passing_score) VALUES 
                 -- Toán học (topic_id = 1)
-                (1, 'Trò chơi Hình dạng', 'Bài tập nhận diện và sắp xếp hình học', 50),
-                (1, 'Trò chơi Số học', 'Các bài tập về số và tính toán', 50),
-                (1, 'Trò chơi Góc và đo lường', 'Bài toán liên quan đến góc và đo lường', 50),
-                (1, 'Tangram', 'Xếp hình tangram để tạo hình', 50),
-                (1, 'Trò chơi Thời gian', 'Bài luyện đọc đồng hồ và giờ', 50),
+                (1, 'Trò chơi Hình dạng', 'Bài tập nhận diện và sắp xếp hình học', 0),
+                (1, 'Trò chơi Số học', 'Các bài tập về số và tính toán', 0),
+                (1, 'Trò chơi Góc và đo lường', 'Bài toán liên quan đến góc và đo lường', 0),
+                (1, 'Tangram', 'Xếp hình tangram để tạo hình', 0),
+                (1, 'Trò chơi Thời gian', 'Bài luyện đọc đồng hồ và giờ', 0),
 
                 -- Khoa học (topic_id = 2)
-                (2, 'Tháp dinh dưỡng', 'Sắp xếp các nhóm thực phẩm theo tháp dinh dưỡng', 50),
-                (2, 'Pha màu', 'Pha màu đúng tỉ lệ', 50),
-                (2, 'Ngày và đêm', 'Trả lời các câu hỏi về ngày và đêm', 50),
-                (2, 'Thùng rác thân thiện', 'Phân loại rác đúng cách', 50),
-                (2, 'Lắp ghép bộ phận', 'Lắp ghép các bộ phận của cây', 50),
+                (2, 'Tháp dinh dưỡng', 'Sắp xếp các nhóm thực phẩm theo tháp dinh dưỡng', 0),
+                (2, 'Pha màu', 'Pha màu đúng tỉ lệ', 0),
+                (2, 'Ngày và đêm', 'Trả lời các câu hỏi về ngày và đêm', 0),
+                (2, 'Thùng rác thân thiện', 'Phân loại rác đúng cách', 0),
+                (2, 'Lắp ghép bộ phận', 'Lắp ghép các bộ phận của cây', 0),
 
                 -- Công nghệ (topic_id = 3)
-                (3, 'Cây gia đình', 'Tìm hiểu về các mối quan hệ gia đình qua cây phả hệ', 50),
-                (3, 'Trò chơi Lập trình (Coding)', 'Các thử thách lập trình cơ bản', 50),
-                (3, 'Em làm họa sĩ máy tính', 'Khám phá các công cụ vẽ đơn giản trên máy tính', 50),
-                (3, 'Các bộ phận của máy tính', 'Tìm hiểu các thành phần cơ bản của máy tính', 50),
-                (3, 'Em là người đánh máy', 'Rèn luyện kỹ năng đánh máy nhanh và chính xác', 50),
+                (3, 'Cây gia đình', 'Tìm hiểu về các mối quan hệ gia đình qua cây phả hệ', 0),
+                (3, 'Trò chơi Lập trình (Coding)', 'Các thử thách lập trình cơ bản', 0),
+                (3, 'Em làm họa sĩ máy tính', 'Khám phá các công cụ vẽ đơn giản trên máy tính', 0),
+                (3, 'Các bộ phận của máy tính', 'Tìm hiểu các thành phần cơ bản của máy tính', 0),
+                (3, 'Em là người đánh máy', 'Rèn luyện kỹ năng đánh máy nhanh và chính xác', 0),
 
                 -- Kỹ thuật (topic_id = 4)
-                (4, 'Cầu kỹ thuật (Bridge)', 'Thiết kế cầu và thử tải', 50),
-                (4, 'Bộ lọc nước', 'Thiết kế bộ lọc đơn giản để làm sạch nước', 50),
-                (4, 'Trò chơi Tháp', 'Thử thách xây tháp bền vững', 50),
-                (4, 'Trang trí phòng (Room Decor)', 'Thiết kế trang trí phòng sáng tạo', 50),
-                (4, 'Hệ thống dẫn nước', 'Thiết kế hệ thống ống dẫn nước hiệu quả', 50)
+                (4, 'Cầu kỹ thuật (Bridge)', 'Thiết kế cầu và thử tải', 0),
+                (4, 'Bộ lọc nước', 'Thiết kế bộ lọc đơn giản để làm sạch nước', 0),
+                (4, 'Trò chơi Tháp', 'Thử thách xây tháp bền vững', 0),
+                (4, 'Trang trí phòng (Room Decor)', 'Thiết kế trang trí phòng sáng tạo', 0),
+                (4, 'Hệ thống dẫn nước', 'Thiết kế hệ thống ống dẫn nước hiệu quả', 0)
                 ");
 
 
