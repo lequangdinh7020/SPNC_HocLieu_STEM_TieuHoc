@@ -8,13 +8,13 @@ const planets = {
         status: "completed",
         description: "Trò chơi máy bắn đá mini học về lực và góc bắn",
         time: "22 phút",
-        xp: "35 XP",
+        xp: "20 XP",
         activities: [
             { 
                 type: "game", 
                 name: "Chế tạo máy bắn đá", 
                 icon: "🎮", 
-                xp: "35 XP", 
+                xp: "20 XP", 
                 link: baseUrl + '/views/lessons/math_angle_game', 
                 status: "completed" 
             }
@@ -26,13 +26,13 @@ const planets = {
         status: "current",
         description: "Trò chơi học về các hình học qua thử thách",
         time: "18 phút",
-        xp: "55 XP",
+        xp: "20 XP",
         activities: [
             { 
                 type: "game", 
                 name: "Thử thách hình học", 
                 icon: "🧩", 
-                xp: "25 XP",
+                xp: "20 XP",
                 link: baseUrl + '/views/lessons/math_shapes_challenge', 
                 status: "current" 
             }
@@ -44,13 +44,13 @@ const planets = {
         status: "current",
         description: "Trò chơi tangram không gian 3 chiều thú vị",
         time: "25 phút", 
-        xp: "70 XP",
+        xp: "20 XP",
         activities: [
             { 
                 type: "game", 
                 name: "Ghép hình tangram 3D", 
                 icon: "🔷", 
-                xp: "40 XP",
+                xp: "20 XP",
                 link: baseUrl + '/views/lessons/math_tangram_3d', 
                 status: "current" 
             }
@@ -62,13 +62,13 @@ const planets = {
         status: "upcoming",
         description: "Trò chơi học đếm số và nhận biết số thú vị",
         time: "20 phút",
-        xp: "60 XP",
+        xp: "20 XP",
         activities: [
             { 
                 type: "game", 
                 name: "Trò chơi đếm số", 
                 icon: "🎲", 
-                xp: "25 XP",
+                xp: "20 XP",
                 link: baseUrl + '/views/lessons/math_number_game', 
                 status: "upcoming" 
             }
@@ -80,13 +80,13 @@ const planets = {
         status: "current",
         description: "Trò chơi học xem đồng hồ và quản lý thời gian",
         time: "28 phút",
-        xp: "45 XP",
+        xp: "20 XP",
         activities: [
             { 
                 type: "game", 
                 name: "Quản lý thời gian", 
                 icon: "⏳", 
-                xp: "45 XP",
+                xp: "20 XP",
                 link: baseUrl + '/views/lessons/math_time_game', 
                 status: "current" 
             }

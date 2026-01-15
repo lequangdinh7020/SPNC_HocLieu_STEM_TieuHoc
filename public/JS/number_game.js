@@ -7,7 +7,9 @@ document.addEventListener('DOMContentLoaded', function() {
         isPaused: false,
         timerInterval: null,
         answers: {},
-        correctAnswers: {}
+        correctAnswers: {},
+        checkedItems: {}, // Theo dõi những ô đã kiểm tra (để không tăng lại)
+        gameSaved: false // Theo dõi xem điểm đã lưu chưa
     };
     
     initGame();
@@ -141,7 +143,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (gameState.timeLeft <= 0) {
                     clearInterval(gameState.timerInterval);
                     endGame();
-                    showFeedback('Hết thời gian! Game kết thúc.', 'wrong');
+                    // Thông báo hết giờ rõ ràng
+                    showFeedback('⏰ HẾT THỜI GIAN! Đang tự động lưu điểm...', 'wrong');
+                    // Chờ 1 giây rồi lưu điểm
+                    setTimeout(() => {
+                        saveGameScore('Hết thời gian!');
+                    }, 1000);
                 }
             }
         }, 1000);
@@ -161,7 +168,8 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        let allCorrect = true;
+        let newCorrectCount = 0;
+        let newWrongCount = 0;
         let answeredCount = 0;
         
         for (let i = 1; i <= 20; i++) {
@@ -169,6 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const userAnswer = gameState.answers[i];
             const correctAnswer = gameState.correctAnswers[i] || 0;
         
+            // Bỏ class highlight cũ
             input.classList.remove('correct', 'wrong');
             
             if (userAnswer !== null && userAnswer !== undefined) {
@@ -176,32 +185,42 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (userAnswer === correctAnswer) {
                     input.classList.add('correct');
+                    // Chỉ tính là "mới đúng" nếu ô này chưa được kiểm tra trước
+                    if (!gameState.checkedItems[i] || gameState.checkedItems[i].result !== 'correct') {
+                        newCorrectCount++;
+                    }
+                    gameState.checkedItems[i] = { result: 'correct', answer: userAnswer };
                 } else {
                     input.classList.add('wrong');
-                    allCorrect = false;
+                    // Chỉ tính là "mới sai" nếu ô này chưa được kiểm tra trước
+                    if (!gameState.checkedItems[i] || gameState.checkedItems[i].result !== 'wrong') {
+                        newWrongCount++;
+                    }
+                    gameState.checkedItems[i] = { result: 'wrong', answer: userAnswer };
                 }
             }
         }
         
         if (answeredCount > 0) {
-            const correctCount = Object.keys(gameState.answers).filter(num => 
-                gameState.answers[num] === gameState.correctAnswers[num]
-            ).length;
-            
-            const wrongCount = answeredCount - correctCount;
-            
-            gameState.correct += correctCount;
-            gameState.wrong += wrongCount;
+            // Chỉ cộng những ô mới được kiểm tra và đúng
+            gameState.correct += newCorrectCount;
+            gameState.wrong += newWrongCount;
             
             updateUI();
         }
         
         if (answeredCount === 0) {
             showFeedback('Hãy nhập ít nhất một câu trả lời trước khi kiểm tra!', 'neutral');
-        } else if (allCorrect) {
-            showFeedback('Tuyệt vời! Tất cả câu trả lời đều chính xác!', 'correct');
         } else {
-            showFeedback('Còn một số câu trả lời chưa đúng. Hãy thử lại!', 'wrong');
+            // Đếm tổng số ô đúng hiện tại
+            let totalCorrect = 0;
+            for (let i = 1; i <= 20; i++) {
+                if (gameState.checkedItems[i] && gameState.checkedItems[i].result === 'correct') {
+                    totalCorrect++;
+                }
+            }
+            showFeedback(`Kiểm tra xong! Hiện tại: ${totalCorrect} ô đúng (từ ${answeredCount} ô đã nhập).`, 
+                        totalCorrect === answeredCount ? 'correct' : 'neutral');
         }
     }
     
@@ -236,7 +255,74 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function giveUpGame() {
         if (confirm('Bạn có chắc chắn muốn thoát về Menu?')) {
-            window.location.href = window.baseUrl || '/';
+            const menuUrl = (window.baseUrl || '') + '/views/lessons/math.php';
+            window.location.href = menuUrl;
+        }
+    }
+
+    /**
+     * Hàm tổng kết kết quả và lưu điểm
+     */
+    function saveGameScore(endMessage) {
+        if (gameState.gameSaved) {
+            // Đã lưu rồi, không lưu lại
+            if (endMessage) {
+                showFeedback(endMessage + ' (Điểm đã được lưu trước đó)', 'neutral');
+            }
+            return;
+        }
+
+        // Tính số ô đúng từ answers hiện tại (so sánh với correctAnswers)
+        // Không cần phải bấm "Kiểm tra" - tính luôn những ô được nhập
+        let correctCount = 0;
+        let answeredCount = 0;
+        for (let i = 1; i <= 20; i++) {
+            const userAnswer = gameState.answers[i];
+            const correctAnswer = gameState.correctAnswers[i] || 0;
+            
+            if (userAnswer !== null && userAnswer !== undefined) {
+                answeredCount++;
+                if (userAnswer === correctAnswer) {
+                    correctCount++;
+                }
+            }
+        }
+
+        // Score = (số ô đúng / 20) * 100
+        const accuracy = Math.round((correctCount / 20) * 100);
+
+        // Hiển thị tổng kết
+        const resultMsg = `Tổng kết: ${correctCount}/20 câu đúng. Độ chính xác: ${accuracy}%`;
+        showFeedback(resultMsg, accuracy >= 70 ? 'correct' : 'wrong');
+
+        // Gửi điểm tới server
+        try {
+            const apiUrl = (window.baseUrl || '') + '/views/lessons/update-number-score';
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'commit', score_pct: accuracy })
+            }).then(resp => resp.json()).then(json => {
+                if (json && json.success) {
+                    gameState.gameSaved = true;
+                    if (json.xp_awarded) {
+                        showFeedback('✓ Lưu điểm thành công! Bạn nhận được +' + json.xp_awarded + ' XP!', 'correct');
+                    } else {
+                        showFeedback('✓ Lưu điểm thành công!', 'correct');
+                    }
+                } else {
+                    // show server message if any
+                    if (json && json.message) {
+                        showFeedback('⚠ Lưu điểm: ' + json.message, 'wrong');
+                    }
+                }
+            }).catch(err => {
+                console.error('Commit error', err);
+                showFeedback('⚠ Lỗi khi lưu điểm: ' + err.message, 'wrong');
+            });
+        } catch (e) {
+            console.error('Commit exception', e);
+            showFeedback('⚠ Lỗi: ' + e.message, 'wrong');
         }
     }
     
@@ -256,34 +342,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         endGame();
         
-        const accuracy = gameState.correct + gameState.wrong > 0 
-            ? Math.round((gameState.correct / (gameState.correct + gameState.wrong)) * 100) 
-            : 0;
-        
-        showFeedback(`Hoàn thành! Điểm số: ${gameState.correct} đúng, ${gameState.wrong} sai. Độ chính xác: ${accuracy}%`, 
-                    accuracy >= 70 ? 'correct' : 'wrong');
-
-        // Commit to server: allow repeated saves and award XP (server will return xp_awarded)
-        try {
-            fetch('/views/lessons/update-number-score', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'commit', score_pct: accuracy })
-            }).then(resp => resp.json()).then(json => {
-                if (json && json.success) {
-                    if (json.xp_awarded) {
-                        showFeedback('Hoàn thành - Bạn nhận được +' + json.xp_awarded + ' XP!', 'correct');
-                    }
-                } else {
-                    // show server message if any
-                    if (json && json.message) showFeedback('Lưu điểm: ' + json.message, 'neutral');
-                }
-            }).catch(err => {
-                console.error('Commit error', err);
-            });
-        } catch (e) {
-            console.error('Commit exception', e);
-        }
+        // Tự động lưu điểm
+        saveGameScore('Hoàn thành game!');
     }
     
     function resetGame() {
@@ -296,7 +356,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 isPaused: false,
                 timerInterval: null,
                 answers: {},
-                correctAnswers: gameState.correctAnswers
+                correctAnswers: gameState.correctAnswers,
+                checkedItems: {},
+                gameSaved: false
             };
             
             if (gameState.timerInterval) {

@@ -8,10 +8,10 @@ const planets = {
         status: "completed",
         description: "Khám phá bí mật của màu sắc qua các hoạt động thú vị",
         time: "15 phút",
-        xp: "50 XP",
+        xp: "20 XP",
         activities: [
-                        { type: "game", name: "Trò chơi pha màu", icon: "🎮", xp: "25 XP",
-                            link: baseUrl + '/views/lessons/science_color_game', status: "completed" }
+                        { type: "game", name: "Trò chơi pha màu", icon: "🎮", xp: "20 XP",
+                            link: baseUrl + '/views/lessons/science_color_game', status: "current" }
         ]
     },
     2: {
@@ -20,25 +20,25 @@ const planets = {
         status: "completed",
         description: "Học cách chọn thực phẩm tốt cho sức khỏe",
         time: "20 phút",
-        xp: "50 XP",
+        xp: "20 XP",
         activities: [
-            { type: "game", name: "Trò chơi tháp dinh dưỡng", icon: "🧩", xp: "50 XP",
-              link: baseUrl + '/views/lessons/science_nutrition_game', status: "completed" }
+            { type: "game", name: "Trò chơi tháp dinh dưỡng", icon: "🧩", xp: "20 XP",
+              link: baseUrl + '/views/lessons/science_nutrition_game', status: "current" }
         ]
     },
     3: {
         name: "NGÀY VÀ ĐÊM", 
         icon: "🌓",
-        status: "current",
+        status: "completed",
         description: "Khám phá bí mật của thời gian và thiên văn",
         time: "12 phút", 
-        xp: "50 XP",
+        xp: "20 XP",
         activities: [
             { 
                 type: "question", 
                 name: "Trả lời câu hỏi", 
                 icon: "🌞", 
-                xp: "50 XP",
+                xp: "20 XP",
                 link: baseUrl + '/views/lessons/science_day_night',
                 status: "current"
             }
@@ -47,24 +47,24 @@ const planets = {
     4: {
         name: "THÙNG RÁC THÂN THIỆN",
         icon: "🗑️",
-        status: "current",
+        status: "completed",
         description: "Học cách phân loại rác bảo vệ môi trường",
         time: "16 phút",
-        xp: "50 XP",
+        xp: "20 XP",
         activities: [
-            { type: "game", name: "Trò chơi phân loại rác", icon: "♻️", xp: "30 XP",
+            { type: "game", name: "Trò chơi phân loại rác", icon: "♻️", xp: "20 XP",
                 link: baseUrl + '/views/lessons/science_trash_game', status: "current" }
         ]
     },
     5: {
         name: "CÁC BỘ PHẬN CỦA CÂY",
         icon: "🌱",
-        status: "current",
+        status: "completed",
         description: "Học cách nhận biết các bộ phận của cây",
         time: "10 phút",
-        xp: "30 XP",
+        xp: "20 XP",
         activities: [
-            { type: "game", name: "Trò chơi lắp ghép", icon: "🌿", xp: "30 XP",
+            { type: "game", name: "Trò chơi lắp ghép", icon: "🌿", xp: "20 XP",
               link: baseUrl + '/views/lessons/science_plant_game', status: "current" }
         ]
     }

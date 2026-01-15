@@ -8,6 +8,9 @@ $router->get('/science/nutrition', [LessonController::class, 'showNutritionGame'
 // 2. Đường dẫn API (POST) để cập nhật điểm
 $router->post('/science/update-score', [LessonController::class, 'updateNutritionScore']);
 
+// --- TRÒ CHƠI ĐẾM SỐ (Number Game) ---
+$router->post('/views/lessons/update-number-score', [LessonController::class, 'updateNumberGameScore']);
+
 // --- QUÊN MẬT KHẨU (Forgot Password) ---
 $router->get('/forgot-password', function() {
 	require __DIR__ . '/views/forgot-password.php';

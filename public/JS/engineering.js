@@ -8,13 +8,13 @@ const planets = {
         status: "completed",
         description: "Học cách xây tháp vững chắc từ câu chuyện Cây tre trăm đốt",
         time: "25 phút",
-        xp: "30 XP",
+        xp: "20 XP",
         activities: [
             { 
                 type: "tutorial", 
                 name: "Thử thách xây tháp", 
                 icon: "🏗️", 
-                xp: "30 XP", 
+                xp: "20 XP", 
                 link: baseUrl + '/views/lessons/engineering_tower_game', 
                 status: "completed" 
             }
@@ -26,13 +26,13 @@ const planets = {
         status: "current",
         description: "Thiết kế và sắp xếp không gian sống gọn gàng, hợp lý",
         time: "30 phút",
-        xp: "60 XP",
+        xp: "20 XP",
         activities: [
             { 
                 type: "tutorial", 
                 name: "Thiết kế không gian", 
                 icon: "🎨", 
-                xp: "35 XP",
+                xp: "20 XP",
                 link: baseUrl + '/views/lessons/engineering_room_decor', 
                 status: "current" 
             }
@@ -44,13 +44,13 @@ const planets = {
         status: "current",
         description: "Thiết kế và xây dựng cầu từ giấy A4 chịu lực",
         time: "35 phút", 
-        xp: "75 XP",
+        xp: "20 XP",
         activities: [
             { 
                 type: "challenge", 
                 name: "Thử thách cầu giấy", 
                 icon: "🌉", 
-                xp: "35 XP",
+                xp: "20 XP",
                 link: baseUrl + '/views/lessons/engineering_bridge_game', 
                 status: "current" 
             }
@@ -62,13 +62,13 @@ const planets = {
         status: "current",
         description: "Tìm hiểu và thiết kế hệ thống dẫn nước đơn giản",
         time: "28 phút",
-        xp: "70 XP",
+        xp: "20 XP",
         activities: [
             { 
                 type: "experiment", 
                 name: "Trò chơi dẫn nước", 
                 icon: "🧪", 
-                xp: "40 XP",
+                xp: "20 XP",
                 link: baseUrl + '/views/lessons/engineering_water_pipe', 
                 status: "current" 
             }
@@ -80,13 +80,13 @@ const planets = {
         status: "current",
         description: "Tìm hiểu và chế tạo hệ thống lọc nước đơn giản từ vật liệu dễ kiếm",
         time: "40 phút",
-        xp: "75 XP",
+        xp: "20 XP",
         activities: [
             { 
                 type: "experiment", 
                 name: "Chế tạo bộ lọc", 
                 icon: "🧪", 
-                xp: "40 XP",
+                xp: "20 XP",
                 link: baseUrl + '/views/lessons/engineering_water_filter', 
                 status: "current" 
             }

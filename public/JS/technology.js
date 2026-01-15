@@ -16,7 +16,7 @@ const planets = {
                 icon: "🎮", 
                 xp: "20 XP", 
                 link: baseUrl + '/views/lessons/technology_family_tree_game', 
-                status: "completed" 
+                status: "current" 
             }
             
         ]

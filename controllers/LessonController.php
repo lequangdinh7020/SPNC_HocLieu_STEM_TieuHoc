@@ -2046,6 +2046,12 @@ class LessonController {
             }
 
             $xpAwarded = 20;
+            // Tính xpAwarded từ score_pct: score_pct = (correct_count / 20) * 100
+            // Vậy correct_count = (score_pct / 100) * 20 = xp_awarded
+            if ($scorePct !== null) {
+                $correctCount = (int)round(($pct / 100) * 20);
+                $xpAwarded = max(0, min(20, $correctCount)); // max 20 XP
+            }
             // Allow client to override xp if provided
             if (isset($data['xp'])) $xpAwarded = (int)$data['xp'];
 
@@ -2963,5 +2969,94 @@ class LessonController {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
             return;
         }
+    }
+
+    /**
+     * API: Update score for Number Game (Trò chơi Số học)
+     * Mỗi ô nhập đúng số lượng = 1 câu đúng = 1 XP
+     * Tính điểm trung bình: (số ô đúng / 20) * 100 = score_percentage
+     */
+    public function updateNumberGameScore() {
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+        header('Content-Type: application/json');
+
+        $data = json_decode(file_get_contents('php://input'), true);
+
+        if (!$data || !isset($data['action'])) {
+            echo json_encode(['success' => false, 'message' => 'Missing action']);
+            exit();
+        }
+
+        if ($data['action'] === 'commit') {
+            $userId = $_SESSION['user_id'] ?? null;
+            if (empty($userId)) {
+                echo json_encode(['success' => false, 'message' => 'User not logged in']);
+                exit();
+            }
+
+            try {
+                require_once __DIR__ . '/../models/Database.php';
+                require_once __DIR__ . '/../models/Score.php';
+
+                $db = (new Database())->getConnection();
+
+                // Tìm game "Trò chơi Số học" trong bảng games
+                $stmt = $db->prepare("SELECT id FROM games WHERE game_name = :name LIMIT 1");
+                $stmt->execute([':name' => 'Trò chơi Số học']);
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if (!$row) {
+                    // Thử tìm bằng LIKE nếu tên không khớp chính xác
+                    $stmt2 = $db->prepare("SELECT id FROM games WHERE game_name LIKE :like LIMIT 1");
+                    $stmt2->execute([':like' => '%Số học%']);
+                    $r2 = $stmt2->fetch(PDO::FETCH_ASSOC);
+                    if ($r2) {
+                        $gameId = (int)$r2['id'];
+                    } else {
+                        echo json_encode(['success' => false, 'message' => 'Game "Trò chơi Số học" not found']);
+                        exit();
+                    }
+                } else {
+                    $gameId = (int)$row['id'];
+                }
+
+                // score_pct: từ client (tính toán dựa trên số ô đúng / 20 * 100)
+                $scorePct = isset($data['score_pct']) ? max(0, min(100, (int)$data['score_pct'])) : 0;
+
+                // Tính xp_awarded: score_pct / 5 (để mỗi 20 điểm = 1 xp, tối đa 20 xp khi 100%)
+                // hoặc cách khác: (số câu đúng) xp, nhưng vì client gửi score_pct nên tính theo đó
+                // score_pct = (correct_count / 20) * 100
+                // correct_count = (score_pct / 100) * 20
+                // xp_awarded = correct_count
+                $correctCount = (int)round(($scorePct / 100) * 20);
+                $xpAwarded = max(0, min(20, $correctCount)); // max 20 XP
+
+                // Prevent duplicate commits trong session
+                if (!empty($_SESSION['number_game_committed'])) {
+                    echo json_encode(['success' => true, 'message' => 'Already committed', 'xp_awarded' => 0]);
+                    exit();
+                }
+
+                // Lưu điểm vào database
+                $res = Score::saveAndMark((int)$userId, $gameId, $scorePct, $xpAwarded);
+
+                if (is_array($res) && !empty($res['success'])) {
+                    $_SESSION['number_game_committed'] = true;
+                    $res['xp_awarded'] = $xpAwarded;
+                }
+
+                echo json_encode($res);
+                exit();
+
+            } catch (Exception $e) {
+                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+                exit();
+            }
+        }
+
+        echo json_encode(['success' => false, 'message' => 'Invalid action']);
+        exit();
     }
 }
