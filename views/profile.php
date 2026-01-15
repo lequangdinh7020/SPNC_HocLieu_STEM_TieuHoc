@@ -18,6 +18,16 @@ $user = [
     'role' => 'user'
 ];
 
+$stats = [
+    'total_lessons' => 0,
+    'works_count' => 0,
+    'scores_count' => 0,
+    'active_days' => 0,
+    'avg_score' => 0,
+    'total_xp' => 0,
+    'completed_lessons' => 0
+];
+
 if (!empty($_SESSION['user_id'])) {
     try {
     require_once __DIR__ . '/../models/Database.php';
@@ -32,16 +42,67 @@ if (!empty($_SESSION['user_id'])) {
                 $user = array_merge($user, $row);
             }
 
+            // Completed games (distinct game_id, best score >= passing_score)
+            $completedStmt = $db->prepare(<<<'SQL'
+    SELECT COUNT(*) as cnt FROM (
+      SELECT s.game_id, MAX(s.score_percentage) as best
+      FROM scores s
+      WHERE s.user_id = :uid
+      GROUP BY s.game_id
+    ) b JOIN games g ON b.game_id = g.id
+    WHERE g.passing_score IS NOT NULL AND b.best >= g.passing_score
+    SQL
+            );
+            $completedStmt->execute([':uid' => $_SESSION['user_id']]);
+            $completedRow = $completedStmt->fetch(PDO::FETCH_ASSOC);
+            $completedCount = $completedRow ? (int)$completedRow['cnt'] : 0;
+
+            // Certificates count
+            $cstmt = $db->prepare("SELECT COUNT(*) as cnt FROM certificates WHERE user_id = :uid");
+            $cstmt->execute([':uid' => $_SESSION['user_id']]);
+            $crow = $cstmt->fetch(PDO::FETCH_ASSOC);
+            $certCount = $crow ? (int)$crow['cnt'] : 0;
+
+            // User XP
+            $ustmt = $db->prepare("SELECT xp FROM users WHERE id = :uid LIMIT 1");
+            $ustmt->execute([':uid' => $_SESSION['user_id']]);
+            $urow = $ustmt->fetch(PDO::FETCH_ASSOC);
+            $userXp = $urow ? (int)$urow['xp'] : 0;
+
+            // Average of best scores per game
+            $avgStmt = $db->prepare(<<<'SQL'
+    SELECT IFNULL(ROUND(AVG(best), 1), 0) as avg_best_score FROM (
+      SELECT MAX(s.score_percentage) as best
+      FROM scores s
+      WHERE s.user_id = :uid
+      GROUP BY s.game_id
+    ) a
+    SQL
+            );
+            $avgStmt->execute([':uid' => $_SESSION['user_id']]);
+            $avgRow = $avgStmt->fetch(PDO::FETCH_ASSOC);
+            $avgScore = $avgRow ? (float)$avgRow['avg_best_score'] : 0;
+
             // compute some simple stats from scores/works
             $statsStmt = $db->prepare("SELECT
-                (SELECT COUNT(*) FROM lessons) AS total_lessons,
-                (SELECT COUNT(*) FROM works WHERE user_id = :uid) AS works_count,
-                (SELECT COUNT(*) FROM scores WHERE user_id = :uid) AS scores_count,
-                (SELECT COUNT(DISTINCT DATE(created_at)) FROM scores WHERE user_id = :uid) AS active_days,
-                (SELECT IFNULL(ROUND(AVG(score),1), 0) FROM scores WHERE user_id = :uid) AS avg_score
+                (SELECT COUNT(*) FROM games) AS total_lessons,
+                (SELECT COUNT(*) FROM works WHERE user_id = :uid) AS works_count
                 ");
             $statsStmt->execute([':uid' => $_SESSION['user_id']]);
-            $stats = $statsStmt->fetch(PDO::FETCH_ASSOC) ?: [];
+            $statsData = $statsStmt->fetch(PDO::FETCH_ASSOC);
+            if ($statsData) {
+                $stats = array_merge($stats, $statsData);
+            }
+
+            // Get scores and active days separately
+            $scoresStmt = $db->prepare("SELECT COUNT(*) as scores_count, COUNT(DISTINCT DATE(created_at)) as active_days FROM scores WHERE user_id = :uid");
+            $scoresStmt->execute([':uid' => $_SESSION['user_id']]);
+            $scoresData = $scoresStmt->fetch(PDO::FETCH_ASSOC);
+            if ($scoresData) {
+                $stats = array_merge($stats, $scoresData);
+            }
+            // DEBUG
+            error_log('Profile stats DEBUG: user_id=' . $_SESSION['user_id'] . ', scoresData=' . json_encode($scoresData) . ', stats after merge=' . json_encode($stats));
         }
     } catch (Exception $e) {
         error_log('Profile load error: ' . $e->getMessage());
@@ -57,11 +118,35 @@ if (!empty($user['avatar'])) {
     $avatarHtml = '<img src="' . $avatarPath . '" alt="avatar" class="avatar-img" />';
 }
 
+// DEBUG: Show session info
+echo '<!-- DEBUG: user_id=' . $_SESSION['user_id'] . ', user=' . json_encode($user) . ', stats=' . json_encode($stats) . ' -->';
+
 // Safe stats
 $lessonsCount = isset($stats['total_lessons']) ? (int)$stats['total_lessons'] : 0;
 $achievementsCount = isset($stats['works_count']) ? (int)$stats['works_count'] : 0;
 $daysLearning = isset($stats['active_days']) ? (int)$stats['active_days'] : 0;
-$avgScore = isset($stats['avg_score']) ? $stats['avg_score'] : 0;
+$completedLessons = isset($completedCount) ? $completedCount : 0;
+$certificatesCount = isset($certCount) ? $certCount : 0;
+error_log('Final values: daysLearning=' . $daysLearning . ', active_days=' . $stats['active_days']);
+
+// Function to get level based on XP
+function getLevelFromXp($xp) {
+    if ($xp <= 100) {
+        return 'Sao Nhí Lấp Lánh';
+    } elseif ($xp <= 200) {
+        return 'Phi Hành Gia Tập Sự';
+    } elseif ($xp <= 300) {
+        return 'Thuyền Trưởng Không Gian';
+    } else {
+        return 'Người Chinh Phục Vũ Trụ';
+    }
+}
+
+$levelBadge = getLevelFromXp($userXp);
+
+// Calculate progress percent
+$totalLessonsCount = 20;
+$progressPercent = $totalLessonsCount ? round(($completedLessons / $totalLessonsCount) * 100) : 0;
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -101,11 +186,11 @@ $avgScore = isset($stats['avg_score']) ? $stats['avg_score'] : 0;
                             <p class="profile-role"><?php echo htmlspecialchars($profileRole); ?></p>
                             <div class="profile-stats">
                                 <div class="stat-item">
-                                    <span class="stat-number"><?php echo $lessonsCount; ?></span>
+                                    <span class="stat-number"><?php echo $completedLessons; ?></span>
                                     <span class="stat-label">Bài học</span>
                                 </div>
                                 <div class="stat-item">
-                                    <span class="stat-number"><?php echo $achievementsCount; ?></span>
+                                    <span class="stat-number"><?php echo $certificatesCount; ?></span>
                                     <span class="stat-label">Thành tích</span>
                                 </div>
                                 <div class="stat-item">
@@ -158,15 +243,15 @@ $avgScore = isset($stats['avg_score']) ? $stats['avg_score'] : 0;
                                 <div class="study-info-grid">
                                     <div class="study-item">
                                         <span class="info-label">Điểm trung bình</span>
-                                        <span class="study-value"><?php echo htmlspecialchars($avgScore); ?></span>
+                                        <span class="study-value"><?php echo $avgScore > 0 ? round($avgScore, 1) : '0'; ?>%</span>
                                     </div>
                                     <div class="study-item">
                                         <span class="info-label">Bài học hoàn thành</span>
-                                        <span class="study-value"><?php echo ($lessonsCount > 0) ? ($achievementsCount . '/' . $lessonsCount) : '0/' . $lessonsCount; ?></span>
+                                        <span class="study-value"><?php echo $completedLessons . '/' . "20"; ?></span>
                                     </div>
                                     <div class="study-item">
                                         <span class="info-label">Cấp độ</span>
-                                        <span class="level-badge">Nhà khoa học nhí</span>
+                                        <span class="level-badge"><?php echo htmlspecialchars($levelBadge); ?></span>
                                     </div>
                                 </div>
                             </div>
@@ -178,13 +263,13 @@ $avgScore = isset($stats['avg_score']) ? $stats['avg_score'] : 0;
                             <div class="progress-card">
                                 <h4>Tiến độ học tập</h4>
                                 <div class="circular-progress-wrapper">
-                                    <div class="circular-progress" data-progress="60">
+                                    <div class="circular-progress" data-progress="<?php echo $progressPercent; ?>">
                                         <div class="inner-circle">
-                                            <span class="progress-value">60%</span>
+                                            <span class="progress-value"><?php echo $progressPercent; ?>%</span>
                                         </div>
                                     </div>
                                 </div>
-                                <p class="progress-text">Đã hoàn thành 12/20 bài học</p>
+                                <p class="progress-text">Đã hoàn thành <?php echo $completedLessons; ?>/<?php echo $totalLessonsCount; ?> bài học</p>
                             </div>
                             
                             <div class="chart-container">

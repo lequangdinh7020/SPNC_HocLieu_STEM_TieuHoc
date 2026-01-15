@@ -41,6 +41,20 @@ if (!empty($_SESSION['user_id'])) {
         $urow = $ustmt->fetch(PDO::FETCH_ASSOC);
         $userXp = $urow ? (int)$urow['xp'] : 0;
 
+        // Average of best scores per game
+        $avgStmt = $db->prepare(<<<'SQL'
+    SELECT IFNULL(ROUND(AVG(best), 1), 0) as avg_best_score FROM (
+      SELECT MAX(s.score_percentage) as best
+      FROM scores s
+      WHERE s.user_id = :uid
+      GROUP BY s.game_id
+    ) a
+    SQL
+        );
+        $avgStmt->execute([':uid' => $_SESSION['user_id']]);
+        $avgRow = $avgStmt->fetch(PDO::FETCH_ASSOC);
+        $avgScore = $avgRow ? (float)$avgRow['avg_best_score'] : 0;
+
         // Progress percent (reuse home.php logic)
         $done = $completedCount;
         $total = $totalLessons;
@@ -107,8 +121,8 @@ if (!empty($_SESSION['user_id'])) {
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon">📈</div>
-                    <div class="stat-number"><?php echo htmlspecialchars($progressPercent); ?>%</div>
-                    <div class="stat-label">Tiến độ học tập</div>
+                    <div class="stat-number"><?php echo htmlspecialchars(round($avgScore, 1)); ?>%</div>
+                    <div class="stat-label">Điểm trung bình</div>
                 </div>
             </div>
         </section>
