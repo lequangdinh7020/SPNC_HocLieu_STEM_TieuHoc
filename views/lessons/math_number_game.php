@@ -33,23 +33,15 @@ require_once __DIR__ . '/../template/header.php';
             <span class="stat-label">SAI</span>
             <span id="wrongCount" class="stat-value">0</span>
         </div>
-        <div class="stat-box remaining">
-            <span class="stat-label">CÒN LẠI</span>
-            <span id="questionsRemaining" class="stat-value">197</span>
-        </div>
         <div class="stat-box timer">
             <span class="stat-label">THỜI GIAN</span>
             <span id="timer" class="stat-value">05:00</span>
-        </div>
-        <div class="stat-box progress">
-            <span class="stat-label">TIẾN ĐỘ</span>
-            <span id="progressValue" class="stat-value">3/200</span>
         </div>
     </div>
     
     <div class="game-controls">
         <button id="giveUpButton" class="control-btn give-up">
-            <i class="fas fa-flag"></i> Bỏ cuộc
+            <i class="fas fa-home"></i> Menu
         </button>
         <button id="resetButton" class="control-btn reset">
             <i class="fas fa-redo"></i> Chơi lại
@@ -91,15 +83,6 @@ require_once __DIR__ . '/../template/header.php';
             
             <div class="result-feedback" id="resultFeedback"></div>
         </div>
-    </div>
-    
-    <div class="navigation-controls">
-        <button id="prevButton" class="nav-btn prev-btn">
-            <i class="fas fa-chevron-left"></i> TRƯỚC
-        </button>
-        <button id="nextButton" class="nav-btn next-btn">
-            TIẾP THEO <i class="fas fa-chevron-right"></i>
-        </button>
     </div>
     
     <div class="game-hints">

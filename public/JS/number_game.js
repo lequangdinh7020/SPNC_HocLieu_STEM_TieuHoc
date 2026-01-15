@@ -2,10 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let gameState = {
         correct: 0,
         wrong: 0,
-        remaining: 197,
-        timeLeft: 231, 
-        currentSet: 0,
-        totalSets: 5,
+        timeLeft: 300,
         isPlaying: false,
         isPaused: false,
         timerInterval: null,
@@ -28,9 +25,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('checkAnswersButton').addEventListener('click', checkAnswers);
     
     document.getElementById('clearAnswersButton').addEventListener('click', clearAnswers);
-    
-    document.getElementById('prevButton').addEventListener('click', prevSet);
-    document.getElementById('nextButton').addEventListener('click', nextSet);
     
     function initGame() {
         const introModal = document.getElementById('intro-modal');
@@ -198,7 +192,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             gameState.correct += correctCount;
             gameState.wrong += wrongCount;
-            gameState.remaining = Math.max(0, gameState.remaining - answeredCount);
             
             updateUI();
         }
@@ -241,24 +234,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    function prevSet() {
-        if (gameState.currentSet > 0) {
-            gameState.currentSet--;
-            showFeedback(`Đã chuyển đến set ${gameState.currentSet + 1}`, 'neutral');
-        }
-    }
-    
-    function nextSet() {
-        if (gameState.currentSet < gameState.totalSets - 1) {
-            gameState.currentSet++;
-            showFeedback(`Đã chuyển đến set ${gameState.currentSet + 1}`, 'neutral');
-        }
-    }
-    
     function giveUpGame() {
-        if (confirm('Bạn có chắc chắn muốn bỏ cuộc? Tất cả tiến trình sẽ bị mất.')) {
-            endGame();
-            showFeedback('Bạn đã bỏ cuộc. Hãy thử lại lần sau!', 'wrong');
+        if (confirm('Bạn có chắc chắn muốn thoát về Menu?')) {
+            window.location.href = window.baseUrl || '/';
         }
     }
     
@@ -313,10 +291,7 @@ document.addEventListener('DOMContentLoaded', function() {
             gameState = {
                 correct: 0,
                 wrong: 0,
-                remaining: 197,
-                timeLeft: 231,
-                currentSet: 0,
-                totalSets: 5,
+                timeLeft: 300,
                 isPlaying: false,
                 isPaused: false,
                 timerInterval: null,
@@ -349,7 +324,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function enableControls() {
         const controlButtons = ['giveUpButton', 'resetButton', 'pauseButton', 'completeButton', 
-                               'checkAnswersButton', 'clearAnswersButton', 'prevButton', 'nextButton'];
+                               'checkAnswersButton', 'clearAnswersButton'];
         
         controlButtons.forEach(buttonId => {
             const button = document.getElementById(buttonId);
@@ -359,7 +334,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function disableControls() {
         const controlButtons = ['giveUpButton', 'pauseButton', 'completeButton', 
-                               'checkAnswersButton', 'prevButton', 'nextButton'];
+                               'checkAnswersButton'];
         
         controlButtons.forEach(buttonId => {
             const button = document.getElementById(buttonId);
@@ -370,8 +345,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateUI() {
         document.getElementById('correctCount').textContent = gameState.correct;
         document.getElementById('wrongCount').textContent = gameState.wrong;
-        document.getElementById('questionsRemaining').textContent = gameState.remaining;
-        document.getElementById('progressValue').textContent = `${gameState.currentSet + 1}/${gameState.totalSets}`;
         
         updateTimerDisplay();
     }
