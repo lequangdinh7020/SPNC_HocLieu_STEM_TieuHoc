@@ -252,7 +252,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     colorSwatches.forEach(swatch => {
         swatch.addEventListener("click", () => {
-            document.querySelector(".color-swatch.selected").classList.remove("selected");
+            const activeSwatch = document.querySelector(".color-swatch.selected");
+            if (activeSwatch) {
+                activeSwatch.classList.remove("selected");
+            }
+
+            // document.querySelector(".color-swatch.selected").classList.remove("selected");
             swatch.classList.add("selected");
             currentColor = swatch.dataset.color;
             colorPicker.value = currentColor;
