@@ -7,6 +7,16 @@ require_once 'models/User.php';
 require_once 'controllers/LessonController.php';
 require_once 'controllers/AuthController.php';
 
+// KIỂM TRA REMEMBER TOKEN - nếu session hết nhưng có cookie remember
+if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember'])) {
+    try {
+        $authController = new AuthController();
+        $authController->checkRememberToken();
+    } catch (Exception $e) {
+        error_log("Remember token check error: " . $e->getMessage());
+    }
+}
+
 // 2. PHÂN TÍCH URL
 $request_uri = $_SERVER['REQUEST_URI'];
 
@@ -319,8 +329,7 @@ function showHomePage() {
         error_log("Database error: " . $e->getMessage());
     }
 
-    $base_url = "http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['SCRIPT_NAME']);
-    $base_url = rtrim($base_url, '/\\');
+    $base_url = "http://" . $_SERVER['HTTP_HOST'] . "/SPNC_HocLieu_STEM_TieuHoc";
     
 ?>
 <!DOCTYPE html>
@@ -330,7 +339,7 @@ function showHomePage() {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>STEM Kids Việt - Khám phá vũ trụ STEM</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="public/css/style.css">
+    <link rel="stylesheet" href="<?= $base_url ?>/public/CSS/style.css">
 </head>
 <body>
     <div class="cosmic-bg">
@@ -455,7 +464,7 @@ function showHomePage() {
                                             <h4><?php echo htmlspecialchars($userName); ?>!</h4>
                                         </div>
                                     </div>
-                                    <a href="adventure.php" class="btn btn-neon btn-launch">
+                                    <a href="<?php echo $base_url; ?>/views/home.php" class="btn btn-neon btn-launch">
                                         <i class="fas fa-play"></i>
                                         <span>Tiếp tục hành trình</span>
                                         <div class="rocket-trail"></div>
