@@ -238,7 +238,7 @@ if (!empty($_SESSION['user_id'])) {
                                         </div>
                                         <div class="lessons-list">
                                             <?php foreach ($subject['lessons'] as $index => $lesson): ?>
-                                                <div class="lesson-item <?php echo $lesson['status']; ?>" 
+                                                <div class="lesson-item" 
                                                      onclick="openLesson('<?php echo $lesson['url']; ?>')">
                                                     <div class="lesson-preview"></div>
                                                     <div class="lesson-details">
@@ -249,13 +249,6 @@ if (!empty($_SESSION['user_id'])) {
                                                                 <span class="video-indicator" title="Có video">📹</span>
                                                             <?php endif; ?>
                                                         </div>
-                                                    </div>
-                                                    <div class="lesson-status">
-                                                        <?php if ($lesson['status'] == 'complete'): ?>
-                                                            <div class="status-badge completed">✓</div>
-                                                        <?php else: ?>
-                                                            <div class="status-badge upcoming">●</div>
-                                                        <?php endif; ?>
                                                     </div>
                                                 </div>
                                             <?php endforeach; ?>
