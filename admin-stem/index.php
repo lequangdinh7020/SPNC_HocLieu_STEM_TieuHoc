@@ -1,3 +1,81 @@
+<?php
+session_start();
+require_once __DIR__ . '/includes/config.php';
+
+checkAdminLogin();
+
+// Lấy dữ liệu từ database
+$conn = getDBConnection();
+
+// 1. Tổng số học liệu
+$stmt_lessons = mysqli_query($conn, "SELECT COUNT(*) as total FROM games");
+$row_lessons = mysqli_fetch_assoc($stmt_lessons);
+$total_lessons = $row_lessons['total'] ?? 0;
+
+// 2. Tổng số người dùng
+$stmt_users = mysqli_query($conn, "SELECT COUNT(*) as total FROM users WHERE role = 'user'");
+$row_users = mysqli_fetch_assoc($stmt_users);
+$total_users = $row_users['total'] ?? 0;
+
+// 3. Tổng lượt xem (số bản ghi trong bảng scores)
+$stmt_views = mysqli_query($conn, "SELECT COUNT(*) as total FROM scores");
+$row_views = mysqli_fetch_assoc($stmt_views);
+$total_views = $row_views['total'] ?? 0;
+
+// 4. Hoạt động gần đây (users vừa tạo account)
+$activities = [];
+$stmt_activity = mysqli_query($conn, "SELECT id, first_name, last_name, role, created_at FROM users ORDER BY created_at DESC LIMIT 5");
+while ($act = mysqli_fetch_assoc($stmt_activity)) {
+    $activities[] = $act;
+}
+
+// 5. Học liệu phổ biến (game với nhiều lượt chơi nhất)
+$popular_materials = [];
+$stmt_popular = mysqli_query($conn, "
+    SELECT 
+        g.id,
+        g.game_name,
+        IFNULL(sf.name, 'Không xác định') as topic_name,
+        COUNT(s.id) as play_count,
+        IFNULL(ROUND(AVG(s.score_percentage), 1), 0) as avg_score
+    FROM games g
+    LEFT JOIN scores s ON g.id = s.game_id
+    LEFT JOIN stem_fields sf ON g.topic_id = sf.id
+    GROUP BY g.id, g.game_name, sf.name
+    ORDER BY play_count DESC
+    LIMIT 5
+");
+while ($material = mysqli_fetch_assoc($stmt_popular)) {
+    $popular_materials[] = $material;
+}
+
+// 6. Thống kê theo từng field (Toán, Khoa học, Công nghệ, Kỹ thuật)
+$field_stats = [];
+$stmt_fields = mysqli_query($conn, "
+    SELECT 
+        sf.id,
+        sf.name,
+        sf.icon,
+        sf.color,
+        COUNT(DISTINCT g.id) as lesson_count,
+        COUNT(DISTINCT CASE WHEN s.id IS NOT NULL THEN s.user_id END) as unique_players,
+        COUNT(DISTINCT s.id) as total_plays,
+        IFNULL(ROUND(AVG(max_scores.max_score), 1), 0) as avg_best_score
+    FROM stem_fields sf
+    LEFT JOIN games g ON sf.id = g.topic_id
+    LEFT JOIN (
+        SELECT game_id, MAX(score_percentage) as max_score 
+        FROM scores 
+        GROUP BY game_id
+    ) max_scores ON g.id = max_scores.game_id
+    LEFT JOIN scores s ON g.id = s.game_id
+    GROUP BY sf.id, sf.name, sf.icon, sf.color
+    ORDER BY total_plays DESC
+");
+while ($field = mysqli_fetch_assoc($stmt_fields)) {
+    $field_stats[] = $field;
+}
+?>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -30,7 +108,7 @@
                             <span>Thống kê</span>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item" style="display: none;">
                         <a href="learning_materials.php">
                             <i class="fas fa-book"></i>
                             <span>Học liệu</span>
@@ -42,7 +120,7 @@
                             <span>Người dùng</span>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item" style="display: none;">
                         <a href="settings.php">
                             <i class="fas fa-cog"></i>
                             <span>Cài đặt</span>
@@ -57,7 +135,7 @@
                         <i class="fas fa-user-shield"></i>
                     </div>
                     <div class="admin-details">
-                        <h4>Admin</h4>
+                        <h4><?php echo $_SESSION['admin_username'] ?? 'Admin'; ?></h4>
                         <p>Quản trị viên</p>
                     </div>
                 </div>
@@ -80,7 +158,7 @@
                     </div>
                     <button class="btn-notification">
                         <i class="fas fa-bell"></i>
-                        <span class="notification-badge">3</span>
+                        <span class="notification-badge"><?php echo count($activities); ?></span>
                     </button>
                 </div>
             </div>
@@ -88,81 +166,55 @@
             <div class="content-wrapper">
                 <div class="welcome-card">
                     <div class="welcome-text">
-                        <h2>Chào mừng đến với bảng điều khiển</h2>
+                        <h2>Chào mừng!</h2>
                         <p>Giám sát và quản lý hệ thống học liệu STEM một cách hiệu quả</p>
                     </div>
                     <div class="welcome-stats">
                         <div class="stat-item">
                             <i class="fas fa-book"></i>
-                            <h3>17</h3>
+                            <h3><?php echo $total_lessons; ?></h3>
                             <p>Học liệu</p>
                         </div>
                         <div class="stat-item">
                             <i class="fas fa-users"></i>
-                            <h3>245</h3>
+                            <h3><?php echo $total_users; ?></h3>
                             <p>Người dùng</p>
                         </div>
                         <div class="stat-item">
                             <i class="fas fa-eye"></i>
-                            <h3>12.5K</h3>
+                            <h3><?php echo number_format($total_views); ?></h3>
                             <p>Lượt xem</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="stats-overview">
+                    <?php 
+                    $icons = ['flask', 'laptop-code', 'cogs', 'calculator'];
+                    $colors = ['science', 'technology', 'engineering', 'math'];
+                    $index = 0;
+                    
+                    foreach ($field_stats as $field): 
+                    ?>
                     <div class="stat-card">
-                        <div class="stat-icon science">
-                            <i class="fas fa-flask"></i>
+                        <div class="stat-icon <?php echo $colors[$index % 4]; ?>">
+                            <i class="fas fa-<?php echo $icons[$index % 4]; ?>"></i>
                         </div>
                         <div class="stat-info">
-                            <h3>Khoa học</h3>
+                            <h3><?php echo htmlspecialchars($field['name']); ?></h3>
                             <div class="stat-details">
-                                <span class="stat-value">42</span>
-                                <span class="stat-change positive">+12%</span>
+                                <span class="stat-value"><?php echo $field['total_plays']; ?></span>
+                                <span class="stat-change <?php echo $field['avg_best_score'] > 70 ? 'positive' : ($field['avg_best_score'] > 50 ? 'neutral' : 'warning'); ?>">
+                                    <?php echo $field['avg_best_score']; ?>%
+                                </span>
                             </div>
-                            <p class="stat-sub">Học liệu</p>
+                            <p class="stat-sub"><?php echo $field['lesson_count']; ?> học liệu</p>
                         </div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon technology">
-                            <i class="fas fa-laptop-code"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>Công nghệ</h3>
-                            <div class="stat-details">
-                                <span class="stat-value">38</span>
-                                <span class="stat-change positive">+8%</span>
-                            </div>
-                            <p class="stat-sub">Học liệu</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon engineering">
-                            <i class="fas fa-cogs"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>Kỹ thuật</h3>
-                            <div class="stat-details">
-                                <span class="stat-value">29</span>
-                                <span class="stat-change neutral">±0%</span>
-                            </div>
-                            <p class="stat-sub">Học liệu</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon math">
-                            <i class="fas fa-calculator"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>Toán học</h3>
-                            <div class="stat-details">
-                                <span class="stat-value">35</span>
-                                <span class="stat-change positive">+5%</span>
-                            </div>
-                            <p class="stat-sub">Học liệu</p>
-                        </div>
-                    </div>
+                    <?php 
+                    $index++;
+                    endforeach; 
+                    ?>
                 </div>
 
                 <div class="content-row">
@@ -175,42 +227,32 @@
                                 </h3>
                             </div>
                             <div class="activity-list">
+                                <?php 
+                                if (empty($activities)): 
+                                ?>
+                                    <div class="activity-item">
+                                        <p style="padding: 20px; text-align: center; color: #999;">Chưa có hoạt động nào</p>
+                                    </div>
+                                <?php 
+                                else:
+                                    foreach ($activities as $activity): 
+                                        $role_text = $activity['role'] === 'admin' ? 'quản trị viên' : 'học sinh/giáo viên';
+                                        $full_name = trim($activity['first_name'] . ' ' . $activity['last_name']);
+                                        $time_ago = time_elapsed_string($activity['created_at']);
+                                ?>
                                 <div class="activity-item">
                                     <div class="activity-icon success">
                                         <i class="fas fa-user-check"></i>
                                     </div>
                                     <div class="activity-content">
-                                        <p>Người dùng mới đăng ký: giáo viên Nguyễn Văn A</p>
-                                        <span class="activity-time">5 giờ trước</span>
+                                        <p>Người dùng mới đăng ký: <?php echo htmlspecialchars($role_text . ' ' . $full_name); ?></p>
+                                        <span class="activity-time"><?php echo $time_ago; ?></span>
                                     </div>
                                 </div>
-                                <div class="activity-item">
-                                    <div class="activity-icon warning">
-                                        <i class="fas fa-exclamation-triangle"></i>
-                                    </div>
-                                    <div class="activity-content">
-                                        <p>Báo cáo lỗi từ học liệu "Hậu Nghệ bắn mặt trời"</p>
-                                        <span class="activity-time">1 ngày trước</span>
-                                    </div>
-                                </div>
-                                <div class="activity-item">
-                                    <div class="activity-icon success">
-                                        <i class="fas fa-user-check"></i>
-                                    </div>
-                                    <div class="activity-content">
-                                        <p>Người dùng mới đăng ký: học sinh Nguyễn Văn B</p>
-                                        <span class="activity-time">1 ngày trước</span>
-                                    </div>
-                                </div>
-                                <div class="activity-item">
-                                    <div class="activity-icon success">
-                                        <i class="fas fa-user-check"></i>
-                                    </div>
-                                    <div class="activity-content">
-                                        <p>Người dùng mới đăng ký: học sinh Nguyễn Văn C</p>
-                                        <span class="activity-time">2 ngày trước</span>
-                                    </div>
-                                </div>
+                                <?php 
+                                    endforeach;
+                                endif;
+                                ?>
                             </div>
                         </div>
                     </div>
@@ -223,86 +265,30 @@
                             </h3>
                         </div>
                         <div class="popular-materials">
+                            <?php 
+                            if (empty($popular_materials)): 
+                            ?>
+                                <div style="padding: 20px; text-align: center; color: #999;">Chưa có dữ liệu</div>
+                            <?php 
+                            else:
+                                $rank = 1;
+                                foreach ($popular_materials as $material): 
+                            ?>
                             <div class="material-item">
-                                <div class="material-rank">1</div>
+                                <div class="material-rank"><?php echo $rank; ?></div>
                                 <div class="material-info">
-                                    <h4>Em là họa sĩ máy tính</h4>
+                                    <h4><?php echo htmlspecialchars($material['game_name']); ?></h4>
                                     <div class="material-meta">
-                                        <span class="material-category">Công nghệ</span>
-                                        <span class="material-views"><i class="fas fa-eye"></i> 3,421 lượt</span>
-                                    </div>
-                                </div>
-                                <div class="material-rating">
-                                    <div class="stars">
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <span>5.0</span>
+                                        <span class="material-category"><?php echo htmlspecialchars($material['topic_name']); ?></span>
+                                        <span class="material-views"><i class="fas fa-play"></i> <?php echo $material['play_count']; ?> lượt</span>
                                     </div>
                                 </div>
                             </div>
-                            <div class="material-item">
-                                <div class="material-rank">2</div>
-                                <div class="material-info">
-                                    <h4>Bí kiếp ăn uống lành mạnh</h4>
-                                    <div class="material-meta">
-                                        <span class="material-category">Khoa học</span>
-                                        <span class="material-views"><i class="fas fa-eye"></i> 2,847 lượt</span>
-                                    </div>
-                                </div>
-                                <div class="material-rating">
-                                    <div class="stars">
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <span>4.8</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="material-item">
-                                <div class="material-rank">3</div>
-                                <div class="material-info">
-                                    <h4>Hậu nghệ</h4>
-                                    <div class="material-meta">
-                                        <span class="material-category">Toán học</span>
-                                        <span class="material-views"><i class="fas fa-eye"></i> 3.792 lượt</span>
-                                    </div>
-                                </div>
-                                <div class="material-rating">
-                                    <div class="stars">
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <span>4.7</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="material-item">
-                                <div class="material-rank">4</div>
-                                <div class="material-info">
-                                    <h4>Hoa yêu thương nở rộ</h4>
-                                    <div class="material-meta">
-                                        <span class="material-category">Kỹ thuật</span>
-                                        <span class="material-views"><i class="fas fa-eye"></i> 2,539 lượt</span>
-                                    </div>
-                                </div>
-                                <div class="material-rating">
-                                    <div class="stars">
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <span>4.5</span>
-                                    </div>
-                                </div>
-                            </div>
+                            <?php 
+                                $rank++;
+                                endforeach;
+                            endif;
+                            ?>
                         </div>
                     </div>
                 </div>
@@ -312,5 +298,44 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="assets/js/index.js"></script>
+    <script>
+        // Hiển thị ngày hiện tại
+        const dateElement = document.getElementById('current-date');
+        const today = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        dateElement.textContent = today.toLocaleDateString('vi-VN', options);
+    </script>
 </body>
 </html>
+
+<?php
+// Helper function để tính thời gian đã trôi qua
+function time_elapsed_string($datetime, $full = false) {
+    $now = new DateTime;
+    $ago = new DateTime($datetime);
+    $diff = $now->diff($ago);
+
+    $diff->w = floor($diff->d / 7);
+    $diff->d -= $diff->w * 7;
+
+    $string = array(
+        'y' => 'năm',
+        'm' => 'tháng',
+        'w' => 'tuần',
+        'd' => 'ngày',
+        'h' => 'giờ',
+        'i' => 'phút',
+        's' => 'giây',
+    );
+    foreach($string as $k => &$v) {
+        if($diff->$k) {
+            $v = $diff->$k . ' ' . $v . ($diff->$k > 1 ? '' : '');
+        } else {
+            unset($string[$k]);
+        }
+    }
+
+    if(!$full) $string = array_slice($string, 0, 1);
+    return $string ? implode(', ', $string) . ' trước' : 'vừa xong';
+}
+?>
