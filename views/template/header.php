@@ -3,7 +3,17 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$protocol = 'http'; // Mặc định là http
+
+// 1. Kiểm tra xem Ngrok có đang chuyển hướng HTTPS về không (Quan trọng)
+if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
+    $protocol = 'https';
+} 
+// 2. Nếu không phải Ngrok, kiểm tra HTTPS thông thường trên server
+elseif (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+    $protocol = 'https';
+}
+
 $host = $_SERVER['HTTP_HOST'];
 $project_path = '/SPNC_HocLieu_STEM_TieuHoc';
 
@@ -13,11 +23,11 @@ $current_page = basename($_SERVER['PHP_SELF']) ?? 'home.php';
 
 $userName  = '';
 $userEmail = '';
-$avatarHtml = '<div class="avatar">👦</div>'; 
+$avatarHtml = '<div class="avatar">👦</div>';
 
 if (!empty($_SESSION['user_id'])) {
     try {
-        require_once __DIR__ . '/../../models/Database.php'; 
+        require_once __DIR__ . '/../../models/Database.php';
         $database = new Database();
         $db = $database->getConnection();
 
@@ -44,6 +54,7 @@ if (!empty($_SESSION['user_id'])) {
 ?>
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -51,7 +62,25 @@ if (!empty($_SESSION['user_id'])) {
     <link rel="stylesheet" href="<?= $base_url ?>/public/CSS/header.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Baloo+2:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="/SPNC_HocLieu_STEM_TieuHoc/public/manifest.json">
+    <link rel="apple-touch-icon" href="/SPNC_HocLieu_STEM_TieuHoc/public/images/logoApp-192.png">
+    <meta name="theme-color" content="#4caf50">
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/SPNC_HocLieu_STEM_TieuHoc/sw.js')
+                    .then((registration) => {
+                        console.log('ServiceWorker đăng ký thành công: ', registration.scope);
+                    }, (err) => {
+                        console.log('ServiceWorker đăng ký thất bại: ', err);
+                    });
+            });
+        }
+    </script>
+    <meta name="ngrok-skip-browser-warning" content="true">
+
 </head>
+
 <body>
     <div class="bg-elements">
         <div class="bg-circle circle-1"></div>
@@ -71,7 +100,7 @@ if (!empty($_SESSION['user_id'])) {
                         <p>Hành trình khám phá tri thức</p>
                     </div>
                 </div>
-                
+
                 <nav class="main-nav">
                     <a href="<?= $base_url ?>/views/home.php" class="nav-link <?php echo $current_page === 'home.php' ? 'active' : ''; ?>">Trang chủ</a>
                     <a href="<?= $base_url ?>/views/main_lesson.php" class="nav-link <?php echo $current_page === 'main_lesson.php' ? 'active' : ''; ?>">Bài học</a>
@@ -102,7 +131,7 @@ if (!empty($_SESSION['user_id'])) {
                 </div>
             </div>
         </div>
-        
+
         <div class="dropdown-section">
             <a href="<?= $base_url ?>/views/profile.php" class="dropdown-item">
                 <i class="fas fa-user"></i>
@@ -120,4 +149,11 @@ if (!empty($_SESSION['user_id'])) {
     <script src="<?= $base_url ?>/public/JS/header.js?v=<?php echo time(); ?>"></script>
 
 </body>
+<!-- <div style="padding: 20px; background: yellow; text-align: center; font-size: 18px; z-index: 9999; position: relative;">
+    <p>Bấm vào link dưới để mở khóa CSS:</p>
+    <a href="<?= $base_url ?>/public/CSS/header.css" style="color: red; font-weight: bold; font-size: 24px;">
+        >>> CLICK VÀO ĐÂY ĐỂ SỬA LỖI CSS <<<
+    </a>
+</div> -->
+
 </html>
