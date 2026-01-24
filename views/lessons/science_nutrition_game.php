@@ -53,43 +53,65 @@ shuffle($foodItems);
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/nutrition_game.css?v=<?= time() . rand(1000,9999) ?>">
-<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/home.css?v=<?= time() . rand(1000,9999) ?>"> 
+<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/nutrition_game.css?v=<?= time() . rand(1000, 9999) ?>">
+<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/home.css?v=<?= time() . rand(1000, 9999) ?>">
 <script src="https://unpkg.com/kaboom@3000.0.1/dist/kaboom.js"></script>
 
-<div class="game-wrapper"> 
-    <div class="game-header">
-        <div class="center-info">
-            <h1>SẮP XẾP THÁP DINH DƯỠNG PYRAMID</h1>
-            <div id="feedback"></div>
+<div id="intro-modal" class="modal-overlay active">
+    <div class="intro-dialogue modal-content">
+        <div class="intro-avatar">
+            <img src="<?= $base_url ?>/public/images/foods/cam.png" alt="Nutrition Master" class="intro-avatar-img">
+        </div>
+        <div class="intro-text-content">
+            <h3>Chào bạn! Mình là Nutrition Master!</h3>
+            <p>Chào mừng bạn đến với trò chơi "SẮP XẾP THÁP DINH DƯỠNG". Nhiệm vụ của bạn là kéo các món ăn vào đúng nhóm dinh dưỡng của chúng trên tháp. Bạn đã sẵn sàng chưa?</p>
+            <button id="startGameButton" class="start-btn">Bắt đầu thôi!</button>
         </div>
     </div>
+</div>
 
-    <div class="controls-section">
-        <div class="score-board">
-            Điểm của bạn: <span id="score">0</span>
-        </div>
-
-        <div class="top-buttons">
+<div class="game-wrapper">
+    <div class="game-header-bar">
+        <div class="header-left">
             <a href="<?= $base_url ?>/views/lessons/science.php" class="menu-btn">Menu</a>
-            <button id="resetButton">Chơi lại</button>
-            <button id="finishButton" class="finish-btn">Kết thúc</button>
+            <button id="resetButton" class="reset-btn">Làm lại</button>
+        </div>
+        <div class="header-center">
+            <h1>SẮP XẾP THÁP DINH DƯỠNG</h1>
+            <p class="game-subtitle">Xếp món ăn đúng nhóm dinh dưỡng</p>
+        </div>
+        <div class="header-right">
+            <div class="score-display">
+                <span class="score-label">Điểm</span>
+                <span id="score" class="score-value">0</span>
+            </div>
         </div>
     </div>
-    
+
+    <div class="game-instructions">
+        <div class="instruction-box">
+            <i class="fas fa-lightbulb instruction-icon"></i>
+            <h3>Hướng dẫn chơi</h3>
+            <p>Hãy kéo các món ăn vào đúng nhóm của chúng trên tháp dinh dưỡng.</p>
+        </div>
+    </div>
+
+    <div id="userFeedback"></div>
+    <button id="finishButton" class="finish-btn" style="display: block; margin: 20px auto;">Kết thúc</button>
+
     <div id="gameContainer">
         <div id="foodBank">
             <h3>Hãy kéo các món ăn vào đúng nhóm của chúng trên tháp.</h3>
             <div class="food-items-container">
-            <?php foreach ($foodItems as $food): ?>
-                <div class="food-item" 
-                     draggable="true" 
-                     id="<?= $food['id'] ?>" 
-                     data-group="<?= $food['group'] ?>"
-                     data-name="<?= $food['name'] ?>" data-attempt="1"> <img src="<?= $base_url ?>/public/images/foods/<?= $food['img'] ?>" alt="<?= $food['name'] ?>">
-                    <span><?= $food['name'] ?></span>
-                </div>
-            <?php endforeach; ?>
+                <?php foreach ($foodItems as $food): ?>
+                    <div class="food-item"
+                        draggable="true"
+                        id="<?= $food['id'] ?>"
+                        data-group="<?= $food['group'] ?>"
+                        data-name="<?= $food['name'] ?>" data-attempt="1"> <img src="<?= $base_url ?>/public/images/foods/<?= $food['img'] ?>" alt="<?= $food['name'] ?>">
+                        <span><?= $food['name'] ?></span>
+                    </div>
+                <?php endforeach; ?>
             </div>
         </div>
 
@@ -106,7 +128,28 @@ shuffle($foodItems);
             <div class="pyramid-level" id="level1" data-group="1">
                 <span>Tầng 4: Ăn đủ</span>
             </div>
-        </div> 
+        </div>
+    </div>
+
+    <div class="final-result" id="finalResult">
+        <h2>Kết quả cuối cùng</h2>
+        <div class="score-circle">
+            <p class="final-score" id="finalScore">0</p>
+            <span class="score-label">Điểm</span>
+        </div>
+        <div class="result-actions">
+            <button class="play-again" onclick="location.reload()">Chơi lại</button>
+            <a href="<?= $base_url ?>/views/lessons/science.php" class="back-to-lessons">Về bài học</a>
+        </div>
+    </div>
+
+    <div class="game-hints">
+        <h3><i class="fas fa-trophy"></i> Mẹo để đạt điểm cao</h3>
+        <ul>
+            <li>Nhớ nhóm thực phẩm: Đáy tháp là tinh bột, giữa là rau/trái cây, protein/sữa, đỉnh là chất béo</li>
+            <li>Quan sát kỹ hình ảnh món ăn trước khi kéo thả</li>
+            <li>Món ăn sai sẽ trở lại, hãy thử nhóm khác</li>
+        </ul>
     </div>
 </div>
 
@@ -115,7 +158,7 @@ shuffle($foodItems);
     window.baseUrl = window.baseUrl || "<?= $base_url ?>";
 </script>
 
-<script src="<?= $base_url ?>/public/JS/nutrition_game.js?v=<?= time() . rand(1000,9999) ?>"></script>
+<script src="<?= $base_url ?>/public/JS/nutrition_game.js?v=<?= time() . rand(1000, 9999) ?>"></script>
 
 <?php
 require_once __DIR__ . '/../template/footer.php';
