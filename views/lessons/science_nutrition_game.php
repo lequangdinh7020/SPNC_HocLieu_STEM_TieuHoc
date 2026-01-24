@@ -148,7 +148,6 @@ shuffle($foodItems);
         <ul>
             <li>Nhớ nhóm thực phẩm: Đáy tháp là tinh bột, giữa là rau/trái cây, protein/sữa, đỉnh là chất béo</li>
             <li>Quan sát kỹ hình ảnh món ăn trước khi kéo thả</li>
-            <li>Món ăn sai sẽ trở lại, hãy thử nhóm khác</li>
         </ul>
     </div>
 </div>
