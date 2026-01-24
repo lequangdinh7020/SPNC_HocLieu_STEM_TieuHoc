@@ -1,17 +1,45 @@
 let currentQuestionIndex = 0;
 let score = 0;
 let totalXp = 0;
+let correctCount = 0;
+let wrongCount = 0;
 const attempts = [];
 const quizContentEl = document.getElementById('quizContent');
 const finalResultEl = document.getElementById('finalResult');
 const progressFillEl = document.getElementById('progressFill');
 const progressCounter = document.getElementById('progressCounter');
+const headerProgressCounter = document.getElementById('headerProgressCounter');
+const correctCountEl = document.getElementById('correctCount');
+const wrongCountEl = document.getElementById('wrongCount');
+const userFeedbackEl = document.getElementById('userFeedback');
 
 function updateProgressCounter() {
     const totalQuestions = quizData.length;
+    const currentProgress = `${Math.min(currentQuestionIndex + 1, totalQuestions)}/${totalQuestions}`;
+    
     if (progressCounter) {
-        progressCounter.textContent = `${Math.min(currentQuestionIndex + 1, totalQuestions)}/${totalQuestions}`;
+        progressCounter.textContent = currentProgress;
     }
+    if (headerProgressCounter) {
+        headerProgressCounter.textContent = currentProgress;
+    }
+}
+
+function updateStats() {
+    if (correctCountEl) correctCountEl.textContent = correctCount;
+    if (wrongCountEl) wrongCountEl.textContent = wrongCount;
+}
+
+function showUserFeedback(message, type) {
+    if (!userFeedbackEl) return;
+    
+    userFeedbackEl.textContent = message;
+    userFeedbackEl.className = `result-feedback ${type}`;
+    userFeedbackEl.classList.remove('hidden');
+    
+    setTimeout(() => {
+        userFeedbackEl.classList.add('hidden');
+    }, 3000);
 }
 
 function loadQuestion(index) {
@@ -46,7 +74,7 @@ function loadQuestion(index) {
                 <span id="explanation-text-${index}" class="explanation-text"></span>
             </div>
             <button class="next-btn" id="nextBtn-${index}" onclick="nextQuestion()">
-                <span class="btn-icon">→</span> Câu tiếp theo
+                <i class="fas fa-arrow-right"></i> Câu tiếp theo
             </button>
         </div>
     `;
@@ -57,19 +85,28 @@ function checkAnswer(selectedBtn, selectedOption) {
     const correctOption = currentQuizData.correct;
     const allOptions = document.querySelectorAll('.option-btn');
 
+    // Disable all buttons
+    allOptions.forEach(btn => btn.disabled = true);
+
     // increment attempt count for this question
     attempts[currentQuestionIndex] = (attempts[currentQuestionIndex] || 0) + 1;
 
     if (selectedOption === correctOption) {
         selectedBtn.classList.add('correct');
         score += 10;
+        correctCount++;
+        updateStats();
+        
         // award XP only if this is the first attempt for the question
         if (attempts[currentQuestionIndex] === 1) {
             totalXp += 4; // 4 XP for first-try correct (5 questions total -> 20 XP)
         }
-        showFeedback('correct', 'Chính xác!');
+        showUserFeedback('Chính xác!', 'correct');
     } else {
         selectedBtn.classList.add('wrong');
+        wrongCount++;
+        updateStats();
+        
         allOptions.forEach(btn => {
             const btnText = btn.textContent.trim();
             const optionKey = currentQuizData.options ? 
@@ -80,7 +117,7 @@ function checkAnswer(selectedBtn, selectedOption) {
                 btn.classList.add('correct');
             }
         });
-        showFeedback('wrong', 'Sai rồi!');
+        showUserFeedback('Chưa đúng!', 'wrong');
     }
 
     const explanationBox = document.getElementById(`explanation-${currentQuestionIndex}`);
@@ -88,24 +125,6 @@ function checkAnswer(selectedBtn, selectedOption) {
     explanationText.textContent = currentQuizData.explanation;
     explanationBox.style.display = 'block';
     document.getElementById(`nextBtn-${currentQuestionIndex}`).style.display = 'flex';
-}
-
-function showFeedback(type, message) {
-    const feedbackEl = document.createElement('div');
-    feedbackEl.className = `feedback-message ${type}`;
-    feedbackEl.innerHTML = `
-        <span class="feedback-icon">${type === 'correct' ? '✓' : '✗'}</span>
-        <span class="feedback-text">${message}</span>
-    `;
-    
-    const questionBox = document.querySelector('.question-box');
-    questionBox.appendChild(feedbackEl);
-    
-    setTimeout(() => {
-        feedbackEl.style.opacity = '0';
-        feedbackEl.style.transform = 'translateY(-10px)';
-        setTimeout(() => feedbackEl.remove(), 300);
-    }, 1500);
 }
 
 function nextQuestion() {
@@ -127,29 +146,35 @@ function showFinalResult() {
     
     if (score === totalQuestions * 10) {
         messageText.textContent = "Xuất sắc! Bạn đã hoàn thành bài học một cách hoàn hảo!";
+        showUserFeedback('🎉 Hoàn hảo! Bạn đã trả lời đúng tất cả!', 'correct');
     } else if (percentage >= 80) {
         messageText.textContent = "Rất tốt! Bạn đã nắm vững kiến thức về Ngày và Đêm.";
+        showUserFeedback('👏 Rất tốt! Bạn đã làm bài xuất sắc!', 'correct');
     } else if (percentage >= 60) {
         messageText.textContent = "Tốt! Bạn hiểu phần lớn nội dung bài học.";
+        showUserFeedback('👍 Tốt! Hãy tiếp tục cố gắng!', 'neutral');
     } else {
         messageText.textContent = "Hãy xem lại video và làm bài tập thêm nhé!";
+        showUserFeedback('📚 Hãy học lại và thử lần nữa nhé!', 'neutral');
     }
 
     try {
-        fetch('/SPNC_HocLieu_STEM_TieuHoc/science/commit-quiz', {
+        fetch(window.baseUrl + '/science/commit-quiz', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 lesson: 'Ngày và Đêm', 
                 score: percentage,
                 rawScore: score,
-                totalScore: totalQuestions * 10
-                ,
+                totalScore: totalQuestions * 10,
                 xp: totalXp
             })
         }).then(r => r.json()).then(data => {
             if (data && data.success) {
                 console.log('Điểm đã được lưu thành công!');
+                if (data.xp_awarded) {
+                    showUserFeedback(`✓ Lưu điểm thành công! Bạn nhận được +${data.xp_awarded} XP!`, 'correct');
+                }
             } else {
                 const msg = document.createElement('p');
                 msg.textContent = 'Có lỗi khi lưu điểm: ' + (data && data.message ? data.message : '');
@@ -174,6 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (typeof quizData !== 'undefined' && quizData.length > 0) {
         loadQuestion(0);
         updateProgressCounter();
+        updateStats();
     } else {
         console.error("Không tìm thấy dữ liệu câu hỏi (quizData)!");
         quizContentEl.innerHTML = `
