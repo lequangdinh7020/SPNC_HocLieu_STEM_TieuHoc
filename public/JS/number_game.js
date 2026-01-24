@@ -8,24 +8,18 @@ document.addEventListener('DOMContentLoaded', function() {
         timerInterval: null,
         answers: {},
         correctAnswers: {},
-        checkedItems: {}, // Theo dõi những ô đã kiểm tra (để không tăng lại)
-        gameSaved: false // Theo dõi xem điểm đã lưu chưa
+        checkedItems: {},
+        gameSaved: false,
+        totalNumbers: 10
     };
     
     initGame();
     
     document.getElementById('startGameButton').addEventListener('click', startGame);
-    
     document.getElementById('giveUpButton').addEventListener('click', giveUpGame);
-    
     document.getElementById('resetButton').addEventListener('click', resetGame);
-    
     document.getElementById('pauseButton').addEventListener('click', togglePause);
-    
-    document.getElementById('completeButton').addEventListener('click', completeGame);
-    
     document.getElementById('checkAnswersButton').addEventListener('click', checkAnswers);
-    
     document.getElementById('clearAnswersButton').addEventListener('click', clearAnswers);
     
     function initGame() {
@@ -33,11 +27,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (introModal.classList.contains('active')) {}
         
         createNumberGrid();
-        
         createAnswerGrid();
-        
         calculateCorrectAnswers();
-        
         updateUI();
     }
     
@@ -67,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const answerGrid = document.getElementById('answerGrid');
         answerGrid.innerHTML = '';
         
-        for (let i = 1; i <= 20; i++) {
+        for (let i = 1; i <= gameState.totalNumbers; i++) {
             const answerItem = document.createElement('div');
             answerItem.className = 'answer-item';
             
@@ -123,7 +114,6 @@ document.addEventListener('DOMContentLoaded', function() {
         gameState.isPaused = false;
         
         startTimer();
-        
         enableControls();
         
         showFeedback('Bắt đầu! Hãy đếm số thật nhanh và chính xác!', 'neutral');
@@ -143,9 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (gameState.timeLeft <= 0) {
                     clearInterval(gameState.timerInterval);
                     endGame();
-                    // Thông báo hết giờ rõ ràng
                     showFeedback('⏰ HẾT THỜI GIAN! Đang tự động lưu điểm...', 'wrong');
-                    // Chờ 1 giây rồi lưu điểm
                     setTimeout(() => {
                         saveGameScore('Hết thời gian!');
                     }, 1000);
@@ -172,12 +160,11 @@ document.addEventListener('DOMContentLoaded', function() {
         let newWrongCount = 0;
         let answeredCount = 0;
         
-        for (let i = 1; i <= 20; i++) {
+        for (let i = 1; i <= gameState.totalNumbers; i++) {
             const input = document.getElementById(`answer-${i}`);
             const userAnswer = gameState.answers[i];
             const correctAnswer = gameState.correctAnswers[i] || 0;
         
-            // Bỏ class highlight cũ
             input.classList.remove('correct', 'wrong');
             
             if (userAnswer !== null && userAnswer !== undefined) {
@@ -185,14 +172,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (userAnswer === correctAnswer) {
                     input.classList.add('correct');
-                    // Chỉ tính là "mới đúng" nếu ô này chưa được kiểm tra trước
                     if (!gameState.checkedItems[i] || gameState.checkedItems[i].result !== 'correct') {
                         newCorrectCount++;
                     }
                     gameState.checkedItems[i] = { result: 'correct', answer: userAnswer };
                 } else {
                     input.classList.add('wrong');
-                    // Chỉ tính là "mới sai" nếu ô này chưa được kiểm tra trước
                     if (!gameState.checkedItems[i] || gameState.checkedItems[i].result !== 'wrong') {
                         newWrongCount++;
                     }
@@ -202,30 +187,33 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         if (answeredCount > 0) {
-            // Chỉ cộng những ô mới được kiểm tra và đúng
             gameState.correct += newCorrectCount;
             gameState.wrong += newWrongCount;
             
             updateUI();
-        }
-        
-        if (answeredCount === 0) {
-            showFeedback('Hãy nhập ít nhất một câu trả lời trước khi kiểm tra!', 'neutral');
-        } else {
-            // Đếm tổng số ô đúng hiện tại
+            
             let totalCorrect = 0;
-            for (let i = 1; i <= 20; i++) {
+            for (let i = 1; i <= gameState.totalNumbers; i++) {
                 if (gameState.checkedItems[i] && gameState.checkedItems[i].result === 'correct') {
                     totalCorrect++;
                 }
             }
-            showFeedback(`Kiểm tra xong! Hiện tại: ${totalCorrect} ô đúng (từ ${answeredCount} ô đã nhập).`, 
-                        totalCorrect === answeredCount ? 'correct' : 'neutral');
+            
+            showFeedback(`Kết quả: ${newCorrectCount} đúng, ${newWrongCount} sai. Tổng: ${totalCorrect}/${gameState.totalNumbers}`, 
+                        totalCorrect === gameState.totalNumbers ? 'correct' : 'neutral');
+            
+            if (totalCorrect === gameState.totalNumbers) {
+                setTimeout(() => {
+                    saveGameScore('Hoàn thành xuất sắc!');
+                }, 1500);
+            }
+        } else {
+            showFeedback('Hãy nhập ít nhất một câu trả lời trước khi kiểm tra!', 'neutral');
         }
     }
     
     function clearAnswers() {
-        for (let i = 1; i <= 20; i++) {
+        for (let i = 1; i <= gameState.totalNumbers; i++) {
             const input = document.getElementById(`answer-${i}`);
             input.value = '';
             input.classList.remove('correct', 'wrong');
@@ -242,13 +230,14 @@ document.addEventListener('DOMContentLoaded', function() {
         gameState.isPaused = !gameState.isPaused;
         
         const pauseButton = document.getElementById('pauseButton');
-        const pauseIcon = pauseButton.querySelector('i');
         
         if (gameState.isPaused) {
             pauseButton.innerHTML = '<i class="fas fa-play"></i> Tiếp tục';
+            pauseButton.style.backgroundColor = '#28a745';
             showFeedback('Game đã tạm dừng.', 'neutral');
         } else {
             pauseButton.innerHTML = '<i class="fas fa-pause"></i> Tạm dừng';
+            pauseButton.style.backgroundColor = '#ffd166';
             showFeedback('Game đã tiếp tục.', 'neutral');
         }
     }
@@ -260,23 +249,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    /**
-     * Hàm tổng kết kết quả và lưu điểm
-     */
     function saveGameScore(endMessage) {
         if (gameState.gameSaved) {
-            // Đã lưu rồi, không lưu lại
             if (endMessage) {
                 showFeedback(endMessage + ' (Điểm đã được lưu trước đó)', 'neutral');
             }
             return;
         }
 
-        // Tính số ô đúng từ answers hiện tại (so sánh với correctAnswers)
-        // Không cần phải bấm "Kiểm tra" - tính luôn những ô được nhập
         let correctCount = 0;
         let answeredCount = 0;
-        for (let i = 1; i <= 20; i++) {
+        for (let i = 1; i <= gameState.totalNumbers; i++) {
             const userAnswer = gameState.answers[i];
             const correctAnswer = gameState.correctAnswers[i] || 0;
             
@@ -288,14 +271,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // Score = (số ô đúng / 20) * 100
-        const accuracy = Math.round((correctCount / 20) * 100);
+        const accuracy = Math.round((correctCount / gameState.totalNumbers) * 100);
 
-        // Hiển thị tổng kết
-        const resultMsg = `Tổng kết: ${correctCount}/20 câu đúng. Độ chính xác: ${accuracy}%`;
+        const resultMsg = `Tổng kết: ${correctCount}/${gameState.totalNumbers} câu đúng. Độ chính xác: ${accuracy}%`;
         showFeedback(resultMsg, accuracy >= 70 ? 'correct' : 'wrong');
 
-        // Gửi điểm tới server
         try {
             const apiUrl = (window.baseUrl || '') + '/views/lessons/update-number-score';
             fetch(apiUrl, {
@@ -311,7 +291,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         showFeedback('✓ Lưu điểm thành công!', 'correct');
                     }
                 } else {
-                    // show server message if any
                     if (json && json.message) {
                         showFeedback('⚠ Lưu điểm: ' + json.message, 'wrong');
                     }
@@ -326,26 +305,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    function completeGame() {
-        if (!gameState.isPlaying) {
-            showFeedback('Hãy bắt đầu game trước!', 'neutral');
-            return;
-        }
-        
-        const unanswered = Object.keys(gameState.answers).filter(num => 
-            gameState.answers[num] === null || gameState.answers[num] === undefined
-        ).length;
-        
-        if (unanswered > 0 && !confirm(`Bạn còn ${unanswered} câu chưa trả lời. Bạn có chắc chắn muốn nộp bài?`)) {
-            return;
-        }
-        
-        endGame();
-        
-        // Tự động lưu điểm
-        saveGameScore('Hoàn thành game!');
-    }
-    
     function resetGame() {
         if (confirm('Bạn có chắc chắn muốn chơi lại từ đầu?')) {
             gameState = {
@@ -358,7 +317,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 answers: {},
                 correctAnswers: gameState.correctAnswers,
                 checkedItems: {},
-                gameSaved: false
+                gameSaved: false,
+                totalNumbers: 10
             };
             
             if (gameState.timerInterval) {
@@ -369,6 +329,10 @@ document.addEventListener('DOMContentLoaded', function() {
             updateUI();
             
             document.getElementById('intro-modal').classList.add('active');
+            
+            const pauseButton = document.getElementById('pauseButton');
+            pauseButton.innerHTML = '<i class="fas fa-pause"></i> Tạm dừng';
+            pauseButton.style.backgroundColor = '';
             
             showFeedback('Game đã được reset. Hãy bắt đầu lại!', 'neutral');
         }
@@ -385,7 +349,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function enableControls() {
-        const controlButtons = ['giveUpButton', 'resetButton', 'pauseButton', 'completeButton', 
+        const controlButtons = ['giveUpButton', 'resetButton', 'pauseButton', 
                                'checkAnswersButton', 'clearAnswersButton'];
         
         controlButtons.forEach(buttonId => {
@@ -395,8 +359,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function disableControls() {
-        const controlButtons = ['giveUpButton', 'pauseButton', 'completeButton', 
-                               'checkAnswersButton'];
+        const controlButtons = ['giveUpButton', 'pauseButton', 'checkAnswersButton'];
         
         controlButtons.forEach(buttonId => {
             const button = document.getElementById(buttonId);
@@ -438,6 +401,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 1000);
         }
     }
+    
     function initAdditionalFeatures() {
         const numberCells = document.querySelectorAll('.number-cell');
         numberCells.forEach(cell => {
@@ -459,8 +423,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function highlightNumberInGrid(number) {
         const cells = document.querySelectorAll(`.number-cell[data-number="${number}"]`);
         cells.forEach(cell => {
-            cell.style.backgroundColor = '#cce5ff';
-            cell.style.boxShadow = '0 0 10px rgba(0, 123, 255, 0.5)';
+            cell.style.backgroundColor = '#d4c5f7';
+            cell.style.boxShadow = '0 0 15px rgba(123, 104, 238, 0.5)';
         });
     }
     
