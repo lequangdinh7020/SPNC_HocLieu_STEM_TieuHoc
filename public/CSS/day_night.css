@@ -126,9 +126,8 @@ body {
     justify-content: space-between;
     margin-bottom: 30px;
     padding: 20px;
-    background: white;
+    background: none;
     border-radius: 12px;
-    box-shadow: 0 5px 15px var(--shadow-light);
     gap: 20px;
     flex-wrap: wrap;
 }

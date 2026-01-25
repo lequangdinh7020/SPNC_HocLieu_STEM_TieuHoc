@@ -1,5 +1,15 @@
 document.addEventListener("DOMContentLoaded", () => {
     
+    // Handle intro modal
+    const introModal = document.getElementById('intro-modal');
+    const startGameButton = document.getElementById('startGameButton');
+    
+    if (startGameButton && introModal) {
+        startGameButton.addEventListener('click', () => {
+            introModal.classList.remove('active');
+        });
+    }
+    
     // Tìm các phần tử bên trong .game-wrapper
     const gameWrapper = document.querySelector(".game-wrapper");
     if (!gameWrapper) return;
@@ -14,6 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const foodItems = gameWrapper.querySelectorAll(".food-item");
     const pyramidLevels = gameWrapper.querySelectorAll(".pyramid-level");
     const feedbackBox = gameWrapper.querySelector("#feedback");
+    const userFeedback = document.getElementById("userFeedback");
     const scoreDisplay = gameWrapper.querySelector("#score");
     const resetButton = gameWrapper.querySelector("#resetButton");
     const finishButton = gameWrapper.querySelector("#finishButton");
@@ -453,68 +464,92 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- Các hàm hỗ trợ ---
     function showFeedback(message, type) {
-        feedbackBox.textContent = message;
-        feedbackBox.className = type;
+        // Show in userFeedback div
+        if (userFeedback) {
+            userFeedback.textContent = message;
+            userFeedback.className = type;
+            
+            const duration = (type === 'hint') ? 3500 : 2000;
+            
+            setTimeout(() => {
+                userFeedback.textContent = "";
+                userFeedback.className = "";
+            }, duration);
+        }
         
-        const duration = (type === 'hint') ? 3500 : 2000;
-        
-        setTimeout(() => {
-            feedbackBox.textContent = "";
-            feedbackBox.className = "";
-        }, duration);
+        // Also show in feedbackBox if exists (for compatibility)
+        if (feedbackBox) {
+            feedbackBox.textContent = message;
+            feedbackBox.className = type;
+            
+            const duration = (type === 'hint') ? 3500 : 2000;
+            
+            setTimeout(() => {
+                feedbackBox.textContent = "";
+                feedbackBox.className = "";
+            }, duration);
+        }
     }
 
     function showFinishModal(score) {
-        const toast = document.createElement('div');
-        toast.className = 'toast-notification';
-        toast.innerHTML = `
-            <div class="toast-content">
-                <h2>KẾT THÚC</h2>
-                <p class="toast-score">Điểm của bạn: <strong>${score}</strong></p>
-                <p class="toast-message">${getFinishMessage(score)}</p>
-                <div class="toast-buttons">
-                    <button class="toast-menu-btn">
-                        <span>Menu</span>
-                    </button>
-                    <button class="toast-replay-btn">
-                        <span>Chơi lại</span>
-                    </button>
+        // Show final result section
+        const finalResult = document.getElementById('finalResult');
+        const finalScore = document.getElementById('finalScore');
+        
+        if (finalResult && finalScore) {
+            finalScore.textContent = score;
+            finalResult.classList.add('show');
+            playCelebrationSound();
+        } else {
+            // Fallback to toast if final result section doesn't exist
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            toast.innerHTML = `
+                <div class="toast-content">
+                    <h2>KẾT THÚC</h2>
+                    <p class="toast-score">Điểm của bạn: <strong>${score}</strong></p>
+                    <p class="toast-message">${getFinishMessage(score)}</p>
+                    <div class="toast-buttons">
+                        <button class="toast-menu-btn">
+                            <span>Menu</span>
+                        </button>
+                        <button class="toast-replay-btn">
+                            <span>Chơi lại</span>
+                        </button>
+                    </div>
                 </div>
-            </div>
-        `;
-        document.body.appendChild(toast);
-        
-        setTimeout(() => toast.classList.add('show'), 10);
-        
-        // Thêm âm thanh cho nút
-        const replayBtn = toast.querySelector('.toast-replay-btn');
-        const menuBtn = toast.querySelector('.toast-menu-btn');
-        
-        console.log('Toast buttons:', { replayBtn, menuBtn });
-        
-        if (replayBtn) {
-            replayBtn.addEventListener('click', () => {
-                console.log('Replay button clicked');
-                playSuccessSound();
-                setTimeout(() => {
-                    toast.remove();
-                    // Khôi phục nút Kết thúc
-                    if (finishButton) {
-                        finishButton.disabled = false;
-                        finishButton.innerHTML = 'Kết thúc';
-                    }
-                }, 100);
-            });
-        }
-        
-        if (menuBtn) {
-            menuBtn.addEventListener('click', () => {
-                console.log('Menu button clicked, navigating to:', `${window.baseUrl}/views/lessons/science.php`);
-                playSuccessSound();
-                setTimeout(() => {
-                    window.location.href = `${window.baseUrl}/views/lessons/science.php`;
-                }, 100);
-            });
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.classList.add('show'), 10);
+            
+            // Thêm âm thanh cho nút
+            const replayBtn = toast.querySelector('.toast-replay-btn');
+            const menuBtn = toast.querySelector('.toast-menu-btn');
+            
+            if (replayBtn) {
+                replayBtn.addEventListener('click', () => {
+                    playSuccessSound();
+                    setTimeout(() => {
+                        toast.remove();
+                        // Khôi phục nút Kết thúc nếu có
+                        if (finishButton) {
+                            finishButton.disabled = false;
+                        }
+                        // resetGameState(); // <-- ĐÃ XÓA DÒNG NÀY VÌ GÂY LỖI
+                        location.reload(); // Tải lại trang là đủ để reset game
+                    }, 100);
+                });
+            }
+            
+            if (menuBtn) {
+                menuBtn.addEventListener('click', () => {
+                    playSuccessSound();
+                    setTimeout(() => {
+                        window.location.href = window.baseUrl + '/views/lessons/science.php';
+                    }, 100);
+                });
+            }
         }
     }
 
