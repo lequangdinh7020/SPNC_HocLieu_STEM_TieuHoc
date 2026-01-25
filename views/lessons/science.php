@@ -9,8 +9,8 @@ $science_data = [
     'icon' => '🔬',
     'description' => 'Cùng khám phá thế giới diệu kỳ!',
     'total_xp' => 280, 
-    'completed_xp' => 0, // Bắt đầu từ 0 XP
-    'current_streak' => 0, // Bắt đầu từ 0 streak
+    'completed_xp' => 0, 
+    'current_streak' => 0, 
     'character' => [
         'name' => 'Bạn Khủng Long Khoa Học',
         'avatar' => '🦖',
@@ -18,17 +18,17 @@ $science_data = [
         'welcome_message' => 'Chào bạn nhỏ! Mình là Khủng Long Khoa Học! Cùng mình khám phá các chủ đề siêu thú vị nhé! 🦖✨'
     ],
     'stats' => [
-        'completed' => 0, // Chưa hoàn thành bài nào
-        'current' => 0,   // Chưa có bài nào đang học
-        'upcoming' => 5,  // 5 bài chưa học
-        'total_xp' => 0   // Tổng XP = 0
+        'completed' => 0, 
+        'current' => 0,   
+        'upcoming' => 5, 
+        'total_xp' => 0   
     ],
     'topics' => [
         [
             'id' => 1,
             'title' => 'THẾ GIỚI MÀU SẮC',
             'icon' => '🎨',
-            'status' => 'not-started', // Đổi thành not-started
+            'status' => 'not-started', 
             'color' => '#22C55E',
             'description' => 'Khám phá bí mật của màu sắc qua các hoạt động thú vị',
             'learning_time' => '15 phút',
@@ -40,7 +40,7 @@ $science_data = [
             'id' => 2,
             'title' => 'BÍ KÍP ĂN UỐNG LÀNH MẠNH',
             'icon' => '🍎',
-            'status' => 'not-started', // Đổi thành not-started
+            'status' => 'not-started', 
             'color' => '#10B981',
             'description' => 'Học cách chọn thực phẩm tốt cho sức khỏe',
             'learning_time' => '20 phút',
@@ -52,7 +52,7 @@ $science_data = [
             'id' => 3,
             'title' => 'NGÀY VÀ ĐÊM',
             'icon' => '🌓',
-            'status' => 'not-started', // Đổi thành not-started
+            'status' => 'not-started', 
             'color' => '#3B82F6',
             'description' => 'Khám phá bí mật của thời gian và thiên văn',
             'learning_time' => '12 phút',
@@ -159,7 +159,6 @@ if (!isset($_SESSION['planet_status'])) {
             <div class="orbit orbit-4"></div>
             <div class="orbit orbit-5"></div>
             
-            <!-- Tất cả đều là not-started khi khởi tạo -->
             <div class="planet planet-1 not-started" data-planet="1">🎨</div>
             <div class="planet planet-2 not-started" data-planet="2">🍎</div>
             <div class="planet planet-3 not-started" data-planet="3">🌓</div>
@@ -200,10 +199,8 @@ if (!isset($_SESSION['planet_status'])) {
      <script>
         window.baseUrl = "<?php echo $base_url; ?>";
         
-        // Khởi tạo trạng thái mặc định cho JS
         window.defaultPlanetStatuses = <?php echo json_encode($_SESSION['planet_status']); ?>;
         
-        // Debug
         console.log('Default planet statuses from PHP:', window.defaultPlanetStatuses);
     </script>
     <script src="<?php echo $base_url; ?>/public/JS/science.js?v=<?= time() ?>"></script>

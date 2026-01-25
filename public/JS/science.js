@@ -94,10 +94,8 @@ const planets = {
     }
 };
 
-// Sử dụng localStorage để tránh delay
 const STORAGE_KEY = 'science_planet_status';
 
-// Hàm lưu tất cả trạng thái vào localStorage
 function saveAllPlanetStatuses() {
     try {
         const statuses = {};
@@ -113,7 +111,6 @@ function saveAllPlanetStatuses() {
     }
 }
 
-// Hàm load trạng thái từ localStorage
 function loadPlanetStatuses() {
     try {
         const saved = localStorage.getItem(STORAGE_KEY);
@@ -122,7 +119,6 @@ function loadPlanetStatuses() {
             for (const id in statuses) {
                 if (planets[id]) {
                     planets[id].status = statuses[id];
-                    // Update activities status
                     planets[id].activities.forEach(act => {
                         act.status = statuses[id];
                     });
@@ -137,7 +133,6 @@ function loadPlanetStatuses() {
     }
 }
 
-// Hàm đánh dấu planet là current
 function markPlanetAsCurrent(planetId) {
     const planet = planets[planetId];
     if (!planet) {
@@ -145,20 +140,16 @@ function markPlanetAsCurrent(planetId) {
         return false;
     }
     
-    // Chỉ chuyển nếu đang là not-started
     if (planet.status === 'not-started') {
         console.log(`🔄 Marking planet ${planetId} as current...`);
         
-        // Cập nhật ngay lập tức
         planet.status = 'current';
         planet.activities.forEach(act => {
             act.status = 'current';
         });
         
-        // Cập nhật hiển thị ngay
         updatePlanetDisplay();
         
-        // Lưu vào localStorage ngay
         saveAllPlanetStatuses();
         
         console.log(`✅ Planet ${planetId} marked as current`);
@@ -168,7 +159,6 @@ function markPlanetAsCurrent(planetId) {
     return false;
 }
 
-// Hàm cập nhật hiển thị planet
 function updatePlanetDisplay() {
     console.log('🔄 Updating planet display...');
     
@@ -177,10 +167,8 @@ function updatePlanetDisplay() {
         const pdata = planets[pid];
         if (!pdata) return;
         
-        // Remove all status classes
         el.classList.remove('completed', 'current', 'not-started', 'locked');
         
-        // Add the correct status class
         if (pdata.status === 'completed') {
             el.classList.add('completed');
             el.style.opacity = '';
@@ -203,11 +191,9 @@ function updatePlanetDisplay() {
     });
 }
 
-// Main initialization
 function initScienceSystem() {
     console.log('🚀 Initializing Science System...');
     
-    // Load trạng thái từ localStorage ngay lập tức
     loadPlanetStatuses();
     
     const planetInfoOverlay = document.getElementById('planetInfoOverlay');
@@ -233,7 +219,6 @@ function initScienceSystem() {
 
     console.log('✅ Tất cả elements đã được tìm thấy');
 
-    // Xử lý click vào planet
     document.querySelectorAll('.planet').forEach(planet => {
         planet.addEventListener('click', function() {
             const planetId = this.getAttribute('data-planet');
@@ -246,10 +231,8 @@ function initScienceSystem() {
                 return;
             }
             
-            // QUAN TRỌNG: Đánh dấu là current NGAY KHI CLICK
             const wasMarked = markPlanetAsCurrent(planetId);
             
-            // Hiển thị thông tin
             infoIcon.textContent = currentPlanetData.icon;
             infoName.textContent = currentPlanetData.name;
             infoDescription.textContent = currentPlanetData.description;
@@ -257,7 +240,6 @@ function initScienceSystem() {
             let statusText = '';
             let statusClass = '';
             
-            // Sử dụng trạng thái mới (sau khi đã update)
             const displayStatus = planets[planetId].status;
             
             if (displayStatus === 'completed') {
@@ -277,7 +259,6 @@ function initScienceSystem() {
             infoStatus.textContent = statusText;
             infoStatus.className = 'status ' + statusClass;
             
-            // Hiển thị activities
             activitiesGrid.innerHTML = '';
             planets[planetId].activities.forEach(activity => {
                 const activityElement = document.createElement('div');
@@ -293,7 +274,6 @@ function initScienceSystem() {
                     activityElement.classList.add('activity-locked');
                 }
                 
-                // Tất cả hoạt động đều có thể click
                 if (activity.link) {
                     activityElement.classList.add('activity-clickable');
                     activityElement.style.cursor = 'pointer';
@@ -329,16 +309,13 @@ function initScienceSystem() {
                 activitiesGrid.appendChild(activityElement);
             });
 
-            // Hiển thị panel
             planetInfoOverlay.classList.add('show');
             console.log('📱 Info panel shown');
             
-            // Thông báo nếu đã chuyển trạng thái
             if (wasMarked) {
                 console.log(`🌟 Planet ${planetId} is now marked as "đang học"`);
             }
             
-            // Hiệu ứng click
             this.style.transform = 'scale(1.3)';
             setTimeout(() => {
                 this.style.transform = '';
@@ -378,15 +355,12 @@ function initScienceSystem() {
     return true;
 }
 
-// Thêm: Xử lý khi tải lại trang
 window.addEventListener('beforeunload', function() {
     saveAllPlanetStatuses();
 });
 
-// Thêm: Tự động lưu mỗi 5 giây để đảm bảo không mất dữ liệu
 setInterval(saveAllPlanetStatuses, 5000);
 
-// Start the system when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initScienceSystem);
 } else {

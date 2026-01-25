@@ -9,8 +9,8 @@ $math_data = [
     'icon' => '🧮',
     'description' => 'Khám phá thế giới số học đầy màu sắc!',
     'total_xp' => 290,
-    'completed_xp' => 0, // Bắt đầu từ 0 XP
-    'current_streak' => 0, // Bắt đầu từ 0 streak
+    'completed_xp' => 0, 
+    'current_streak' => 0,
     'character' => [
         'name' => 'Bạn Thỏ Toán Học',
         'avatar' => '🐰',
@@ -18,17 +18,17 @@ $math_data = [
         'welcome_message' => 'Chào bạn nhỏ! Mình là Thỏ Toán Học! Cùng mình khám phá 5 chủ đề toán học siêu vui nhé! 🐰✨'
     ],
     'stats' => [
-        'completed' => 0, // Chưa hoàn thành
-        'current' => 0,   // Chưa có cái nào đang học
-        'upcoming' => 5,  // 5 bài chưa học
-        'total_xp' => 0   // Tổng XP = 0
+        'completed' => 0, 
+        'current' => 0,   
+        'upcoming' => 5,  
+        'total_xp' => 0  
     ],
     'topics' => [
         [
             'id' => 1,
             'title' => 'HẬU NGHỆ BẮN MẶT TRỜI',
             'icon' => '🎯',
-            'status' => 'not-started', // Đổi thành not-started
+            'status' => 'not-started',
             'color' => '#EF4444',
             'description' => 'Trò chơi máy bắn đá mini học về lực và góc bắn',
             'learning_time' => '22 phút',
@@ -38,7 +38,7 @@ $math_data = [
                     'title' => 'CHẾ TẠO MÁY BẮN ĐÁ',
                     'icon' => '🎮',
                     'description' => 'Trò chơi chế tạo máy bắn đá từ vật liệu đơn giản',
-                    'status' => 'not-started', // Đổi thành not-started
+                    'status' => 'not-started', 
                     'xp' => 35
                 ]
             ]
@@ -47,7 +47,7 @@ $math_data = [
             'id' => 2,
             'title' => 'NHẬN BIẾT HÌNH HỌC',
             'icon' => '🔺',
-            'status' => 'not-started', // Đổi thành not-started
+            'status' => 'not-started', 
             'color' => '#3B82F6',
             'description' => 'Trò chơi học về các hình học qua thử thách',
             'learning_time' => '18 phút',
@@ -57,7 +57,7 @@ $math_data = [
                     'title' => 'THỬ THÁCH HÌNH HỌC',
                     'icon' => '🧩',
                     'description' => 'Trò chơi phân loại các hình học khác nhau',
-                    'status' => 'not-started', // Đổi thành not-started
+                    'status' => 'not-started', 
                     'xp' => 25
                 ]
             ]
@@ -136,7 +136,6 @@ $progress_percentage = ($subject['completed_xp'] / $subject['total_xp']) * 100;
 $first_visit = !isset($_SESSION['math_visited']);
 $_SESSION['math_visited'] = true;
 
-// Khởi tạo session để lưu trạng thái học - TẤT CẢ ĐỀU LÀ NOT-STARTED
 if (!isset($_SESSION['math_planet_status'])) {
     $_SESSION['math_planet_status'] = [
         1 => 'not-started',
@@ -195,7 +194,6 @@ if (!isset($_SESSION['math_planet_status'])) {
             <div class="orbit orbit-4"></div>
             <div class="orbit orbit-5"></div>
             
-            <!-- TẤT CẢ ĐỀU LÀ NOT-STARTED -->
             <div class="planet planet-1 not-started" data-planet="1">🎯</div>
             <div class="planet planet-2 not-started" data-planet="2">🔺</div>
             <div class="planet planet-3 not-started" data-planet="3">🧩</div>
@@ -235,7 +233,6 @@ if (!isset($_SESSION['math_planet_status'])) {
     </button>
     <script>
         window.baseUrl = "<?php echo $base_url; ?>";
-        // Truyền trạng thái từ PHP session sang JavaScript - TẤT CẢ ĐỀU NOT-STARTED
         window.mathPlanetStatuses = <?php echo json_encode($_SESSION['math_planet_status']); ?>;
     </script>
     <script src="<?php echo $base_url; ?>/public/JS/math.js?v=<?= time() ?>"></script>

@@ -9,8 +9,8 @@ $technology_data = [
     'icon' => '💻',
     'description' => 'Khám phá thế giới công nghệ đầy thú vị!',
     'total_xp' => 300,
-    'completed_xp' => 0, // Bắt đầu từ 0 XP
-    'current_streak' => 0, // Bắt đầu từ 0 streak
+    'completed_xp' => 0, 
+    'current_streak' => 0, 
     'character' => [
         'name' => 'Bạn Robot Công Nghệ',
         'avatar' => '🤖',
@@ -18,17 +18,17 @@ $technology_data = [
         'welcome_message' => 'Xin chào! Mình là Robot Công Nghệ! Cùng mình khám phá 5 chủ đề công nghệ siêu thú vị nhé! 🤖✨'
     ],
     'stats' => [
-        'completed' => 0, // Chưa hoàn thành
-        'current' => 0,   // Chưa có cái nào đang học
-        'upcoming' => 5,  // 5 bài chưa học
-        'total_xp' => 0   // Tổng XP = 0
+        'completed' => 0, 
+        'current' => 0, 
+        'upcoming' => 5, 
+        'total_xp' => 0 
     ],
     'topics' => [
         [
             'id' => 1,
             'title' => 'CÂY GIA ĐÌNH',
             'icon' => '🌳',
-            'status' => 'not-started', // Đổi thành not-started
+            'status' => 'not-started', 
             'color' => '#10B981',
             'description' => 'Tìm hiểu về các mối quan hệ gia đình qua cây phả hệ',
             'learning_time' => '20 phút',
@@ -38,7 +38,7 @@ $technology_data = [
                     'title' => 'TRÒ CHƠI CÂY GIA ĐÌNH',
                     'icon' => '🎮',
                     'description' => 'Xây dựng cây phả hệ gia đình',
-                    'status' => 'not-started', // Đổi thành not-started
+                    'status' => 'not-started', 
                     'xp' => 25
                 ]
             ]
@@ -47,7 +47,7 @@ $technology_data = [
             'id' => 2,
             'title' => 'EM LÀ HỌA SĨ MÁY TÍNH',
             'icon' => '🎨',
-            'status' => 'not-started', // Đổi thành not-started
+            'status' => 'not-started', 
             'color' => '#EC4899',
             'description' => 'Khám phá các công cụ vẽ đơn giản trên máy tính',
             'learning_time' => '25 phút',
@@ -57,7 +57,7 @@ $technology_data = [
                     'title' => 'CHIA SẺ TÁC PHẨM',
                     'icon' => '🖼️',
                     'description' => 'Chia sẻ bức vẽ của bạn với mọi người',
-                    'status' => 'not-started', // Đổi thành not-started
+                    'status' => 'not-started', 
                     'xp' => 20
                 ]
             ]
@@ -128,7 +128,6 @@ $progress_percentage = ($subject['completed_xp'] / $subject['total_xp']) * 100;
 $first_visit = !isset($_SESSION['technology_visited']);
 $_SESSION['technology_visited'] = true;
 
-// Khởi tạo session để lưu trạng thái học - TẤT CẢ ĐỀU LÀ NOT-STARTED
 if (!isset($_SESSION['tech_planet_status'])) {
     $_SESSION['tech_planet_status'] = [
         1 => 'not-started',
@@ -187,7 +186,6 @@ if (!isset($_SESSION['tech_planet_status'])) {
             <div class="orbit orbit-4"></div>
             <div class="orbit orbit-5"></div>
             
-            <!-- TẤT CẢ ĐỀU LÀ NOT-STARTED -->
             <div class="planet planet-1 not-started" data-planet="1">🌳</div>
             <div class="planet planet-2 not-started" data-planet="2">🎨</div>
             <div class="planet planet-3 not-started" data-planet="3">⌨️</div>
@@ -227,7 +225,6 @@ if (!isset($_SESSION['tech_planet_status'])) {
     </button>
     <script>
         window.baseUrl = "<?php echo $base_url; ?>";
-        // Truyền trạng thái từ PHP session sang JavaScript - TẤT CẢ ĐỀU NOT-STARTED
         window.techPlanetStatuses = <?php echo json_encode($_SESSION['tech_planet_status']); ?>;
     </script>
     <script src="<?php echo $base_url; ?>/public/JS/technology.js?v=<?= time() ?>"></script>

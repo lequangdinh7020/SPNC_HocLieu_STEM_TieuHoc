@@ -5,7 +5,7 @@ const planets = {
     1: {
         name: "HẬU NGHỆ BẮN MẶT TRỜI",
         icon: "🎯",
-        status: "not-started", // Đổi thành not-started
+        status: "not-started", 
         description: "Trò chơi máy bắn đá mini học về lực và góc bắn",
         time: "22 phút",
         xp: "20 XP",
@@ -16,14 +16,14 @@ const planets = {
                 icon: "🎮", 
                 xp: "20 XP", 
                 link: baseUrl + '/views/lessons/math_angle_game', 
-                status: "not-started" // Đổi thành not-started
+                status: "not-started" 
             }
         ]
     },
     2: {
         name: "NHẬN BIẾT HÌNH HỌC",
         icon: "🔺",
-        status: "not-started", // Đổi thành not-started
+        status: "not-started", 
         description: "Trò chơi học về các hình học qua thử thách",
         time: "18 phút",
         xp: "20 XP",
@@ -34,7 +34,7 @@ const planets = {
                 icon: "🧩", 
                 xp: "20 XP",
                 link: baseUrl + '/views/lessons/math_shapes_challenge', 
-                status: "not-started" // Đổi thành not-started
+                status: "not-started" 
             }
         ]
     },
@@ -94,10 +94,8 @@ const planets = {
     }
 };
 
-// Storage key cho math
 const MATH_STORAGE_KEY = 'math_planet_status';
 
-// Load trạng thái từ session nếu có
 if (window.mathPlanetStatuses) {
     for (const id in planets) {
         if (window.mathPlanetStatuses[id]) {
@@ -111,7 +109,6 @@ if (window.mathPlanetStatuses) {
     }
 }
 
-// Hàm lưu tất cả trạng thái vào localStorage
 function saveAllMathStatuses() {
     try {
         const statuses = {};
@@ -127,7 +124,6 @@ function saveAllMathStatuses() {
     }
 }
 
-// Hàm load trạng thái từ localStorage
 function loadMathStatuses() {
     try {
         const saved = localStorage.getItem(MATH_STORAGE_KEY);
@@ -150,7 +146,6 @@ function loadMathStatuses() {
     }
 }
 
-// Hàm đánh dấu planet là current
 function markPlanetAsCurrent(planetId) {
     const planet = planets[planetId];
     if (!planet) {
@@ -158,13 +153,11 @@ function markPlanetAsCurrent(planetId) {
         return false;
     }
     
-    // Chỉ chuyển nếu đang là not-started
     if (planet.status === 'not-started') {
         console.log(`🔄 Marking math planet ${planetId} as current...`);
         
         planet.status = 'current';
         planet.activities.forEach(act => {
-            // Chỉ cập nhật nếu chưa hoàn thành
             if (act.status !== 'completed') {
                 act.status = 'current';
             }
@@ -180,7 +173,6 @@ function markPlanetAsCurrent(planetId) {
     return false;
 }
 
-// Hàm cập nhật hiển thị planet
 function updateMathPlanetDisplay() {
     console.log('🔄 Updating math planet display...');
     
@@ -189,10 +181,8 @@ function updateMathPlanetDisplay() {
         const pdata = planets[pid];
         if (!pdata) return;
         
-        // Remove all status classes
         el.classList.remove('completed', 'current', 'not-started', 'locked');
         
-        // Add the correct status class
         if (pdata.status === 'completed') {
             el.classList.add('completed');
             el.style.opacity = '';
@@ -215,7 +205,6 @@ function updateMathPlanetDisplay() {
     });
 }
 
-// Fetch completed games và cập nhật trạng thái
 (function updatePlanetStatuses() {
     try {
         const endpoint = (typeof baseUrl !== 'undefined' ? baseUrl : '') + '/public/api/get_topic_status.php';
@@ -243,7 +232,6 @@ function updateMathPlanetDisplay() {
                     const matchedByName = completedNames.indexOf(pName) !== -1;
                     const matchedBySlug = completedSlugs.indexOf(pSlug) !== -1;
                     
-                    // Chỉ cập nhật nếu là "not-started" và đã hoàn thành
                     if ((matchedByName || matchedBySlug) && p.status === 'not-started') {
                         p.status = 'completed';
                     }
@@ -254,18 +242,15 @@ function updateMathPlanetDisplay() {
                         const matchedAByName = completedNames.findIndex(g => g && (aName.includes(g) || g.includes(aName))) !== -1;
                         const matchedABySlug = completedSlugs.indexOf(aSlugFromName) !== -1;
                         
-                        // Chỉ cập nhật nếu là "not-started" và đã hoàn thành
                         if ((matchedAByName || matchedABySlug) && a.status === 'not-started') {
                             a.status = 'completed';
                         }
                         
-                        // Nếu activity hoàn thành và planet là not-started, chuyển planet sang current
                         if (a.status === 'completed' && p.status === 'not-started') {
                             p.status = 'current';
                         }
                     });
 
-                    // If all activities are completed, mark the whole planet as completed
                     if (Array.isArray(p.activities) && p.activities.length > 0 && 
                         p.activities.every(act => act.status === 'completed')) {
                         p.status = 'completed';
@@ -288,7 +273,6 @@ function updateMathPlanetDisplay() {
 function initMathSystem() {
     console.log('🚀 Initializing Math System...');
     
-    // Load trạng thái từ localStorage
     loadMathStatuses();
     
     const planetInfoOverlay = document.getElementById('planetInfoOverlay');
@@ -329,10 +313,8 @@ function initMathSystem() {
                 return;
             }
             
-            // QUAN TRỌNG: Đánh dấu là current NGAY KHI CLICK (nếu là not-started)
             const wasMarked = markPlanetAsCurrent(planetId);
             
-            // Hiển thị thông tin
             infoIcon.textContent = currentPlanetData.icon;
             infoName.textContent = currentPlanetData.name;
             infoDescription.textContent = currentPlanetData.description;
@@ -340,7 +322,6 @@ function initMathSystem() {
             let statusText = '';
             let statusClass = '';
             
-            // Sử dụng trạng thái mới (sau khi đã update)
             const displayStatus = planets[planetId].status;
             
             if (displayStatus === 'completed') {
@@ -360,7 +341,6 @@ function initMathSystem() {
             infoStatus.textContent = statusText;
             infoStatus.className = 'status ' + statusClass;
             
-            // Hiển thị activities
             activitiesGrid.innerHTML = '';
             planets[planetId].activities.forEach(activity => {
                 const activityElement = document.createElement('div');
@@ -376,7 +356,6 @@ function initMathSystem() {
                     activityElement.classList.add('activity-locked');
                 }
                 
-                // Tất cả hoạt động đều có thể click (kể cả not-started)
                 if (activity.link) {
                     activityElement.classList.add('activity-clickable');
                     activityElement.style.cursor = 'pointer';
@@ -418,16 +397,13 @@ function initMathSystem() {
                 activitiesGrid.appendChild(activityElement);
             });
 
-            // Hiển thị panel
             planetInfoOverlay.classList.add('show');
             console.log('📱 Math Info panel shown');
             
-            // Thông báo nếu đã chuyển trạng thái
             if (wasMarked) {
                 console.log(`🌟 Math Planet ${planetId} is now marked as "đang học" (màu tím)`);
             }
             
-            // Hiệu ứng click
             this.style.transform = 'scale(1.3)';
             setTimeout(() => {
                 this.style.transform = '';
@@ -463,7 +439,6 @@ function initMathSystem() {
         });
     });
 
-    // Tự động lưu mỗi 5 giây
     setInterval(saveAllMathStatuses, 5000);
 
     console.log('🎉 Math System initialized successfully!');

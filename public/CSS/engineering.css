@@ -273,7 +273,6 @@ body {
     50% { box-shadow: 0 0 40px currentColor; }
 }
 
-/* Trạng thái: Chưa học - Màu cam */
 .planet.not-started {
     opacity: 0.5;
     filter: grayscale(0.7);
@@ -286,7 +285,6 @@ body {
     transform: scale(1.05);
 }
 
-/* Trạng thái: Đang học */
 .planet.current {
     opacity: 1;
     filter: none;
@@ -296,7 +294,6 @@ body {
     transform: scale(1.05);
 }
 
-/* Trạng thái: Đã hoàn thành */
 .planet.completed {
     opacity: 1;
     filter: none;
@@ -366,7 +363,6 @@ body {
     100% { transform: translate(-50%, -50%) rotate(648deg) translateX(300px) rotate(-648deg); }
 }
 
-/* Badge cho trạng thái hoàn thành */
 .planet.completed::after {
     content: '✓';
     position: absolute;
@@ -386,7 +382,6 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
-/* Badge cho trạng thái đang học - Màu cam */
 .planet.current::after {
     content: '●';
     position: absolute;
@@ -394,7 +389,7 @@ body {
     right: -5px;
     width: 20px;
     height: 20px;
-    background: var(--primary); /* Màu cam */
+    background: var(--primary); 
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -495,7 +490,7 @@ body {
 }
 
 .status-current {
-    background: var(--primary); /* Màu cam */
+    background: var(--primary); 
     color: white;
 }
 
@@ -663,7 +658,7 @@ body {
 }
 
 .current-badge {
-    background: #F59E0B; /* Màu cam */
+    background: #F59E0B; 
     color: white;
     animation: pulse-badge 2s infinite;
 }
@@ -694,16 +689,16 @@ body {
 }
 
 .activity-current {
-    background: rgba(245, 158, 11, 0.1); /* Màu cam */
+    background: rgba(245, 158, 11, 0.1); 
     border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
 .activity-current .activity-name {
-    color: #F59E0B; /* Màu cam */
+    color: #F59E0B; 
 }
 
 .activity-current .activity-xp {
-    color: #F59E0B; /* Màu cam */
+    color: #F59E0B; 
 }
 
 .activity-not-started {
@@ -753,19 +748,13 @@ body {
 }
 
 .activity-clickable:hover .activity-name {
-    color: #F59E0B; /* Màu cam */
+    color: #F59E0B; 
 }
 
 .activity-clickable:hover .activity-icon {
     transform: scale(1.1);
-    background: rgba(245, 158, 11, 0.2); /* Màu cam */
+    background: rgba(245, 158, 11, 0.2); 
 }
-
-/* Xóa CSS cũ cho planet mờ */
-/* .planet[data-planet="3"], .planet[data-planet="4"], .planet[data-planet="5"] {
-    opacity: 0.6;
-    filter: grayscale(0.7);
-} */
 
 @media (max-width: 768px) {
     .universe-container {
