@@ -1,8 +1,20 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+    // Handle intro modal
+    const introModal = document.getElementById('intro-modal');
+    const startGameButton = document.getElementById('startGameButton');
+    
+    if (startGameButton && introModal) {
+        startGameButton.addEventListener('click', () => {
+            introModal.classList.remove('active');
+        });
+    }
+
     const draggableParts = document.querySelectorAll(".draggable-label");
     const dropzones = document.querySelectorAll(".dropzone");
     const feedbackBox = document.getElementById("plant-feedback");
+    const userFeedback = document.getElementById("userFeedback");
+    const plantProgress = document.getElementById("plantProgress");
     const resetButton = document.getElementById("plantResetButton");
     const finishButton = document.getElementById('plantFinishButton');
     const backButton = document.querySelector('.back-button');
@@ -13,6 +25,16 @@ document.addEventListener("DOMContentLoaded", () => {
     let draggedItem = null;
     let correctDrops = 0;
     const totalDrops = dropzones.length; // Đếm số lượng dropzone
+    
+    // Update progress display
+    function updateProgress() {
+        if (plantProgress) {
+            plantProgress.textContent = `${correctDrops}/${totalDrops}`;
+        }
+    }
+    
+    // Initialize progress
+    updateProgress();
 
     // 1. Xử lý kéo
     draggableParts.forEach(part => {
@@ -70,7 +92,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 // points are awarded once per finished plant (handled on Finish click)
                 let points = 0;
 
-                correctDrops++; 
+                correctDrops++;
+                updateProgress();
                 
                 if (correctDrops === totalDrops) {
                     if (points > 0) {
@@ -169,22 +192,51 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Hàm hiển thị thông báo
     function showFeedback(message, type) {
-        feedbackBox.textContent = message;
-        feedbackBox.className = type;
+        // Show in userFeedback div
+        if (userFeedback) {
+            userFeedback.textContent = message;
+            if (type === "win") {
+                userFeedback.className = "correct";
+            } else if (type === "wrong") {
+                userFeedback.className = "wrong";
+            } else {
+                userFeedback.className = "";
+            }
+            
+            setTimeout(() => {
+                userFeedback.textContent = "";
+                userFeedback.className = "";
+            }, 2000);
+        }
         
-        if (type === "win") {
-            feedbackBox.style.color = "#2ecc71";
-        } else if (type === "wrong") {
-            feedbackBox.style.color = "#e74c3c";
-        } else {
-            feedbackBox.style.color = "#e67e22";
+        // Also show in feedbackBox if exists (for compatibility)
+        if (feedbackBox) {
+            feedbackBox.textContent = message;
+            feedbackBox.className = type;
+            
+            if (type === "win") {
+                feedbackBox.style.color = "#2ecc71";
+            } else if (type === "wrong") {
+                feedbackBox.style.color = "#e74c3c";
+            } else {
+                feedbackBox.style.color = "#e67e22";
+            }
         }
     }
 
     // No scoring update function: scoring has been removed for the Plant game.
 
     function showWinModal() {
-        const winModal = document.getElementById('win-modal');
+        // Show final result section
+        const finalResult = document.getElementById('finalResult');
+        const finalScore = document.getElementById('finalScore');
+        
+        if (finalResult && finalScore) {
+            finalScore.textContent = `${correctDrops}/${totalDrops}`;
+            finalResult.classList.add('show');
+        } else {
+            // Fallback to original modal
+            const winModal = document.getElementById('win-modal');
         const nextLevelBtn = document.getElementById('next-level-btn');
         const replayAllBtn = document.getElementById('replay-all-btn');
         const closeModalBtn = document.getElementById('close-modal-btn');
@@ -244,4 +296,5 @@ document.addEventListener("DOMContentLoaded", () => {
             };
         }
     }
+}
 });
