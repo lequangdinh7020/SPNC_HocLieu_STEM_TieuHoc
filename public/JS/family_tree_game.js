@@ -1,4 +1,14 @@
 document.addEventListener("DOMContentLoaded", () => {
+    // Handle intro modal
+    const introModal = document.getElementById('intro-modal');
+    const startGameButton = document.getElementById('startGameButton');
+    
+    if (startGameButton && introModal) {
+        startGameButton.addEventListener('click', () => {
+            introModal.classList.remove('active');
+        });
+    }
+
     const BASE_URL = baseUrl; 
     const CURRENT_LEVEL_DATA = currentLevelData; 
     const TOTAL_GAME_LEVELS = totalGameLevels; 
@@ -6,6 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // DOM Elements
     const characterBank = document.getElementById('character-bank');
     const feedbackMessage = document.getElementById('game-feedback');
+    const userFeedback = document.getElementById('userFeedback');
     const livesContainer = document.getElementById('lives-container');
     const currentLevelDisplay = document.getElementById('current-level-display');
     const gameOverModal = document.getElementById('game-over-modal');
@@ -16,6 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const backToTechnologyBtn = document.getElementById('back-to-technology-btn');
     const backToMenuBtn = document.getElementById('back-to-menu-btn');
     const treeCanvas = document.getElementById('tree-canvas');
+    const resetButton = document.getElementById('resetButton');
 
     // Game Variables
     let draggedCharId = null; 
@@ -31,12 +43,18 @@ document.addEventListener("DOMContentLoaded", () => {
         totalCorrectSlots = 0;
         updateLivesDisplay();
         if(feedbackMessage) feedbackMessage.style.display = 'none'; 
+        if(userFeedback) userFeedback.textContent = '';
 
         if(currentLevelDisplay) currentLevelDisplay.textContent = CURRENT_LEVEL_DATA.id;
-        const titleEl = document.querySelector('#level-title');
-        if(titleEl) titleEl.textContent = `Cấp độ ${CURRENT_LEVEL_DATA.id}: ${CURRENT_LEVEL_DATA.level_title}`;
 
         resetSlotsAndBank();
+        
+        // Add reset button handler
+        if(resetButton) {
+            resetButton.onclick = () => {
+                window.location.reload();
+            };
+        }
         
         // Gán sự kiện cho modal
         if(nextLevelBtn) {
@@ -296,13 +314,32 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function showFeedback(message, type) {
-        if (!feedbackMessage) return;
-        feedbackMessage.textContent = message;
-        feedbackMessage.className = `feedback-message ${type}`;
-        feedbackMessage.style.display = 'block';
-        setTimeout(() => {
-            feedbackMessage.style.display = 'none';
-        }, 2000);
+        // Show in userFeedback div
+        if (userFeedback) {
+            userFeedback.textContent = message;
+            if (type === 'correct') {
+                userFeedback.className = 'correct';
+            } else if (type === 'wrong') {
+                userFeedback.className = 'wrong';
+            } else {
+                userFeedback.className = '';
+            }
+            
+            setTimeout(() => {
+                userFeedback.textContent = '';
+                userFeedback.className = '';
+            }, 2000);
+        }
+        
+        // Also show in feedbackMessage if exists (for compatibility)
+        if (feedbackMessage) {
+            feedbackMessage.textContent = message;
+            feedbackMessage.className = `feedback-message ${type}`;
+            feedbackMessage.style.display = 'block';
+            setTimeout(() => {
+                feedbackMessage.style.display = 'none';
+            }, 2000);
+        }
     }
 
     function showModal(status) {
