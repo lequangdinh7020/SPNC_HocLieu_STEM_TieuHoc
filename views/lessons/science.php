@@ -9,8 +9,8 @@ $science_data = [
     'icon' => '🔬',
     'description' => 'Cùng khám phá thế giới diệu kỳ!',
     'total_xp' => 280, 
-    'completed_xp' => 100,
-    'current_streak' => 7,
+    'completed_xp' => 0, // Bắt đầu từ 0 XP
+    'current_streak' => 0, // Bắt đầu từ 0 streak
     'character' => [
         'name' => 'Bạn Khủng Long Khoa Học',
         'avatar' => '🦖',
@@ -18,67 +18,65 @@ $science_data = [
         'welcome_message' => 'Chào bạn nhỏ! Mình là Khủng Long Khoa Học! Cùng mình khám phá các chủ đề siêu thú vị nhé! 🦖✨'
     ],
     'stats' => [
-        'completed' => 2,
-        'current' => 1,
-        'upcoming' => 7, 
-        'total_xp' => 100
+        'completed' => 0, // Chưa hoàn thành bài nào
+        'current' => 0,   // Chưa có bài nào đang học
+        'upcoming' => 5,  // 5 bài chưa học
+        'total_xp' => 0   // Tổng XP = 0
     ],
     'topics' => [
         [
             'id' => 1,
             'title' => 'THẾ GIỚI MÀU SẮC',
             'icon' => '🎨',
-            'status' => 'completed',
+            'status' => 'not-started', // Đổi thành not-started
             'color' => '#22C55E',
             'description' => 'Khám phá bí mật của màu sắc qua các hoạt động thú vị',
             'learning_time' => '15 phút',
             'activities' => [
-                [ 'type' => 'game', 'title' => 'TRÒ CHƠI PHA MÀU', 'icon' => '🎮', 'status' => 'completed', 'xp' => 25 ]
+                [ 'type' => 'game', 'title' => 'TRÒ CHƠI PHA MÀU', 'icon' => '🎮', 'status' => 'not-started', 'xp' => 25 ]
             ]
         ],
         [ 
             'id' => 2,
             'title' => 'BÍ KÍP ĂN UỐNG LÀNH MẠNH',
             'icon' => '🍎',
-            'status' => 'completed',
+            'status' => 'not-started', // Đổi thành not-started
             'color' => '#10B981',
             'description' => 'Học cách chọn thực phẩm tốt cho sức khỏe',
             'learning_time' => '20 phút',
             'activities' => [
-                [ 'type' => 'game', 'title' => 'TRÒ CHƠI THÁP DINH DƯỠNG', 'icon' => '🧩', 'status' => 'completed', 'xp' => 50 ]
+                [ 'type' => 'game', 'title' => 'TRÒ CHƠI THÁP DINH DƯỠNG', 'icon' => '🧩', 'status' => 'not-started', 'xp' => 50 ]
             ]
         ],
         [
             'id' => 3,
             'title' => 'NGÀY VÀ ĐÊM',
             'icon' => '🌓',
-            'status' => 'current',
+            'status' => 'not-started', // Đổi thành not-started
             'color' => '#3B82F6',
             'description' => 'Khám phá bí mật của thời gian và thiên văn',
             'learning_time' => '12 phút',
             'activities' => [
-                [ 'type' => 'question', 'title' => 'TRẢ LỜI CÂU HỎI', 'icon' => '🌞', 'status' => 'current', 'xp' => 50 ]
+                [ 'type' => 'question', 'title' => 'TRẢ LỜI CÂU HỎI', 'icon' => '🌞', 'status' => 'not-started', 'xp' => 50 ]
             ]
         ],
-
         [ 
             'id' => 4,
             'title' => 'THÙNG RÁC THÂN THIỆN',
             'icon' => '🗑️',
-            'status' => 'upcoming',
+            'status' => 'not-started',
             'color' => '#84CC16',
             'description' => 'Học cách phân loại rác bảo vệ môi trường',
             'learning_time' => '16 phút',
             'activities' => [
-                [ 'type' => 'game', 'title' => 'TRÒ CHƠI PHÂN LOẠI RÁC', 'icon' => '♻️', 'status' => 'upcoming', 'xp' => 30 ]
+                [ 'type' => 'game', 'title' => 'TRÒ CHƠI PHÂN LOẠI RÁC', 'icon' => '♻️', 'status' => 'not-started', 'xp' => 30 ]
             ]
         ],
-
         [
             'id' => 5,
             'title' => 'CÁC BỘ PHẬN CỦA CÂY',
             'icon' => '🌱',
-            'status' => 'upcoming',
+            'status' => 'not-started',
             'color' => '#16a085',
             'description' => 'Học cách nhận biết các bộ phận của cây',
             'learning_time' => '10 phút',
@@ -88,7 +86,7 @@ $science_data = [
                     'title' => 'TRÒ CHƠI LẮP GHÉP',
                     'icon' => '🌿',
                     'description' => 'Lắp ghép các bộ phận của cây',
-                    'status' => 'upcoming',
+                    'status' => 'not-started',
                     'xp' => 30
                 ]
             ]
@@ -101,6 +99,16 @@ $current_page = 'science';
 $progress_percentage = ($subject['completed_xp'] / $subject['total_xp']) * 100;
 $first_visit = !isset($_SESSION['science_visited']);
 $_SESSION['science_visited'] = true;
+
+if (!isset($_SESSION['planet_status'])) {
+    $_SESSION['planet_status'] = [
+        1 => 'not-started',
+        2 => 'not-started', 
+        3 => 'not-started',
+        4 => 'not-started',
+        5 => 'not-started'
+    ];
+}
 ?>
 
 <!DOCTYPE html>
@@ -134,7 +142,7 @@ $_SESSION['science_visited'] = true;
                 
                 <div class="mission-stats">
                     <div class="stat-orb xp-orb">
-                        <div class="stat-value">100</div>
+                        <div class="stat-value">0</div>
                         <div class="stat-label">XP</div>
                     </div>
                 </div>
@@ -151,11 +159,12 @@ $_SESSION['science_visited'] = true;
             <div class="orbit orbit-4"></div>
             <div class="orbit orbit-5"></div>
             
-            <div class="planet planet-1 completed" data-planet="1">🎨</div>
-            <div class="planet planet-2 completed" data-planet="2">🍎</div>
-            <div class="planet planet-3 current" data-planet="3">🌓</div>
-            <div class="planet planet-4" data-planet="4">🗑️</div>
-            <div class="planet planet-5" data-planet="5">🌱</div>
+            <!-- Tất cả đều là not-started khi khởi tạo -->
+            <div class="planet planet-1 not-started" data-planet="1">🎨</div>
+            <div class="planet planet-2 not-started" data-planet="2">🍎</div>
+            <div class="planet planet-3 not-started" data-planet="3">🌓</div>
+            <div class="planet planet-4 not-started" data-planet="4">🗑️</div>
+            <div class="planet planet-5 not-started" data-planet="5">🌱</div>
         </section>
     </div>
 
@@ -169,7 +178,7 @@ $_SESSION['science_visited'] = true;
                 <div class="info-icon" id="infoIcon">🎨</div>
                 <div class="info-title">
                     <h3 id="infoName">THẾ GIỚI MÀU SẮC</h3>
-                    <span class="status" id="infoStatus">Đã hoàn thành</span>
+                    <span class="status" id="infoStatus">Chưa học</span>
                 </div>
             </div>
             
@@ -188,7 +197,15 @@ $_SESSION['science_visited'] = true;
     <button class="cosmic-character" id="characterBtn">
         🦖
     </button>
-    <script>window.baseUrl = "<?php echo $base_url; ?>";</script>
+     <script>
+        window.baseUrl = "<?php echo $base_url; ?>";
+        
+        // Khởi tạo trạng thái mặc định cho JS
+        window.defaultPlanetStatuses = <?php echo json_encode($_SESSION['planet_status']); ?>;
+        
+        // Debug
+        console.log('Default planet statuses from PHP:', window.defaultPlanetStatuses);
+    </script>
     <script src="<?php echo $base_url; ?>/public/JS/science.js?v=<?= time() ?>"></script>
 
 </body>

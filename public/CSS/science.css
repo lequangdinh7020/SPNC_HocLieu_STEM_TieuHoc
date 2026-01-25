@@ -273,6 +273,39 @@ body {
     50% { box-shadow: 0 0 40px currentColor; }
 }
 
+/* Trạng thái: Chưa học */
+.planet.not-started {
+    opacity: 0.5;
+    filter: grayscale(0.7);
+    cursor: pointer;
+}
+
+.planet.not-started:hover {
+    opacity: 0.8;
+    filter: grayscale(0.3);
+    transform: scale(1.05);
+}
+
+/* Trạng thái: Đang học */
+.planet.current {
+    opacity: 1;
+    filter: none;
+}
+
+.planet.current:hover {
+    transform: scale(1.05);
+}
+
+/* Trạng thái: Đã hoàn thành */
+.planet.completed {
+    opacity: 1;
+    filter: none;
+}
+
+.planet.completed:hover {
+    transform: scale(1.05);
+}
+
 .planet-1 {
     width: 70px;
     height: 70px;
@@ -333,6 +366,7 @@ body {
     100% { transform: translate(-50%, -50%) rotate(648deg) translateX(300px) rotate(-648deg); }
 }
 
+/* Badge cho trạng thái hoàn thành */
 .planet.completed::after {
     content: '✓';
     position: absolute;
@@ -352,6 +386,7 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
+/* Badge cho trạng thái đang học */
 .planet.current::after {
     content: '●';
     position: absolute;
@@ -462,6 +497,12 @@ body {
 .status-current {
     background: var(--primary);
     color: white;
+}
+
+.status-not-started {
+    background: var(--bg-deep);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-glow);
 }
 
 .status-locked {
@@ -631,7 +672,8 @@ body {
     background: #6B7280;
     color: white;
     font-size: 0.6rem;
- display: none; }
+    display: none;
+}
 
 @keyframes pulse-badge {
     0%, 100% { transform: scale(1); }
@@ -664,10 +706,33 @@ body {
     color: #22C55E;
 }
 
-.activity-locked {
+.activity-not-started {
     background: rgba(107, 114, 128, 0.1);
     border: 1px solid rgba(107, 114, 128, 0.3);
     opacity: 0.7;
+}
+
+.activity-not-started .activity-name {
+    color: #94a3b8;
+}
+
+.activity-not-started .activity-type {
+    color: #94a3b8;
+}
+
+.activity-not-started .activity-xp {
+    color: #94a3b8;
+}
+
+.activity-not-started .activity-icon {
+    opacity: 0.5;
+}
+
+.activity-locked {
+    background: rgba(107, 114, 128, 0.1);
+    border: 1px solid rgba(107, 114, 128, 0.3);
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .activity-locked .activity-name {
@@ -694,11 +759,6 @@ body {
 .activity-clickable:hover .activity-icon {
     transform: scale(1.1);
     background: rgba(34, 197, 94, 0.2);
-}
-
-.planet[data-planet="4"], .planet[data-planet="5"] {
-    opacity: 0.6;
-    filter: grayscale(0.7);
 }
 
 @media (max-width: 768px) {

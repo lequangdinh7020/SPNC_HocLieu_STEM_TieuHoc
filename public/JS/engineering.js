@@ -5,7 +5,7 @@ const planets = {
     1: {
         name: "XÂY THÁP (CÂY TRE TRĂM ĐỐT)",
         icon: "🎋",
-        status: "completed",
+        status: "not-started", // Đổi thành not-started
         description: "Học cách xây tháp vững chắc từ câu chuyện Cây tre trăm đốt",
         time: "25 phút",
         xp: "20 XP",
@@ -16,14 +16,14 @@ const planets = {
                 icon: "🏗️", 
                 xp: "20 XP", 
                 link: baseUrl + '/views/lessons/engineering_tower_game', 
-                status: "completed" 
+                status: "not-started" // Đổi thành not-started
             }
         ]
     },
     2: {
         name: "SẮP XẾP CĂN PHÒNG CỦA EM",
         icon: "🏠",
-        status: "current",
+        status: "not-started", // Đổi thành not-started
         description: "Thiết kế và sắp xếp không gian sống gọn gàng, hợp lý",
         time: "30 phút",
         xp: "20 XP",
@@ -34,14 +34,14 @@ const planets = {
                 icon: "🎨", 
                 xp: "20 XP",
                 link: baseUrl + '/views/lessons/engineering_room_decor', 
-                status: "current" 
+                status: "not-started" // Đổi thành not-started
             }
         ]
     },
     3: {
         name: "XÂY CẦU", 
         icon: "🌉",
-        status: "current",
+        status: "not-started",
         description: "Thiết kế và xây dựng cầu từ giấy A4 chịu lực",
         time: "35 phút", 
         xp: "20 XP",
@@ -52,14 +52,14 @@ const planets = {
                 icon: "🌉", 
                 xp: "20 XP",
                 link: baseUrl + '/views/lessons/engineering_bridge_game', 
-                status: "current" 
+                status: "not-started" 
             }
         ]
     },
     4: {
         name: "HỆ THỐNG DẪN NƯỚC",
         icon: "🚰",
-        status: "current",
+        status: "not-started",
         description: "Tìm hiểu và thiết kế hệ thống dẫn nước đơn giản",
         time: "28 phút",
         xp: "20 XP",
@@ -70,14 +70,14 @@ const planets = {
                 icon: "🧪", 
                 xp: "20 XP",
                 link: baseUrl + '/views/lessons/engineering_water_pipe', 
-                status: "current" 
+                status: "not-started" 
             }
         ]
     },
     5: {
         name: "HỆ THỐNG LỌC NƯỚC CƠ BẢN",
         icon: "💧",
-        status: "current",
+        status: "not-started",
         description: "Tìm hiểu và chế tạo hệ thống lọc nước đơn giản từ vật liệu dễ kiếm",
         time: "40 phút",
         xp: "20 XP",
@@ -88,84 +88,208 @@ const planets = {
                 icon: "🧪", 
                 xp: "20 XP",
                 link: baseUrl + '/views/lessons/engineering_water_filter', 
-                status: "current" 
+                status: "not-started" 
             }
         ]
     }
 };
 
-// Fetch completed games for current user and update planet/activity statuses
+// Storage key cho engineering
+const ENG_STORAGE_KEY = 'eng_planet_status';
+
+// Load trạng thái từ session nếu có
+if (window.engPlanetStatuses) {
+    for (const id in planets) {
+        if (window.engPlanetStatuses[id]) {
+            planets[id].status = window.engPlanetStatuses[id];
+            if (planets[id].status === 'current' || planets[id].status === 'completed') {
+                planets[id].activities.forEach(act => {
+                    act.status = planets[id].status;
+                });
+            }
+        }
+    }
+}
+
+// Hàm lưu tất cả trạng thái vào localStorage
+function saveAllEngStatuses() {
+    try {
+        const statuses = {};
+        for (const id in planets) {
+            statuses[id] = planets[id].status;
+        }
+        localStorage.setItem(ENG_STORAGE_KEY, JSON.stringify(statuses));
+        console.log('💾 All eng planet statuses saved to localStorage');
+        return true;
+    } catch (e) {
+        console.error('❌ Error saving to localStorage:', e);
+        return false;
+    }
+}
+
+// Hàm load trạng thái từ localStorage
+function loadEngStatuses() {
+    try {
+        const saved = localStorage.getItem(ENG_STORAGE_KEY);
+        if (saved) {
+            const statuses = JSON.parse(saved);
+            for (const id in statuses) {
+                if (planets[id]) {
+                    planets[id].status = statuses[id];
+                    planets[id].activities.forEach(act => {
+                        act.status = statuses[id];
+                    });
+                }
+            }
+            console.log('📥 Eng planet statuses loaded:', statuses);
+        }
+        updateEngPlanetDisplay();
+    } catch (e) {
+        console.warn('⚠️ Could not load from localStorage:', e);
+        updateEngPlanetDisplay();
+    }
+}
+
+// Hàm đánh dấu planet là current
+function markPlanetAsCurrent(planetId) {
+    const planet = planets[planetId];
+    if (!planet) {
+        console.error(`❌ Planet ${planetId} not found`);
+        return false;
+    }
+    
+    // Chỉ chuyển nếu đang là not-started
+    if (planet.status === 'not-started') {
+        console.log(`🔄 Marking eng planet ${planetId} as current...`);
+        
+        planet.status = 'current';
+        planet.activities.forEach(act => {
+            // Chỉ cập nhật nếu chưa hoàn thành
+            if (act.status !== 'completed') {
+                act.status = 'current';
+            }
+        });
+        
+        updateEngPlanetDisplay();
+        saveAllEngStatuses();
+        
+        console.log(`✅ Eng planet ${planetId} marked as current (màu cam)`);
+        return true;
+    }
+    
+    return false;
+}
+
+// Hàm cập nhật hiển thị planet
+function updateEngPlanetDisplay() {
+    console.log('🔄 Updating eng planet display...');
+    
+    document.querySelectorAll('.planet').forEach(el => {
+        const pid = el.getAttribute('data-planet');
+        const pdata = planets[pid];
+        if (!pdata) return;
+        
+        // Remove all status classes
+        el.classList.remove('completed', 'current', 'not-started', 'locked');
+        
+        // Add the correct status class
+        if (pdata.status === 'completed') {
+            el.classList.add('completed');
+            el.style.opacity = '';
+            el.style.filter = '';
+            console.log(`🌍 Eng Planet ${pid}: COMPLETED ✓`);
+        } else if (pdata.status === 'current') {
+            el.classList.add('current');
+            el.style.opacity = '';
+            el.style.filter = '';
+            console.log(`🌍 Eng Planet ${pid}: CURRENT ● (màu cam)`);
+        } else if (pdata.status === 'not-started') {
+            el.classList.add('not-started');
+            el.style.opacity = '0.5';
+            el.style.filter = 'grayscale(0.7)';
+            console.log(`🌍 Eng Planet ${pid}: NOT STARTED (dimmed)`);
+        } else {
+            el.classList.add('locked');
+            console.log(`🌍 Eng Planet ${pid}: LOCKED`);
+        }
+    });
+}
+
+// Fetch completed games và cập nhật trạng thái
 (function updatePlanetStatuses() {
     try {
         const endpoint = (typeof baseUrl !== 'undefined' ? baseUrl : '') + '/public/api/get_topic_status.php';
         fetch(endpoint, { credentials: 'same-origin' })
             .then(response => response.json())
-                .then(data => {
-                    const completedItems = (data && data.completed_games) ? data.completed_games : [];
+            .then(data => {
+                const completedItems = (data && data.completed_games) ? data.completed_games : [];
 
-                    // JS slugify (remove diacritics, replace non-alnum with hyphens)
-                    const slugify = (s) => {
-                        if (!s) return '';
-                        return s.toString().normalize('NFD').replace(/\p{Diacritic}/gu, '')
-                            .replace(/[^a-zA-Z0-9]+/g, '-')
-                            .replace(/(^-|-$)/g, '').toLowerCase();
-                    };
+                const slugify = (s) => {
+                    if (!s) return '';
+                    return s.toString().normalize('NFD').replace(/\p{Diacritic}/gu, '')
+                        .replace(/[^a-zA-Z0-9]+/g, '-')
+                        .replace(/(^-|-$)/g, '').toLowerCase();
+                };
 
-                    const completedNames = completedItems.map(ci => (typeof ci === 'string' ? ci : (ci.name || '')).toLowerCase());
-                    const completedSlugs = completedItems.map(ci => (typeof ci === 'string' ? slugify(ci) : (ci.slug || slugify(ci.name || ''))));
+                const completedNames = completedItems.map(ci => (typeof ci === 'string' ? ci : (ci.name || '')).toLowerCase());
+                const completedSlugs = completedItems.map(ci => (typeof ci === 'string' ? slugify(ci) : (ci.slug || slugify(ci.name || ''))));
 
-                    for (const id in planets) {
-                        if (!Object.prototype.hasOwnProperty.call(planets, id)) continue;
-                        const p = planets[id];
-                        const pName = (p.name || '').toLowerCase();
-                        const pSlug = slugify(p.name || '');
+                for (const id in planets) {
+                    if (!Object.prototype.hasOwnProperty.call(planets, id)) continue;
+                    const p = planets[id];
+                    const pName = (p.name || '').toLowerCase();
+                    const pSlug = slugify(p.name || '');
 
-                        const matchedByName = completedNames.indexOf(pName) !== -1;
-                        const matchedBySlug = completedSlugs.indexOf(pSlug) !== -1;
-                        p.status = (matchedByName || matchedBySlug) ? 'completed' : 'current';
+                    const matchedByName = completedNames.indexOf(pName) !== -1;
+                    const matchedBySlug = completedSlugs.indexOf(pSlug) !== -1;
+                    
+                    // Chỉ cập nhật nếu là "not-started" và đã hoàn thành
+                    if ((matchedByName || matchedBySlug) && p.status === 'not-started') {
+                        p.status = 'completed';
+                    }
 
-                        p.activities.forEach(a => {
-                            const aName = (a.name || '').toLowerCase();
-                            const aSlugFromName = slugify(a.name || '');
-                            // attempt match by name or slug
-                            const matchedAByName = completedNames.findIndex(g => g && (aName.includes(g) || g.includes(aName))) !== -1;
-                            const matchedABySlug = completedSlugs.indexOf(aSlugFromName) !== -1;
-                            a.status = (matchedAByName || matchedABySlug) ? 'completed' : 'current';
-                        });
-
-                        // If any activity is completed, mark the whole planet as completed
-                        if (Array.isArray(p.activities) && p.activities.some(act => act.status === 'completed')) {
-                            p.status = 'completed';
+                    p.activities.forEach(a => {
+                        const aName = (a.name || '').toLowerCase();
+                        const aSlugFromName = slugify(a.name || '');
+                        const matchedAByName = completedNames.findIndex(g => g && (aName.includes(g) || g.includes(aName))) !== -1;
+                        const matchedABySlug = completedSlugs.indexOf(aSlugFromName) !== -1;
+                        
+                        // Chỉ cập nhật nếu là "not-started" và đã hoàn thành
+                        if ((matchedAByName || matchedABySlug) && a.status === 'not-started') {
+                            a.status = 'completed';
                         }
-                    }
-                console.log('✅ Planet statuses updated from server');
+                        
+                        // Nếu activity hoàn thành và planet là not-started, chuyển planet sang current
+                        if (a.status === 'completed' && p.status === 'not-started') {
+                            p.status = 'current';
+                        }
+                    });
 
-                // Apply classes to planet DOM elements so CSS rules take effect
-                document.querySelectorAll('.planet').forEach(el => {
-                    const pid = el.getAttribute('data-planet');
-                    const pdata = planets[pid];
-                    if (!pdata) return;
-                    el.classList.remove('completed', 'current', 'locked');
-                    if (pdata.status === 'completed') {
-                        el.classList.add('completed');
-                        el.style.opacity = '';
-                        el.style.filter = '';
-                    } else if (pdata.status === 'current') {
-                        el.classList.add('current');
-                    } else {
-                        el.classList.add('locked');
+                    // If all activities are completed, mark the whole planet as completed
+                    if (Array.isArray(p.activities) && p.activities.length > 0 && 
+                        p.activities.every(act => act.status === 'completed')) {
+                        p.status = 'completed';
                     }
-                });
+                }
+                
+                console.log('✅ Eng planet statuses updated from server');
+                updateEngPlanetDisplay();
             })
             .catch(err => {
                 console.warn('⚠️ Could not load game statuses:', err);
+                updateEngPlanetDisplay();
             });
     } catch (e) {
         console.warn('⚠️ updatePlanetStatuses error:', e);
+        updateEngPlanetDisplay();
     }
 })();
+
 function initEngineeringSystem() {
     console.log('🚀 Initializing Engineering System...');
+    
+    // Load trạng thái từ localStorage
+    loadEngStatuses();
     
     const planetInfoOverlay = document.getElementById('planetInfoOverlay');
     const infoIcon = document.getElementById('infoIcon');
@@ -190,20 +314,25 @@ function initEngineeringSystem() {
 
     console.log('✅ Tất cả elements đã được tìm thấy');
 
-    let currentPlanetData = null;
+    let currentPlanetId = null;
 
     document.querySelectorAll('.planet').forEach(planet => {
         planet.addEventListener('click', function() {
             const planetId = this.getAttribute('data-planet');
-            console.log(`🪐 Planet clicked: ${planetId}`);
+            console.log(`🪐 Eng Planet clicked: ${planetId}`);
             
-            currentPlanetData = planets[planetId];
+            currentPlanetId = planetId;
+            const currentPlanetData = planets[planetId];
             
             if (!currentPlanetData) {
                 console.error('❌ Không tìm thấy dữ liệu cho planet:', planetId);
                 return;
             }
             
+            // QUAN TRỌNG: Đánh dấu là current NGAY KHI CLICK (nếu là not-started)
+            const wasMarked = markPlanetAsCurrent(planetId);
+            
+            // Hiển thị thông tin
             infoIcon.textContent = currentPlanetData.icon;
             infoName.textContent = currentPlanetData.name;
             infoDescription.textContent = currentPlanetData.description;
@@ -211,12 +340,18 @@ function initEngineeringSystem() {
             let statusText = '';
             let statusClass = '';
             
-            if (currentPlanetData.status === 'completed') {
+            // Sử dụng trạng thái mới (sau khi đã update)
+            const displayStatus = planets[planetId].status;
+            
+            if (displayStatus === 'completed') {
                 statusText = 'Đã hoàn thành';
                 statusClass = 'status-completed';
-            } else if (currentPlanetData.status === 'current') {
+            } else if (displayStatus === 'current') {
                 statusText = 'Đang học';
                 statusClass = 'status-current';
+            } else if (displayStatus === 'not-started') {
+                statusText = 'Chưa học';
+                statusClass = 'status-not-started';
             } else {
                 statusText = 'Chờ mở khóa';
                 statusClass = 'status-locked';
@@ -225,8 +360,9 @@ function initEngineeringSystem() {
             infoStatus.textContent = statusText;
             infoStatus.className = 'status ' + statusClass;
             
+            // Hiển thị activities
             activitiesGrid.innerHTML = '';
-            currentPlanetData.activities.forEach(activity => {
+            planets[planetId].activities.forEach(activity => {
                 const activityElement = document.createElement('div');
                 activityElement.className = 'activity-item';
                 
@@ -234,15 +370,18 @@ function initEngineeringSystem() {
                     activityElement.classList.add('activity-completed');
                 } else if (activity.status === 'current') {
                     activityElement.classList.add('activity-current');
-                } else if (activity.status === 'upcoming') {
+                } else if (activity.status === 'not-started') {
+                    activityElement.classList.add('activity-not-started');
+                } else if (activity.status === 'locked') {
                     activityElement.classList.add('activity-locked');
                 }
                 
-                if (activity.link && activity.status !== 'upcoming') {
+                // Tất cả hoạt động đều có thể click (kể cả not-started)
+                if (activity.link) {
                     activityElement.classList.add('activity-clickable');
                     activityElement.style.cursor = 'pointer';
                 } else {
-                    activityElement.style.cursor = 'not-allowed';
+                    activityElement.style.cursor = 'pointer';
                 }
                 
                 let statusBadge = '';
@@ -250,8 +389,6 @@ function initEngineeringSystem() {
                     statusBadge = '<div class="activity-status-badge completed-badge">✓</div>';
                 } else if (activity.status === 'current') {
                     statusBadge = '<div class="activity-status-badge current-badge">●</div>';
-                } else if (activity.status === 'upcoming') {
-                    statusBadge = '<div class="activity-status-badge locked-badge">🔒</div>';
                 }
                 
                 activityElement.innerHTML = `
@@ -270,7 +407,7 @@ function initEngineeringSystem() {
                     <div class="activity-xp">${activity.xp}</div>
                 `;
                 
-                if (activity.link && activity.status !== 'upcoming') {
+                if (activity.link) {
                     activityElement.addEventListener('click', function(e) {
                         e.stopPropagation();
                         console.log(`🔧 Navigating to: ${activity.link}`);
@@ -281,9 +418,16 @@ function initEngineeringSystem() {
                 activitiesGrid.appendChild(activityElement);
             });
 
+            // Hiển thị panel
             planetInfoOverlay.classList.add('show');
-            console.log('📱 Info panel shown');
-         
+            console.log('📱 Eng Info panel shown');
+            
+            // Thông báo nếu đã chuyển trạng thái
+            if (wasMarked) {
+                console.log(`🌟 Eng Planet ${planetId} is now marked as "đang học" (màu cam)`);
+            }
+            
+            // Hiệu ứng click
             this.style.transform = 'scale(1.3)';
             setTimeout(() => {
                 this.style.transform = '';
@@ -293,7 +437,7 @@ function initEngineeringSystem() {
 
     function closeInfoPanel() {
         planetInfoOverlay.classList.remove('show');
-        console.log('📱 Info panel closed');
+        console.log('📱 Eng Info panel closed');
     }
 
     closeInfo.addEventListener('click', closeInfoPanel);
@@ -318,6 +462,9 @@ function initEngineeringSystem() {
             this.style.animationPlayState = 'running';
         });
     });
+
+    // Tự động lưu mỗi 5 giây
+    setInterval(saveAllEngStatuses, 5000);
 
     console.log('🎉 Engineering System initialized successfully!');
     return true;

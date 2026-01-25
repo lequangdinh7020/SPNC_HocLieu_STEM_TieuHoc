@@ -9,8 +9,8 @@ $math_data = [
     'icon' => '🧮',
     'description' => 'Khám phá thế giới số học đầy màu sắc!',
     'total_xp' => 290,
-    'completed_xp' => 80,
-    'current_streak' => 6,
+    'completed_xp' => 0, // Bắt đầu từ 0 XP
+    'current_streak' => 0, // Bắt đầu từ 0 streak
     'character' => [
         'name' => 'Bạn Thỏ Toán Học',
         'avatar' => '🐰',
@@ -18,17 +18,17 @@ $math_data = [
         'welcome_message' => 'Chào bạn nhỏ! Mình là Thỏ Toán Học! Cùng mình khám phá 5 chủ đề toán học siêu vui nhé! 🐰✨'
     ],
     'stats' => [
-        'completed' => 1,
-        'current' => 1,
-        'upcoming' => 7,
-        'total_xp' => 80
+        'completed' => 0, // Chưa hoàn thành
+        'current' => 0,   // Chưa có cái nào đang học
+        'upcoming' => 5,  // 5 bài chưa học
+        'total_xp' => 0   // Tổng XP = 0
     ],
     'topics' => [
         [
             'id' => 1,
             'title' => 'HẬU NGHỆ BẮN MẶT TRỜI',
             'icon' => '🎯',
-            'status' => 'completed',
+            'status' => 'not-started', // Đổi thành not-started
             'color' => '#EF4444',
             'description' => 'Trò chơi máy bắn đá mini học về lực và góc bắn',
             'learning_time' => '22 phút',
@@ -38,7 +38,7 @@ $math_data = [
                     'title' => 'CHẾ TẠO MÁY BẮN ĐÁ',
                     'icon' => '🎮',
                     'description' => 'Trò chơi chế tạo máy bắn đá từ vật liệu đơn giản',
-                    'status' => 'completed',
+                    'status' => 'not-started', // Đổi thành not-started
                     'xp' => 35
                 ]
             ]
@@ -47,7 +47,7 @@ $math_data = [
             'id' => 2,
             'title' => 'NHẬN BIẾT HÌNH HỌC',
             'icon' => '🔺',
-            'status' => 'current',
+            'status' => 'not-started', // Đổi thành not-started
             'color' => '#3B82F6',
             'description' => 'Trò chơi học về các hình học qua thử thách',
             'learning_time' => '18 phút',
@@ -57,7 +57,7 @@ $math_data = [
                     'title' => 'THỬ THÁCH HÌNH HỌC',
                     'icon' => '🧩',
                     'description' => 'Trò chơi phân loại các hình học khác nhau',
-                    'status' => 'current',
+                    'status' => 'not-started', // Đổi thành not-started
                     'xp' => 25
                 ]
             ]
@@ -66,7 +66,7 @@ $math_data = [
             'id' => 3,
             'title' => 'TANGRAM 3D',
             'icon' => '🧩',
-            'status' => 'upcoming',
+            'status' => 'not-started',
             'color' => '#10B981',
             'description' => 'Trò chơi tangram không gian 3 chiều thú vị',
             'learning_time' => '25 phút',
@@ -76,7 +76,7 @@ $math_data = [
                     'title' => 'GIỚI THIỆU TANGRAM 3D',
                     'icon' => '🎮',
                     'description' => 'Trò chơi làm quen với tangram 3D',
-                    'status' => 'upcoming',
+                    'status' => 'not-started',
                     'xp' => 30
                 ],
                 [
@@ -84,7 +84,7 @@ $math_data = [
                     'title' => 'GHÉP HÌNH TANGRAM 3D',
                     'icon' => '🔷',
                     'description' => 'Thử thách ghép hình với tangram 3D',
-                    'status' => 'upcoming',
+                    'status' => 'not-started',
                     'xp' => 40
                 ]
             ]
@@ -93,7 +93,7 @@ $math_data = [
             'id' => 4,
             'title' => 'ĐẾM SỐ THÔNG MINH',
             'icon' => '🔢',
-            'status' => 'upcoming',
+            'status' => 'not-started',
             'color' => '#F59E0B',
             'description' => 'Trò chơi học đếm số và nhận biết số thú vị',
             'learning_time' => '20 phút',
@@ -103,7 +103,7 @@ $math_data = [
                     'title' => 'TRÒ CHƠI ĐẾM SỐ',
                     'icon' => '🎲',
                     'description' => 'Trò chơi học đếm từ 1 đến 100',
-                    'status' => 'upcoming',
+                    'status' => 'not-started',
                     'xp' => 25
                 ]
             ]
@@ -112,7 +112,7 @@ $math_data = [
             'id' => 5,
             'title' => 'ĐỒNG HỒ THỜI GIAN',
             'icon' => '⏰',
-            'status' => 'upcoming',
+            'status' => 'not-started',
             'color' => '#EC4899',
             'description' => 'Trò chơi học xem đồng hồ và quản lý thời gian',
             'learning_time' => '28 phút',
@@ -122,7 +122,7 @@ $math_data = [
                     'title' => 'QUẢN LÝ THỜI GIAN',
                     'icon' => '⏳',
                     'description' => 'Trò chơi thực hành quản lý thời gian hàng ngày',
-                    'status' => 'upcoming',
+                    'status' => 'not-started',
                     'xp' => 45
                 ]
             ]
@@ -135,6 +135,17 @@ $current_page = 'math';
 $progress_percentage = ($subject['completed_xp'] / $subject['total_xp']) * 100;
 $first_visit = !isset($_SESSION['math_visited']);
 $_SESSION['math_visited'] = true;
+
+// Khởi tạo session để lưu trạng thái học - TẤT CẢ ĐỀU LÀ NOT-STARTED
+if (!isset($_SESSION['math_planet_status'])) {
+    $_SESSION['math_planet_status'] = [
+        1 => 'not-started',
+        2 => 'not-started',
+        3 => 'not-started',
+        4 => 'not-started',
+        5 => 'not-started'
+    ];
+}
 ?>
 
 <!DOCTYPE html>
@@ -168,7 +179,7 @@ $_SESSION['math_visited'] = true;
                 
                 <div class="mission-stats">
                     <div class="stat-orb xp-orb">
-                        <div class="stat-value">80</div>
+                        <div class="stat-value">0</div>
                         <div class="stat-label">XP</div>
                     </div>
                 </div>
@@ -184,11 +195,12 @@ $_SESSION['math_visited'] = true;
             <div class="orbit orbit-4"></div>
             <div class="orbit orbit-5"></div>
             
-            <div class="planet planet-1 completed" data-planet="1">🎯</div>
-            <div class="planet planet-2 current" data-planet="2">🔺</div>
-            <div class="planet planet-3" data-planet="3">🧩</div>
-            <div class="planet planet-4" data-planet="4">🔢</div>
-            <div class="planet planet-5" data-planet="5">⏰</div>
+            <!-- TẤT CẢ ĐỀU LÀ NOT-STARTED -->
+            <div class="planet planet-1 not-started" data-planet="1">🎯</div>
+            <div class="planet planet-2 not-started" data-planet="2">🔺</div>
+            <div class="planet planet-3 not-started" data-planet="3">🧩</div>
+            <div class="planet planet-4 not-started" data-planet="4">🔢</div>
+            <div class="planet planet-5 not-started" data-planet="5">⏰</div>
         </section>
     </div>
 
@@ -201,13 +213,13 @@ $_SESSION['math_visited'] = true;
             <div class="info-header">
                 <div class="info-icon" id="infoIcon">🎯</div>
                 <div class="info-title">
-                    <h3 id="infoName">MÁY BẮN ĐÁ MINI</h3>
-                    <span class="status" id="infoStatus">Đã hoàn thành</span>
+                    <h3 id="infoName">HẬU NGHỆ BẮN MẶT TRỜI</h3>
+                    <span class="status" id="infoStatus">Chưa học</span>
                 </div>
             </div>
             
             <p class="info-description" id="infoDescription">
-                Chế tạo máy bắn đá mini học về lực và góc bắn
+                Trò chơi máy bắn đá mini học về lực và góc bắn
             </p>
             
             <div class="activities-section">
@@ -221,7 +233,11 @@ $_SESSION['math_visited'] = true;
     <button class="cosmic-character" id="characterBtn">
         🐰
     </button>
-    <script>window.baseUrl = "<?php echo $base_url; ?>";</script>
+    <script>
+        window.baseUrl = "<?php echo $base_url; ?>";
+        // Truyền trạng thái từ PHP session sang JavaScript - TẤT CẢ ĐỀU NOT-STARTED
+        window.mathPlanetStatuses = <?php echo json_encode($_SESSION['math_planet_status']); ?>;
+    </script>
     <script src="<?php echo $base_url; ?>/public/JS/math.js?v=<?= time() ?>"></script>
 </body>
 </html>

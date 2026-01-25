@@ -5,31 +5,43 @@ const planets = {
     1: {
         name: "THẾ GIỚI MÀU SẮC",
         icon: "🎨",
-        status: "completed",
+        status: "not-started",
         description: "Khám phá bí mật của màu sắc qua các hoạt động thú vị",
         time: "15 phút",
         xp: "20 XP",
         activities: [
-                        { type: "game", name: "Trò chơi pha màu", icon: "🎮", xp: "20 XP",
-                            link: baseUrl + '/views/lessons/science_color_game', status: "current" }
+            { 
+                type: "game", 
+                name: "Trò chơi pha màu", 
+                icon: "🎮", 
+                xp: "20 XP",
+                link: baseUrl + '/views/lessons/science_color_game', 
+                status: "not-started"
+            }
         ]
     },
     2: {
         name: "BÍ KÍP ĂN UỐNG LÀNH MẠNH",
         icon: "🍎",
-        status: "completed",
+        status: "not-started",
         description: "Học cách chọn thực phẩm tốt cho sức khỏe",
         time: "20 phút",
         xp: "20 XP",
         activities: [
-            { type: "game", name: "Trò chơi tháp dinh dưỡng", icon: "🧩", xp: "20 XP",
-              link: baseUrl + '/views/lessons/science_nutrition_game', status: "current" }
+            { 
+                type: "game", 
+                name: "Trò chơi tháp dinh dưỡng", 
+                icon: "🧩", 
+                xp: "20 XP",
+                link: baseUrl + '/views/lessons/science_nutrition_game', 
+                status: "not-started"
+            }
         ]
     },
     3: {
         name: "NGÀY VÀ ĐÊM", 
         icon: "🌓",
-        status: "completed",
+        status: "not-started",
         description: "Khám phá bí mật của thời gian và thiên văn",
         time: "12 phút", 
         xp: "20 XP",
@@ -40,121 +52,163 @@ const planets = {
                 icon: "🌞", 
                 xp: "20 XP",
                 link: baseUrl + '/views/lessons/science_day_night',
-                status: "current"
+                status: "not-started"
             }
         ]
     },
     4: {
         name: "THÙNG RÁC THÂN THIỆN",
         icon: "🗑️",
-        status: "completed",
+        status: "not-started",
         description: "Học cách phân loại rác bảo vệ môi trường",
         time: "16 phút",
         xp: "20 XP",
         activities: [
-            { type: "game", name: "Trò chơi phân loại rác", icon: "♻️", xp: "20 XP",
-                link: baseUrl + '/views/lessons/science_trash_game', status: "current" }
+            { 
+                type: "game", 
+                name: "Trò chơi phân loại rác", 
+                icon: "♻️", 
+                xp: "20 XP",
+                link: baseUrl + '/views/lessons/science_trash_game', 
+                status: "not-started"
+            }
         ]
     },
     5: {
         name: "CÁC BỘ PHẬN CỦA CÂY",
         icon: "🌱",
-        status: "completed",
+        status: "not-started",
         description: "Học cách nhận biết các bộ phận của cây",
         time: "10 phút",
         xp: "20 XP",
         activities: [
-            { type: "game", name: "Trò chơi lắp ghép", icon: "🌿", xp: "20 XP",
-              link: baseUrl + '/views/lessons/science_plant_game', status: "current" }
+            { 
+                type: "game", 
+                name: "Trò chơi lắp ghép", 
+                icon: "🌿", 
+                xp: "20 XP",
+                link: baseUrl + '/views/lessons/science_plant_game', 
+                status: "not-started"
+            }
         ]
     }
 };
 
-// Fetch completed games for current user and update planet/activity statuses
-(function updatePlanetStatuses() {
+// Sử dụng localStorage để tránh delay
+const STORAGE_KEY = 'science_planet_status';
+
+// Hàm lưu tất cả trạng thái vào localStorage
+function saveAllPlanetStatuses() {
     try {
-        const endpoint = (typeof baseUrl !== 'undefined' ? baseUrl : '') + '/public/api/get_topic_status.php';
-        fetch(endpoint, { credentials: 'same-origin' })
-            .then(response => response.json())
-                .then(data => {
-                    const completedItems = (data && data.completed_games) ? data.completed_games : [];
-
-                    // JS slugify (remove diacritics, replace non-alnum with hyphens)
-                    const slugify = (s) => {
-                        if (!s) return '';
-                        return s.toString().normalize('NFD').replace(/\p{Diacritic}/gu, '')
-                            .replace(/[^a-zA-Z0-9]+/g, '-')
-                            .replace(/(^-|-$)/g, '').toLowerCase();
-                    };
-
-                    const completedNames = completedItems.map(ci => (typeof ci === 'string' ? ci : (ci.name || '')).toLowerCase());
-                    const completedSlugs = completedItems.map(ci => (typeof ci === 'string' ? slugify(ci) : (ci.slug || slugify(ci.name || ''))));
-
-                    for (const id in planets) {
-                        if (!Object.prototype.hasOwnProperty.call(planets, id)) continue;
-                        const p = planets[id];
-                        const pName = (p.name || '').toLowerCase();
-                        const pSlug = slugify(p.name || '');
-
-                        const matchedByName = completedNames.indexOf(pName) !== -1;
-                        const matchedBySlug = completedSlugs.indexOf(pSlug) !== -1;
-                        p.status = (matchedByName || matchedBySlug) ? 'completed' : 'current';
-
-                        p.activities.forEach(a => {
-                            const aName = (a.name || '').toLowerCase();
-                            const aSlugFromName = slugify(a.name || '');
-                            // attempt match by name or slug
-                            const matchedAByName = completedNames.findIndex(g => g && (aName.includes(g) || g.includes(aName))) !== -1;
-                            const matchedABySlug = completedSlugs.indexOf(aSlugFromName) !== -1;
-                            a.status = (matchedAByName || matchedABySlug) ? 'completed' : 'current';
-                        });
-
-                        // If any activity is completed, mark the whole planet as completed
-                        if (Array.isArray(p.activities) && p.activities.some(act => act.status === 'completed')) {
-                            p.status = 'completed';
-                        }
-                    }
-                console.log('✅ Planet statuses updated from server');
-
-                // Apply classes to planet DOM elements so CSS rules take effect
-                document.querySelectorAll('.planet').forEach(el => {
-                    const pid = el.getAttribute('data-planet');
-                    const pdata = planets[pid];
-                    if (!pdata) return;
-                    el.classList.remove('completed', 'current', 'locked');
-                    if (pdata.status === 'completed') {
-                        el.classList.add('completed');
-                        el.style.opacity = '';
-                        el.style.filter = '';
-                    } else if (pdata.status === 'current') {
-                        el.classList.add('current');
-                    } else {
-                        el.classList.add('locked');
-                    }
-                });
-            })
-            .catch(err => {
-                console.warn('⚠️ Could not load game statuses:', err);
-            });
+        const statuses = {};
+        for (const id in planets) {
+            statuses[id] = planets[id].status;
+        }
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(statuses));
+        console.log('💾 All planet statuses saved to localStorage');
+        return true;
     } catch (e) {
-        console.warn('⚠️ updatePlanetStatuses error:', e);
-    }
-})();
-// Unlock all activities in the science panel so they become available
-// (Converts any 'locked' status into 'current' so items become clickable)
-for (const pid in planets) {
-    if (!planets.hasOwnProperty(pid)) continue;
-    const p = planets[pid];
-    if (p.status === 'locked') p.status = 'current';
-    if (Array.isArray(p.activities)) {
-        p.activities.forEach(act => {
-            if (act.status === 'locked') act.status = 'current';
-        });
+        console.error('❌ Error saving to localStorage:', e);
+        return false;
     }
 }
 
+// Hàm load trạng thái từ localStorage
+function loadPlanetStatuses() {
+    try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            const statuses = JSON.parse(saved);
+            for (const id in statuses) {
+                if (planets[id]) {
+                    planets[id].status = statuses[id];
+                    // Update activities status
+                    planets[id].activities.forEach(act => {
+                        act.status = statuses[id];
+                    });
+                }
+            }
+            console.log('📥 Planet statuses loaded from localStorage:', statuses);
+        }
+        updatePlanetDisplay();
+    } catch (e) {
+        console.warn('⚠️ Could not load from localStorage:', e);
+        updatePlanetDisplay();
+    }
+}
+
+// Hàm đánh dấu planet là current
+function markPlanetAsCurrent(planetId) {
+    const planet = planets[planetId];
+    if (!planet) {
+        console.error(`❌ Planet ${planetId} not found`);
+        return false;
+    }
+    
+    // Chỉ chuyển nếu đang là not-started
+    if (planet.status === 'not-started') {
+        console.log(`🔄 Marking planet ${planetId} as current...`);
+        
+        // Cập nhật ngay lập tức
+        planet.status = 'current';
+        planet.activities.forEach(act => {
+            act.status = 'current';
+        });
+        
+        // Cập nhật hiển thị ngay
+        updatePlanetDisplay();
+        
+        // Lưu vào localStorage ngay
+        saveAllPlanetStatuses();
+        
+        console.log(`✅ Planet ${planetId} marked as current`);
+        return true;
+    }
+    
+    return false;
+}
+
+// Hàm cập nhật hiển thị planet
+function updatePlanetDisplay() {
+    console.log('🔄 Updating planet display...');
+    
+    document.querySelectorAll('.planet').forEach(el => {
+        const pid = el.getAttribute('data-planet');
+        const pdata = planets[pid];
+        if (!pdata) return;
+        
+        // Remove all status classes
+        el.classList.remove('completed', 'current', 'not-started', 'locked');
+        
+        // Add the correct status class
+        if (pdata.status === 'completed') {
+            el.classList.add('completed');
+            el.style.opacity = '';
+            el.style.filter = '';
+            console.log(`🌍 Planet ${pid}: COMPLETED ✓`);
+        } else if (pdata.status === 'current') {
+            el.classList.add('current');
+            el.style.opacity = '';
+            el.style.filter = '';
+            console.log(`🌍 Planet ${pid}: CURRENT ●`);
+        } else if (pdata.status === 'not-started') {
+            el.classList.add('not-started');
+            el.style.opacity = '0.5';
+            el.style.filter = 'grayscale(0.7)';
+            console.log(`🌍 Planet ${pid}: NOT STARTED (dimmed)`);
+        } else {
+            el.classList.add('locked');
+            console.log(`🌍 Planet ${pid}: LOCKED`);
+        }
+    });
+}
+
+// Main initialization
 function initScienceSystem() {
     console.log('🚀 Initializing Science System...');
+    
+    // Load trạng thái từ localStorage ngay lập tức
+    loadPlanetStatuses();
     
     const planetInfoOverlay = document.getElementById('planetInfoOverlay');
     const infoIcon = document.getElementById('infoIcon');
@@ -179,20 +233,23 @@ function initScienceSystem() {
 
     console.log('✅ Tất cả elements đã được tìm thấy');
 
-    let currentPlanetData = null;
-
+    // Xử lý click vào planet
     document.querySelectorAll('.planet').forEach(planet => {
         planet.addEventListener('click', function() {
             const planetId = this.getAttribute('data-planet');
             console.log(`🪐 Planet clicked: ${planetId}`);
             
-            currentPlanetData = planets[planetId];
+            const currentPlanetData = planets[planetId];
             
             if (!currentPlanetData) {
                 console.error('❌ Không tìm thấy dữ liệu cho planet:', planetId);
                 return;
             }
             
+            // QUAN TRỌNG: Đánh dấu là current NGAY KHI CLICK
+            const wasMarked = markPlanetAsCurrent(planetId);
+            
+            // Hiển thị thông tin
             infoIcon.textContent = currentPlanetData.icon;
             infoName.textContent = currentPlanetData.name;
             infoDescription.textContent = currentPlanetData.description;
@@ -200,12 +257,18 @@ function initScienceSystem() {
             let statusText = '';
             let statusClass = '';
             
-            if (currentPlanetData.status === 'completed') {
+            // Sử dụng trạng thái mới (sau khi đã update)
+            const displayStatus = planets[planetId].status;
+            
+            if (displayStatus === 'completed') {
                 statusText = 'Đã hoàn thành';
                 statusClass = 'status-completed';
-            } else if (currentPlanetData.status === 'current') {
+            } else if (displayStatus === 'current') {
                 statusText = 'Đang học';
                 statusClass = 'status-current';
+            } else if (displayStatus === 'not-started') {
+                statusText = 'Chưa học';
+                statusClass = 'status-not-started';
             } else {
                 statusText = 'Chờ mở khóa';
                 statusClass = 'status-locked';
@@ -214,8 +277,9 @@ function initScienceSystem() {
             infoStatus.textContent = statusText;
             infoStatus.className = 'status ' + statusClass;
             
+            // Hiển thị activities
             activitiesGrid.innerHTML = '';
-            currentPlanetData.activities.forEach(activity => {
+            planets[planetId].activities.forEach(activity => {
                 const activityElement = document.createElement('div');
                 activityElement.className = 'activity-item';
                 
@@ -223,15 +287,18 @@ function initScienceSystem() {
                     activityElement.classList.add('activity-completed');
                 } else if (activity.status === 'current') {
                     activityElement.classList.add('activity-current');
+                } else if (activity.status === 'not-started') {
+                    activityElement.classList.add('activity-not-started');
                 } else if (activity.status === 'locked') {
                     activityElement.classList.add('activity-locked');
                 }
                 
-                if (activity.link && activity.status !== 'locked') {
+                // Tất cả hoạt động đều có thể click
+                if (activity.link) {
                     activityElement.classList.add('activity-clickable');
                     activityElement.style.cursor = 'pointer';
                 } else {
-                    activityElement.style.cursor = 'not-allowed';
+                    activityElement.style.cursor = 'pointer';
                 }
                 
                 let statusBadge = '';
@@ -262,9 +329,16 @@ function initScienceSystem() {
                 activitiesGrid.appendChild(activityElement);
             });
 
+            // Hiển thị panel
             planetInfoOverlay.classList.add('show');
             console.log('📱 Info panel shown');
-         
+            
+            // Thông báo nếu đã chuyển trạng thái
+            if (wasMarked) {
+                console.log(`🌟 Planet ${planetId} is now marked as "đang học"`);
+            }
+            
+            // Hiệu ứng click
             this.style.transform = 'scale(1.3)';
             setTimeout(() => {
                 this.style.transform = '';
@@ -304,6 +378,15 @@ function initScienceSystem() {
     return true;
 }
 
+// Thêm: Xử lý khi tải lại trang
+window.addEventListener('beforeunload', function() {
+    saveAllPlanetStatuses();
+});
+
+// Thêm: Tự động lưu mỗi 5 giây để đảm bảo không mất dữ liệu
+setInterval(saveAllPlanetStatuses, 5000);
+
+// Start the system when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initScienceSystem);
 } else {

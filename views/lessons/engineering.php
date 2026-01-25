@@ -9,8 +9,8 @@ $engineering_data = [
     'icon' => '⚙️',
     'description' => 'Sáng tạo và xây dựng thế giới quanh em!',
     'total_xp' => 280,
-    'completed_xp' => 60,
-    'current_streak' => 4,
+    'completed_xp' => 0, // Bắt đầu từ 0 XP
+    'current_streak' => 0, // Bắt đầu từ 0 streak
     'character' => [
         'name' => 'Bạn Thợ Máy Thông Thái',
         'avatar' => '👷‍♂️',
@@ -18,17 +18,17 @@ $engineering_data = [
         'welcome_message' => 'Chào nhà kỹ sư nhí! Mình là Thợ Máy Thông Thái! Cùng mình chế tạo 5 dự án siêu thú vị nhé! 👷‍♂️✨'
     ],
     'stats' => [
-        'completed' => 1,
-        'current' => 1,
-        'upcoming' => 7,
-        'total_xp' => 60
+        'completed' => 0, // Chưa hoàn thành
+        'current' => 0,   // Chưa có cái nào đang học
+        'upcoming' => 5,  // 5 bài chưa học
+        'total_xp' => 0   // Tổng XP = 0
     ],
     'topics' => [
         [
             'id' => 1,
             'title' => 'XÂY THÁP (CÂY TRE TRĂM ĐỐT)',
             'icon' => '🎋',
-            'status' => 'completed',
+            'status' => 'not-started', // Đổi thành not-started
             'color' => '#3B82F6',
             'description' => 'Học cách xây tháp vững chắc từ câu chuyện Cây tre trăm đốt',
             'learning_time' => '25 phút',
@@ -38,7 +38,7 @@ $engineering_data = [
                     'title' => 'THỬ THÁCH XÂY THÁP',
                     'icon' => '🏗️',
                     'description' => 'Học kỹ thuật xây dựng tháp cao và vững chắc',
-                    'status' => 'completed',
+                    'status' => 'not-started', // Đổi thành not-started
                     'xp' => 30
                 ]
             ]
@@ -47,7 +47,7 @@ $engineering_data = [
             'id' => 2,
             'title' => 'SẮP XẾP CĂN PHÒNG CỦA EM',
             'icon' => '🏠',
-            'status' => 'current',
+            'status' => 'not-started', // Đổi thành not-started
             'color' => '#EC4899',
             'description' => 'Thiết kế và sắp xếp không gian sống gọn gàng, hợp lý',
             'learning_time' => '30 phút',
@@ -57,7 +57,7 @@ $engineering_data = [
                     'title' => 'THIẾT KẾ KHÔNG GIAN',
                     'icon' => '🎨',
                     'description' => 'Học về bố cục và sắp xếp đồ đạc thông minh',
-                    'status' => 'current',
+                    'status' => 'not-started', // Đổi thành not-started
                     'xp' => 35
                 ]
             ]
@@ -66,7 +66,7 @@ $engineering_data = [
             'id' => 3,
             'title' => 'XÂY CẦU GIẤY',
             'icon' => '🌉',
-            'status' => 'current',
+            'status' => 'not-started',
             'color' => '#8B5CF6',
             'description' => 'Thiết kế và xây dựng cầu từ giấy A4 chịu lực',
             'learning_time' => '35 phút',
@@ -76,7 +76,7 @@ $engineering_data = [
                     'title' => 'THỬ THÁCH CẦU GIẤY',
                     'icon' => '🌉',
                     'description' => 'Xây cầu chịu được trọng lượng lớn nhất',
-                    'status' => 'current',
+                    'status' => 'not-started',
                     'xp' => 35
                 ]
             ]
@@ -85,7 +85,7 @@ $engineering_data = [
             'id' => 4,
             'title' => 'HỆ THỐNG DẪN NƯỚC',
             'icon' => '🚰',
-            'status' => 'current',
+            'status' => 'not-started',
             'color' => '#06B6D4',
             'description' => 'Tìm hiểu và thiết kế hệ thống dẫn nước đơn giản',
             'learning_time' => '28 phút',
@@ -95,7 +95,7 @@ $engineering_data = [
                     'title' => 'TRÒ CHƠI DẪN NƯỚC',
                     'icon' => '🧪',
                     'description' => 'Chế tạo và thử nghiệm hệ thống dẫn nước',
-                    'status' => 'current',
+                    'status' => 'not-started',
                     'xp' => 40
                 ]
             ]
@@ -104,7 +104,7 @@ $engineering_data = [
             'id' => 5,
             'title' => 'HỆ THỐNG LỌC NƯỚC CƠ BẢN',
             'icon' => '💧',
-            'status' => 'current',
+            'status' => 'not-started',
             'color' => '#06B6D4',
             'description' => 'Tìm hiểu và chế tạo hệ thống lọc nước đơn giản',
             'learning_time' => '40 phút',
@@ -114,7 +114,7 @@ $engineering_data = [
                     'title' => 'CHẾ TẠO BỘ LỌC',
                     'icon' => '🧪',
                     'description' => 'Tự làm hệ thống lọc nước từ vật liệu đơn giản',
-                    'status' => 'current',
+                    'status' => 'not-started',
                     'xp' => 40
                 ]
             ]
@@ -127,6 +127,17 @@ $current_page = 'engineering';
 $progress_percentage = ($subject['completed_xp'] / $subject['total_xp']) * 100;
 $first_visit = !isset($_SESSION['engineering_visited']);
 $_SESSION['engineering_visited'] = true;
+
+// Khởi tạo session để lưu trạng thái học - TẤT CẢ ĐỀU LÀ NOT-STARTED
+if (!isset($_SESSION['eng_planet_status'])) {
+    $_SESSION['eng_planet_status'] = [
+        1 => 'not-started',
+        2 => 'not-started',
+        3 => 'not-started',
+        4 => 'not-started',
+        5 => 'not-started'
+    ];
+}
 ?>
 
 <!DOCTYPE html>
@@ -160,7 +171,7 @@ $_SESSION['engineering_visited'] = true;
                 
                 <div class="mission-stats">
                     <div class="stat-orb xp-orb">
-                        <div class="stat-value">60</div>
+                        <div class="stat-value">0</div>
                         <div class="stat-label">XP</div>
                     </div>
                 </div>
@@ -176,11 +187,12 @@ $_SESSION['engineering_visited'] = true;
             <div class="orbit orbit-4"></div>
             <div class="orbit orbit-5"></div>
             
-            <div class="planet planet-1 completed" data-planet="1">🎋</div>
-            <div class="planet planet-2 current" data-planet="2">🏠</div>
-            <div class="planet planet-3" data-planet="3">🌉</div>
-            <div class="planet planet-4" data-planet="4">🚰</div>
-            <div class="planet planet-5" data-planet="5">💧</div>
+            <!-- TẤT CẢ ĐỀU LÀ NOT-STARTED -->
+            <div class="planet planet-1 not-started" data-planet="1">🎋</div>
+            <div class="planet planet-2 not-started" data-planet="2">🏠</div>
+            <div class="planet planet-3 not-started" data-planet="3">🌉</div>
+            <div class="planet planet-4 not-started" data-planet="4">🚰</div>
+            <div class="planet planet-5 not-started" data-planet="5">💧</div>
         </section>
     </div>
 
@@ -194,7 +206,7 @@ $_SESSION['engineering_visited'] = true;
                 <div class="info-icon" id="infoIcon">🎋</div>
                 <div class="info-title">
                     <h3 id="infoName">XÂY THÁP (CÂY TRE TRĂM ĐỐT)</h3>
-                    <span class="status" id="infoStatus">Đã hoàn thành</span>
+                    <span class="status" id="infoStatus">Chưa học</span>
                 </div>
             </div>
             
@@ -213,7 +225,11 @@ $_SESSION['engineering_visited'] = true;
     <button class="cosmic-character" id="characterBtn">
         👷‍♂️
     </button>
-    <script>window.baseUrl = "<?php echo $base_url; ?>";</script>
+    <script>
+        window.baseUrl = "<?php echo $base_url; ?>";
+        // Truyền trạng thái từ PHP session sang JavaScript - TẤT CẢ ĐỀU NOT-STARTED
+        window.engPlanetStatuses = <?php echo json_encode($_SESSION['eng_planet_status']); ?>;
+    </script>
     <script src="<?php echo $base_url; ?>/public/JS/engineering.js?v=<?= time() ?>"></script>
 </body>
 </html>

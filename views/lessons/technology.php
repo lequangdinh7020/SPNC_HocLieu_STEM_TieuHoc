@@ -9,8 +9,8 @@ $technology_data = [
     'icon' => '💻',
     'description' => 'Khám phá thế giới công nghệ đầy thú vị!',
     'total_xp' => 300,
-    'completed_xp' => 75,
-    'current_streak' => 5,
+    'completed_xp' => 0, // Bắt đầu từ 0 XP
+    'current_streak' => 0, // Bắt đầu từ 0 streak
     'character' => [
         'name' => 'Bạn Robot Công Nghệ',
         'avatar' => '🤖',
@@ -18,17 +18,17 @@ $technology_data = [
         'welcome_message' => 'Xin chào! Mình là Robot Công Nghệ! Cùng mình khám phá 5 chủ đề công nghệ siêu thú vị nhé! 🤖✨'
     ],
     'stats' => [
-        'completed' => 1,
-        'current' => 1,
-        'upcoming' => 7,
-        'total_xp' => 75
+        'completed' => 0, // Chưa hoàn thành
+        'current' => 0,   // Chưa có cái nào đang học
+        'upcoming' => 5,  // 5 bài chưa học
+        'total_xp' => 0   // Tổng XP = 0
     ],
     'topics' => [
         [
             'id' => 1,
             'title' => 'CÂY GIA ĐÌNH',
             'icon' => '🌳',
-            'status' => 'completed',
+            'status' => 'not-started', // Đổi thành not-started
             'color' => '#10B981',
             'description' => 'Tìm hiểu về các mối quan hệ gia đình qua cây phả hệ',
             'learning_time' => '20 phút',
@@ -38,7 +38,7 @@ $technology_data = [
                     'title' => 'TRÒ CHƠI CÂY GIA ĐÌNH',
                     'icon' => '🎮',
                     'description' => 'Xây dựng cây phả hệ gia đình',
-                    'status' => 'completed',
+                    'status' => 'not-started', // Đổi thành not-started
                     'xp' => 25
                 ]
             ]
@@ -47,53 +47,37 @@ $technology_data = [
             'id' => 2,
             'title' => 'EM LÀ HỌA SĨ MÁY TÍNH',
             'icon' => '🎨',
-            'status' => 'current',
+            'status' => 'not-started', // Đổi thành not-started
             'color' => '#EC4899',
             'description' => 'Khám phá các công cụ vẽ đơn giản trên máy tính',
             'learning_time' => '25 phút',
             'activities' => [
                 [
-                    'type' => 'tutorial',
-                    'title' => 'GIỚI THIỆU CÔNG CỤ VẼ',
-                    'icon' => '📝',
-                    'description' => 'Tìm hiểu các công cụ vẽ cơ bản',
-                    'status' => 'current',
-                    'xp' => 30
-                ],
-                [
                     'type' => 'share',
                     'title' => 'CHIA SẺ TÁC PHẨM',
                     'icon' => '🖼️',
                     'description' => 'Chia sẻ bức vẽ của bạn với mọi người',
-                    'status' => 'upcoming',
+                    'status' => 'not-started', // Đổi thành not-started
                     'xp' => 20
                 ]
             ]
         ],
         [
             'id' => 3,
-            'title' => 'AN TOÀN TRÊN INTERNET',
-            'icon' => '🛡️',
-            'status' => 'upcoming',
-            'color' => '#F59E0B',
-            'description' => 'Học các quy tắc cơ bản khi sử dụng Internet',
-            'learning_time' => '18 phút',
+            'title' => 'EM LÀ NGƯỜI ĐÁNH MÁY',
+            'icon' => '⌨️',
+            'status' => 'not-started',
+            'color' => '#3B82F6',
+            'description' => 'Rèn luyện kỹ năng đánh máy nhanh và chính xác',
+            'learning_time' => '35 phút',
             'activities' => [
                 [
-                    'type' => 'video',
-                    'title' => 'QUY TẮC INTERNET',
-                    'icon' => '📺',
-                    'description' => 'Xem video về an toàn trên mạng',
-                    'status' => 'upcoming',
-                    'xp' => 25
-                ],
-                [
-                    'type' => 'question',
-                    'title' => 'TRẢ LỜI CÂU HỎI',
-                    'icon' => '❓',
-                    'description' => 'Kiểm tra kiến thức an toàn mạng',
-                    'status' => 'upcoming',
-                    'xp' => 25
+                    'type' => 'game',
+                    'title' => 'TRÒ CHƠI ĐÁNH MÁY',
+                    'icon' => '🎮',
+                    'description' => 'Luyện tập đánh máy qua trò chơi',
+                    'status' => 'not-started',
+                    'xp' => 40
                 ]
             ]
         ],
@@ -101,25 +85,17 @@ $technology_data = [
             'id' => 4,
             'title' => 'SƠN TINH (LẬP TRÌNH KHỐI)',
             'icon' => '🧩',
-            'status' => 'upcoming',
+            'status' => 'not-started',
             'color' => '#8B5CF6',
-            'description' => 'Làm quen với lập trình qua nền tảng Scratch',
+            'description' => 'Làm quen với lập trình các khối lệnh',
             'learning_time' => '30 phút',
             'activities' => [
-                [
-                    'type' => 'video',
-                    'title' => 'GIỚI THIỆU SCRATCH',
-                    'icon' => '📺',
-                    'description' => 'Xem video giới thiệu về Scratch',
-                    'status' => 'upcoming',
-                    'xp' => 30
-                ],
                 [
                     'type' => 'game',
                     'title' => 'THỰC HÀNH SCRATCH',
                     'icon' => '🎮',
                     'description' => 'Thực hành lập trình đơn giản',
-                    'status' => 'upcoming',
+                    'status' => 'not-started',
                     'xp' => 40
                 ]
             ]
@@ -128,7 +104,7 @@ $technology_data = [
             'id' => 5,
             'title' => 'CÁC BỘ PHẬN CỦA MÁY TÍNH',
             'icon' => '💻',
-            'status' => 'upcoming',
+            'status' => 'not-started',
             'color' => '#6366F1',
             'description' => 'Tìm hiểu các thành phần cơ bản của máy tính',
             'learning_time' => '22 phút',
@@ -138,116 +114,8 @@ $technology_data = [
                     'title' => 'GHÉP BỘ PHẬN MÁY TÍNH',
                     'icon' => '🧩',
                     'description' => 'Trò chơi ghép các bộ phận máy tính',
-                    'status' => 'upcoming',
+                    'status' => 'not-started',
                     'xp' => 35
-                ]
-            ]
-        ],
-        [
-            'id' => 6,
-            'title' => 'TẠO MỘT TẤM THIỆP ĐIỆN TỬ',
-            'icon' => '💌',
-            'status' => 'upcoming',
-            'color' => '#EC4899',
-            'description' => 'Học cách tạo thiệp điện tử và chia sẻ tác phẩm',
-            'learning_time' => '28 phút',
-            'activities' => [
-                [
-                    'type' => 'tutorial',
-                    'title' => 'THIẾT KẾ THIỆP',
-                    'icon' => '🎨',
-                    'description' => 'Học cách thiết kế thiệp điện tử',
-                    'status' => 'upcoming',
-                    'xp' => 30
-                ],
-                [
-                    'type' => 'share',
-                    'title' => 'CHIA SẺ TÁC PHẨM',
-                    'icon' => '📤',
-                    'description' => 'Chia sẻ thiệp với bạn bè',
-                    'status' => 'upcoming',
-                    'xp' => 25
-                ]
-            ]
-        ],
-        [
-            'id' => 7,
-            'title' => 'EM LÀ NGƯỜI ĐÁNH MÁY',
-            'icon' => '⌨️',
-            'status' => 'upcoming',
-            'color' => '#10B981',
-            'description' => 'Rèn luyện kỹ năng đánh máy nhanh và chính xác',
-            'learning_time' => '35 phút',
-            'activities' => [
-                [
-                    'type' => 'game',
-                    'title' => 'TRÒ CHƠI ĐÁNH MÁY',
-                    'icon' => '🎮',
-                    'description' => 'Luyện tập đánh máy qua trò chơi',
-                    'status' => 'upcoming',
-                    'xp' => 40
-                ],
-                [
-                    'type' => 'practice',
-                    'title' => 'THỰC HÀNH TỐC KÝ',
-                    'icon' => '⚡',
-                    'description' => 'Luyện tập tốc độ đánh máy',
-                    'status' => 'upcoming',
-                    'xp' => 35
-                ]
-            ]
-        ],
-        [
-            'id' => 8,
-            'title' => 'TÌM KIẾM THÔNG TIN HỮU ÍCH',
-            'icon' => '🔍',
-            'status' => 'upcoming',
-            'color' => '#F59E0B',
-            'description' => 'Học kỹ năng tìm kiếm thông tin trên Internet',
-            'learning_time' => '32 phút',
-            'activities' => [
-                [
-                    'type' => 'tutorial',
-                    'title' => 'KỸ NĂNG TÌM KIẾM',
-                    'icon' => '📚',
-                    'description' => 'Học cách tìm kiếm hiệu quả',
-                    'status' => 'upcoming',
-                    'xp' => 35
-                ],
-                [
-                    'type' => 'practice',
-                    'title' => 'THỰC HÀNH TÌM KIẾM',
-                    'icon' => '🔎',
-                    'description' => 'Thực hành tìm kiếm thông tin',
-                    'status' => 'upcoming',
-                    'xp' => 30
-                ]
-            ]
-        ],
-        [
-            'id' => 9,
-            'title' => 'KHÁM PHÁ THẾ GIỚI QUA BẢN ĐỒ SỐ',
-            'icon' => '🗺️',
-            'status' => 'upcoming',
-            'color' => '#3B82F6',
-            'description' => 'Tìm hiểu về bản đồ số và khám phá thế giới',
-            'learning_time' => '26 phút',
-            'activities' => [
-                [
-                    'type' => 'explore',
-                    'title' => 'KHÁM PHÁ BẢN ĐỒ',
-                    'icon' => '🌍',
-                    'description' => 'Khám phá thế giới qua bản đồ số',
-                    'status' => 'upcoming',
-                    'xp' => 30
-                ],
-                [
-                    'type' => 'game',
-                    'title' => 'TRÒ CHƠI ĐỊA LÝ',
-                    'icon' => '🎯',
-                    'description' => 'Trò chơi tìm hiểu địa lý',
-                    'status' => 'upcoming',
-                    'xp' => 25
                 ]
             ]
         ]
@@ -259,6 +127,17 @@ $current_page = 'technology';
 $progress_percentage = ($subject['completed_xp'] / $subject['total_xp']) * 100;
 $first_visit = !isset($_SESSION['technology_visited']);
 $_SESSION['technology_visited'] = true;
+
+// Khởi tạo session để lưu trạng thái học - TẤT CẢ ĐỀU LÀ NOT-STARTED
+if (!isset($_SESSION['tech_planet_status'])) {
+    $_SESSION['tech_planet_status'] = [
+        1 => 'not-started',
+        2 => 'not-started',
+        3 => 'not-started',
+        4 => 'not-started',
+        5 => 'not-started'
+    ];
+}
 ?>
 
 <!DOCTYPE html>
@@ -292,7 +171,7 @@ $_SESSION['technology_visited'] = true;
                 
                 <div class="mission-stats">
                     <div class="stat-orb xp-orb">
-                        <div class="stat-value">100</div>
+                        <div class="stat-value">0</div>
                         <div class="stat-label">XP</div>
                     </div>
                 </div>
@@ -308,11 +187,12 @@ $_SESSION['technology_visited'] = true;
             <div class="orbit orbit-4"></div>
             <div class="orbit orbit-5"></div>
             
-            <div class="planet planet-1 completed" data-planet="1">🌳</div>
-            <div class="planet planet-2 current" data-planet="2">🎨</div>
-            <div class="planet planet-3" data-planet="3">⌨️</div>
-            <div class="planet planet-4" data-planet="4">🧩</div>
-            <div class="planet planet-5" data-planet="5">💻</div>
+            <!-- TẤT CẢ ĐỀU LÀ NOT-STARTED -->
+            <div class="planet planet-1 not-started" data-planet="1">🌳</div>
+            <div class="planet planet-2 not-started" data-planet="2">🎨</div>
+            <div class="planet planet-3 not-started" data-planet="3">⌨️</div>
+            <div class="planet planet-4 not-started" data-planet="4">🧩</div>
+            <div class="planet planet-5 not-started" data-planet="5">💻</div>
         </section>
     </div>
 
@@ -326,7 +206,7 @@ $_SESSION['technology_visited'] = true;
                 <div class="info-icon" id="infoIcon">🌳</div>
                 <div class="info-title">
                     <h3 id="infoName">CÂY GIA ĐÌNH</h3>
-                    <span class="status" id="infoStatus">Đã hoàn thành</span>
+                    <span class="status" id="infoStatus">Chưa học</span>
                 </div>
             </div>
             
@@ -345,7 +225,11 @@ $_SESSION['technology_visited'] = true;
     <button class="cosmic-character" id="characterBtn">
         🤖
     </button>
-    <script>window.baseUrl = "<?php echo $base_url; ?>";</script>
+    <script>
+        window.baseUrl = "<?php echo $base_url; ?>";
+        // Truyền trạng thái từ PHP session sang JavaScript - TẤT CẢ ĐỀU NOT-STARTED
+        window.techPlanetStatuses = <?php echo json_encode($_SESSION['tech_planet_status']); ?>;
+    </script>
     <script src="<?php echo $base_url; ?>/public/JS/technology.js?v=<?= time() ?>"></script>
 </body>
 </html>
