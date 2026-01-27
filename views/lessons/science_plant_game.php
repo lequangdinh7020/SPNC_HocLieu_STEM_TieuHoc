@@ -2,31 +2,67 @@
 require_once __DIR__ . '/../template/header.php';
 ?>
 
-<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/home.css"> 
-
+<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/home.css">
 <link rel="stylesheet" href="<?= $base_url ?>/public/CSS/plant_game.css?v=<?php echo time(); ?>">
 
-<div class="game-wrapper plant-game">
-    <h1>Trò chơi: Lắp ghép bộ phận (<?php echo $plantData['title']; ?>)</h1>
-    <p>Hãy kéo các nhãn tên vào đúng vị trí trên cây.</p>
-    
-    <div id="plant-feedback"></div>
-    <div class="game-actions">
-        <button id="plantFinishButton" class="finish-button">Hoàn thành</button>
-        <a href="<?= $base_url ?>/views/lessons/science.php" class="back-button">Quay lại</a>
+<div id="intro-modal" class="modal-overlay active">
+    <div class="intro-dialogue modal-content">
+        <div class="intro-avatar">
+            <img src="<?= $base_url ?>/public/images/plants/plant_hoa_bg.png" alt="Plant Master" class="intro-avatar-img">
+        </div>
+        <div class="intro-text-content">
+            <h3>Chào bạn! Mình là Plant Master!</h3>
+            <p>Chào mừng bạn đến với trò chơi "LẮP GHÉP BỘ PHẬN CÂY". Nhiệm vụ của bạn là kéo các nhãn tên vào đúng vị trí trên cây. Bạn sẵn sàng chưa?</p>
+            <button id="startGameButton" class="start-btn">Bắt đầu thôi!</button>
+        </div>
     </div>
-    <hr>
+</div>
+
+<div class="game-wrapper plant-game">
+    <div class="game-header-bar">
+        <div class="header-left">
+            <div class="menu-btn">
+                <i class="fas fa-home"></i>
+                <a href="<?= $base_url ?>/views/lessons/science.php">Menu</a>
+            </div>
+            <div class="reset-btn">
+                <i class="fas fa-redo"></i>
+                <button id="plantResetButton">Làm lại</button>
+            </div>
+        </div>
+        <div class="header-center">
+            <h1>LẮP GHÉP BỘ PHẬN CÂY</h1>
+            <p class="game-subtitle">Kéo nhãn tên vào đúng vị trí</p>
+        </div>
+        <div class="header-right">
+            <div class="progress-display">
+                <span class="progress-label">Đúng</span>
+                <span id="plantProgress" class="progress-value">0/0</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-instructions">
+        <div class="instruction-box">
+            <i class="fas fa-lightbulb instruction-icon"></i>
+            <h3>Hướng dẫn chơi</h3>
+            <p>Hãy kéo các nhãn tên bộ phận cây vào đúng vị trí trên hình ảnh. Mỗi bộ phận đúng sẽ được cố định tại vị trí.</p>
+        </div>
+    </div>
+
+    <div id="userFeedback"></div>
+    <button id="plantFinishButton" class="finish-btn" style="display: block; margin: 10px auto;">Hoàn thành</button>
 
     <div id="plantGameContainer">
-    
+
         <div id="partsBank">
             <h3>Các bộ phận:</h3>
             <?php foreach ($plantData['parts'] as $part): ?>
-                <div class="draggable-label" 
-                     draggable="true" 
-                     id="<?= $part['id'] ?>" 
-                     data-part-name="<?= $part['name'] ?>"
-                     data-attempt="1">
+                <div class="draggable-label"
+                    draggable="true"
+                    id="<?= $part['id'] ?>"
+                    data-part-name="<?= $part['name'] ?>"
+                    data-attempt="1">
                     <?= $part['text'] ?>
                 </div>
             <?php endforeach; ?>
@@ -36,13 +72,34 @@ require_once __DIR__ . '/../template/header.php';
             <img src="<?= $base_url ?>/public/images/plants/<?php echo $plantData['image_bg']; ?>" alt="<?php echo $plantData['title']; ?>" class="plant-image-bg">
 
             <?php foreach ($plantData['dropzones'] as $zone): ?>
-                <div class="dropzone" 
-                     data-target-part="<?= $zone['target'] ?>"
-                     style="top: <?= $zone['top'] ?>; left: <?= $zone['left'] ?>; width: <?= $zone['width'] ?>; height: <?= $zone['height'] ?>;">
+                <div class="dropzone"
+                    data-target-part="<?= $zone['target'] ?>"
+                    style="top: <?= $zone['top'] ?>; left: <?= $zone['left'] ?>; width: <?= $zone['width'] ?>; height: <?= $zone['height'] ?>;">
                 </div>
             <?php endforeach; ?>
         </div>
-        
+
+    </div>
+
+    <div class="final-result" id="finalResult">
+        <h2>Kết quả cuối cùng</h2>
+        <div class="score-circle">
+            <p class="final-score" id="finalScore">0</p>
+            <span class="score-label">Đúng</span>
+        </div>
+        <div class="result-actions">
+            <button class="play-again" onclick="location.reload()">Chơi lại</button>
+            <a href="<?= $base_url ?>/views/lessons/science.php" class="back-to-lessons">Về bài học</a>
+        </div>
+    </div>
+
+    <div class="game-hints">
+        <h3><i class="fas fa-trophy"></i> Mẹo để đạt điểm cao</h3>
+        <ul>
+            <li>Quan sát kỹ hình dạng và vị trí của từng bộ phận</li>
+            <li>Bộ phận đúng sẽ được giữ lại ở vị trí</li>
+            <li>Bộ phận sai sẽ trở về kho</li>
+        </ul>
     </div>
 </div>
 
@@ -70,7 +127,7 @@ require_once __DIR__ . '/../template/header.php';
 </div>
 
 <script>
-    (function(){
+    (function() {
         var backBtn = document.querySelector('.back-button');
         var prevType = window.prevPlantType || null;
         if (backBtn) {

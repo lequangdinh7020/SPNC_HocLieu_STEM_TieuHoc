@@ -299,7 +299,7 @@ body {
 }
 
 .control-btn.back {
-    background-color: var(--primary-blue-light);
+    background-color: #ff6b6b;
     color: white;
 }
 
