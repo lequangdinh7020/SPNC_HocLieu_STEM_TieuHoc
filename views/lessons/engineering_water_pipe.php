@@ -1,7 +1,7 @@
 <?php require_once __DIR__ . '/../template/header.php'; ?>
 
-<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/home.css">
-<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/water_pipe.css">
+<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/home.css?v=<?= time() . rand(1000, 9999) ?>">
+<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/water_pipe.css?v=<?= time() . rand(1000, 9999) ?>">
 
 <div id="story-modal" class="modal" style="display: none;">
     <div class="modal-content story-content">

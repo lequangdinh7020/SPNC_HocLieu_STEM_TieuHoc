@@ -1,7 +1,7 @@
 <?php require_once __DIR__ . '/../template/header.php'; ?>
 
-<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/home.css">
-<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/water_filter.css">
+<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/home.css?v=<?= time() . rand(1000, 9999) ?>">
+<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/water_filter.css?v=<?= time() . rand(1000, 9999) ?>">
 
 <div class="game-wrapper filter-game">
     <div class="header-game">
