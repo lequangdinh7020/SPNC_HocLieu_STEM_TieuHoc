@@ -75,29 +75,6 @@ document.addEventListener("DOMContentLoaded", () => {
         currentNoteIndex = (currentNoteIndex + 1) % cheerfulNotes.length;
     }
 
-    // Tạo nút music toggle
-    const musicToggle = document.createElement('button');
-    musicToggle.className = 'music-toggle';
-    musicToggle.innerHTML = '🔇'; // Muted speaker
-    musicToggle.title = 'Click để bật nhạc nền vui nhộn!';
-    gameWrapper.appendChild(musicToggle);
-
-    musicToggle.addEventListener('click', () => {
-        if (isMusicPlaying) {
-            clearInterval(bgMusicInterval);
-            musicToggle.innerHTML = '🔇'; // Muted speaker
-            musicToggle.title = 'Bật nhạc nền';
-            musicToggle.classList.add('muted');
-            isMusicPlaying = false;
-        } else {
-            isMusicPlaying = true;
-            bgMusicInterval = setInterval(playBackgroundMusic, 250); // Faster tempo for game feel
-            playBackgroundMusic(); // Start immediately
-            musicToggle.innerHTML = '🔊'; // Speaker on
-            musicToggle.title = 'Tắt nhạc nền';
-            musicToggle.classList.remove('muted');
-        }
-    });
     
     function playSuccessSound() {
         const oscillator = audioContext.createOscillator();
