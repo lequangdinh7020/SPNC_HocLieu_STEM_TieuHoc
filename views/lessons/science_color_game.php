@@ -1,7 +1,7 @@
 <?php require_once __DIR__ . '/../template/header.php'; ?>
 
-<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/home.css"> 
 <link rel="stylesheet" href="<?= $base_url ?>/public/CSS/color_mixing_game.css?v=<?php echo time(); ?>"> 
+<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/home.css?v=<?= time() . rand(1000, 9999) ?>">
 
 <div class="color-game-wrapper"> 
     <h1>TRÒ CHƠI PHA MÀU</h1>
@@ -49,7 +49,6 @@
         </div>
 
         <script>
-            // Use global `baseUrl` from header; do not redeclare it here to avoid duplicate identifier errors.
             const targetColor = <?= json_encode($target['rgb']) ?>;
             const correctPair = <?= json_encode($correct_colors_sorted) ?>;
             let currentAttempt = <?= $current_attempt ?>;
@@ -57,12 +56,9 @@
         
         <script src="<?= $base_url ?>/public/JS/color_mixing_game.js"></script>
 
-        <!-- reset and complete handled in color_mixing_game.js -->
-
     <?php else: ?>
         <p class="question">Trò chơi đã kết thúc!</p>
         <?php
-            // Hiển thị trạng thái hoàn thành nếu có kết quả commit
             if (isset($completionResult) && is_array($completionResult)) {
                 if (!empty($completionResult['success'])) {
                     if (!empty($completionResult['completed'])) {
@@ -77,7 +73,6 @@
             }
         ?>
         <script>
-            // Ensure the header 'Chơi lại' button works on the final screen
             (function(){
                 const resetBtn = document.getElementById('resetGameButton');
                 if (resetBtn) {

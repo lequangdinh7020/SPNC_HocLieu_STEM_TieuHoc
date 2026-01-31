@@ -14,26 +14,25 @@
     --shadow-medium: rgba(0, 0, 0, 0.15);
 }
 
-* {
+body {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
-body {
-    background-color: #f9fbfd;
-    color: var(--text-dark);
-    line-height: 1.6;
-}
-
-.game-wrapper {
+.game-wrapper.day-night-lesson {
     max-width: 1400px;
-    margin: 0 auto;
+    margin: 120px auto 20px auto;
     padding: 20px;
 }
 
-/* Modal Overlay */
+.game-wrapper.day-night-lesson * {
+    box-sizing: border-box;
+}
+
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -119,7 +118,6 @@ body {
     box-shadow: 0 8px 20px rgba(26, 115, 232, 0.4);
 }
 
-/* Game Header Bar */
 .game-header-bar {
     display: flex;
     align-items: center;
@@ -181,7 +179,6 @@ body {
     color: var(--primary-blue);
 }
 
-/* Game Header (old style for backward compatibility) */
 .game-header {
     text-align: center;
     margin-bottom: 30px;
@@ -203,7 +200,6 @@ body {
     margin: 0;
 }
 
-/* Game Stats */
 .game-stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -265,7 +261,6 @@ body {
     color: var(--primary-blue-light);
 }
 
-/* Game Controls */
 .game-controls {
     display: flex;
     flex-wrap: wrap;
@@ -308,7 +303,6 @@ body {
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 
-/* Game Instructions */
 .game-instructions {
     margin-bottom: 30px;
 }
@@ -334,7 +328,6 @@ body {
     font-size: 1.05rem;
 }
 
-/* Theory Content */
 .theory-content {
     display: grid;
     grid-template-columns: 1fr;
@@ -377,7 +370,6 @@ body {
     font-size: 1.1em;
 }
 
-/* Start Quiz Button */
 .start-quiz-btn {
     padding: 15px 40px;
     font-size: 1.3em;
@@ -399,8 +391,6 @@ body {
     box-shadow: 0 12px 25px rgba(74, 111, 165, 0.5);
 }
 
-/* Quiz Card */
-/* Quiz Card */
 .full-width-card {
     background: #fff;
     border-radius: 16px;
@@ -444,7 +434,6 @@ body {
     padding: 30px;
 }
 
-/* User Feedback */
 .result-feedback {
     padding: 20px;
     margin: 20px 30px;
@@ -482,7 +471,6 @@ body {
     border: 2px dashed #dee2e6;
 }
 
-/* Question Styles */
 .question-text {
     font-size: 1.4em;
     color: var(--text-dark);
@@ -569,7 +557,6 @@ body {
     transform: translateY(-2px);
 }
 
-/* Final Result */
 .final-result {
     padding: 40px;
     text-align: center;
@@ -658,7 +645,6 @@ body {
     box-shadow: 0 6px 15px rgba(108, 117, 125, 0.3);
 }
 
-/* Game Hints */
 .game-hints {
     margin-top: 30px;
 }
@@ -695,7 +681,6 @@ body {
     line-height: 1.5;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .game-header-bar {
         flex-direction: column;

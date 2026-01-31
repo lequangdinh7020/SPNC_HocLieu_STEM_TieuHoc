@@ -2,8 +2,8 @@
 require_once __DIR__ . '/../template/header.php';
 ?>
 
-<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/home.css"> 
-<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/trash_game.css">
+<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/home.css?v=<?= time() . rand(1000, 9999) ?>"> 
+<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/trash_game.css?v=<?= time() . rand(1000, 9999) ?>">
 
 <div id="intro-modal">
     <div class="intro-dialogue">
@@ -73,7 +73,6 @@ require_once __DIR__ . '/../template/header.php';
 </div>
 
 <script>
-    // Ensure a single global `baseUrl` exists; do not declare `const/var baseUrl` here
     window.baseUrl = window.baseUrl || "<?= $base_url ?>";
 </script>
 <script src="<?= $base_url ?>/public/JS/trash_game.js"></script>

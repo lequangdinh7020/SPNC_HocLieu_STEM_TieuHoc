@@ -1,4 +1,12 @@
-/* CSS cho game phân loại rác */
+body {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
 .trash-game {
     width: 95%;
     max-width: 1200px;
@@ -11,7 +19,6 @@
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 }
 
-/* Full screen mode */
 .trash-game.game-fullscreen {
     position: fixed;
     top: 0;
@@ -29,7 +36,6 @@
     border: none;
 }
 
-/* Ẩn header và footer khi ở chế độ full screen */
 body:has(.trash-game.game-fullscreen) header,
 body:has(.trash-game.game-fullscreen) footer,
 body:has(.trash-game.game-fullscreen) .bg-elements {
@@ -40,7 +46,6 @@ body:has(.trash-game.game-fullscreen) {
     overflow: hidden;
 }
 
-/* Game Header Layout */
 .trash-game .game-header {
     display: flex;
     align-items: center;
@@ -71,7 +76,6 @@ body:has(.trash-game.game-fullscreen) {
     color: #495057;
 }
 
-/* Controls Section */
 .trash-game .controls-section {
     display: flex;
     flex-direction: column;
@@ -121,7 +125,7 @@ body:has(.trash-game.game-fullscreen) {
     margin: 0;
 }
 
-.game-actions {
+.trash-game .game-actions {
     display: none;
 }
 
@@ -373,7 +377,6 @@ body:has(.trash-game.game-fullscreen) {
 }
 
 #tam-dialogue-box.hidden { display: none; }
-/* Màu sắc hộp thoại */
 #tam-dialogue-box.win { border-color: #2ecc71; color: #27ae60; }
 #tam-dialogue-box.win::after { border-left-color: #2ecc71; }
 #tam-dialogue-box.wrong { border-color: #e74c3c; color: #c0392b; }
@@ -385,7 +388,6 @@ body:has(.trash-game.game-fullscreen) {
 }
 
 
-/* MÀN HÌNH GIỚI THIỆU */
 #intro-modal {
     position: fixed;
     top: 0;

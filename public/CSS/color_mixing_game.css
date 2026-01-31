@@ -1,12 +1,31 @@
 body {
-    font-family: 'Segoe UI', sans-serif;
-    text-align: center;
-    margin-top: 150px;
-    color: #333;
-    min-height: 100vh;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
-h1 { color: #4CAF50; }
+.color-game-wrapper {
+    width: 90%;
+    max-width: 1200px;
+    margin: 120px auto 50px auto;
+    padding: 40px;
+    background: #ffffff !important;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    font-family: 'Segoe UI', sans-serif;
+    text-align: center;
+    color: #333;
+}
+
+.color-game-wrapper h1 { 
+    color: #4CAF50; 
+    font-weight: 700;
+    font-size: 2em;
+    margin-bottom: 20px;
+}
 
 .controls-section {
     display: flex;
@@ -109,39 +128,19 @@ h1 { color: #4CAF50; }
     box-shadow: 0 5px 15px rgba(76,175,80,0.4);
 }
 
-h1 { 
-    color: #4CAF50;
-    font-family: 'Nunito', sans-serif;
-    font-weight: 700;
-    font-size: 2em;
-    margin-bottom: 20px;
-}
-
-/* Khung nền trắng bao quanh nội dung game */
-.color-game-wrapper {
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 40px;
-    background: #ffffff;
-    border-radius: 20px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-}
-
-.final-score {
+.color-game-wrapper .final-score {
     font-size: 24px;
     font-weight: bold;
     color: #2ecc71;
 }
 
-.question {
+.color-game-wrapper .question {
     font-size: 22px;
     margin-bottom: 20px;
     font-weight: bold;
     text-align: center;
 }
 
-/* Layout 2 cột */
 .game-layout {
     display: flex;
     gap: 30px;
@@ -150,7 +149,6 @@ h1 {
     justify-content: center;
 }
 
-/* Bên trái: Palette section */
 .palette-section {
     flex: 1;
     max-width: 50%;
@@ -163,7 +161,6 @@ h1 {
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-/* Bên phải: Canvas section */
 .canvas-section {
     flex: 1;
     max-width: 50%;
@@ -279,7 +276,6 @@ h1 {
     min-height: 25px;
 }
 
-/* Bên phải: Canvas section */
 .canvas-section {
     flex: 1;
     display: flex;
@@ -347,7 +343,6 @@ canvas {
 }
 
 
-/* Toast Notification (Popup) */
 .toast-notification {
     position: fixed;
     top: 50%;

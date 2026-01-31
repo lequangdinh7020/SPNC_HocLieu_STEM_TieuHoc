@@ -1,7 +1,7 @@
 <?php require_once __DIR__ . '/../template/header.php'; ?>
 
-<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/home.css?v=<?= time() ?>">
 <link rel="stylesheet" href="<?= $base_url ?>/public/CSS/day_night.css?v=<?= time() ?>">
+<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/home.css?v=<?= time() . rand(1000, 9999) ?>">
 
 <div id="intro-modal" class="modal-overlay active">
     <div class="intro-dialogue modal-content">
@@ -16,7 +16,7 @@
     </div>
 </div>
 
-<div class="game-wrapper day-night-lesson"><br><br><br>
+<div class="game-wrapper day-night-lesson">
     <div class="game-header-bar">
         <div class="header-left">
             <a href="<?= $base_url ?>/views/lessons/science.php" class="control-btn back">
@@ -143,7 +143,6 @@
     const quizData = <?php echo json_encode($questions); ?>;
     window.baseUrl = window.baseUrl || "<?= $base_url ?>";
 
-    // Hàm chuyển đổi từ Modal sang Lý thuyết
     document.addEventListener('DOMContentLoaded', function() {
         const startLessonBtn = document.getElementById('startLessonButton');
         if (startLessonBtn) {
@@ -154,7 +153,6 @@
         }
     });
 
-    // Hàm chuyển đổi từ Lý thuyết sang Bài tập
     function startQuiz() {
         document.getElementById('theory-section').style.display = 'none';
         document.getElementById('quiz-section').style.display = 'block';
