@@ -3,7 +3,7 @@ require_once __DIR__ . '/../template/header.php';
 ?>
 
 <link rel="stylesheet" href="<?= $base_url ?>/public/CSS/shapes_game.css?v=<?= time() ?>">
-<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/home.css">
+<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/home.css?v=<?= time() . rand(1000, 9999) ?>">
 
 <style>
     body {

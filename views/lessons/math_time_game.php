@@ -57,32 +57,35 @@ if (!empty($_SESSION['user_id'])) {
 ?>
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Học Xem Giờ - STEM Universe</title>
-    <link rel="stylesheet" href="<?= $base_url ?>/public/CSS/header.css">
+    <link rel="stylesheet" href="<?= $base_url ?>/public/CSS/header.css?v=<?= time() . rand(1000, 9999) ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Baloo+2:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?= $base_url ?>/public/CSS/home.css">
     <link rel="stylesheet" href="<?= $base_url ?>/public/CSS/time_game.css?v=<?php echo time(); ?>">
-    
+    <link rel="stylesheet" href="<?= $base_url ?>/public/CSS/home.css?v=<?= time() . rand(1000, 9999) ?>">
+
     <style>
-        body { 
+        body {
             background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-            overflow-x: hidden; 
+            overflow-x: hidden;
             overflow-y: auto;
-            font-family: 'Quicksand', sans-serif; 
-            margin: 0; 
-            padding: 0; 
+            font-family: 'Quicksand', sans-serif;
+            margin: 0;
+            padding: 0;
         }
-        .time-game { 
+
+        .time-game {
             min-height: calc(100vh - 200px);
             padding-bottom: 50px;
         }
     </style>
 </head>
+
 <body>
     <div class="bg-elements">
         <div class="bg-circle circle-1"></div>
@@ -147,7 +150,7 @@ if (!empty($_SESSION['user_id'])) {
     </div>
 
     <div class="game-wrapper time-game"><br><br><br><br>
-        
+
         <div class="header-game">
             <a href="<?= $base_url ?>/views/main_lesson.php" class="home-btn"><i class="fas fa-home"></i></a>
             <div>
@@ -158,7 +161,7 @@ if (!empty($_SESSION['user_id'])) {
         </div>
 
         <div class="game-container">
-            
+
             <div class="digital-clock-panel">
                 <h3>Hãy chỉnh đồng hồ thành:</h3>
                 <div class="digital-display">
@@ -179,7 +182,7 @@ if (!empty($_SESSION['user_id'])) {
             <button id="check-btn" class="game-btn check">Kiểm Tra</button>
             <button id="complete-btn" class="game-btn check">Hoàn Thành</button>
         </div>
-        
+
         <div id="result-modal" class="modal">
             <div class="modal-content">
                 <h2 id="modal-title"></h2>
@@ -206,11 +209,13 @@ if (!empty($_SESSION['user_id'])) {
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <div class="footer-logo">
+                    <div class="footer-logo-wrapper">
                         <div class="logo-icon" style="width: 65px; height: 65px;"><img src="<?= $base_url ?>/public/images/logo.png" alt="STEM Universe Logo" style="width: 100%; height: 100%; object-fit: contain;"></div>
-                        <span>STEM Universe</span>
+                        <div class="footer-text-content">
+                            <h4 class="footer-title">STEM Universe</h4>
+                            <p>Khám phá thế giới STEM đầy sáng tạo. Nền tảng học liệu tương tác cho học sinh tiểu học Việt Nam.</p>
+                        </div>
                     </div>
-                    <p>Khám phá thế giới STEM đầy sáng tạo. Nền tảng học liệu tương tác cho học sinh tiểu học Việt Nam.</p>
                 </div>
                 <div class="footer-section">
                     <h4>Khám phá</h4>
@@ -245,4 +250,5 @@ if (!empty($_SESSION['user_id'])) {
     <script src="<?= $base_url ?>/public/JS/home.js"></script>
 
 </body>
+
 </html>
