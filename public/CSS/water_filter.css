@@ -1,3 +1,9 @@
+/* Override body background từ home.css */
+body {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+}
+
 /* Container chính */
 .filter-game {
     width: 95%; max-width: 1000px; margin: 110px auto 20px auto;

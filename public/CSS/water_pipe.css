@@ -1,10 +1,12 @@
 /* --- 1. CẤU HÌNH CHUNG --- */
 body {
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Quicksand', sans-serif;
     margin: 0;
     padding: 0;
-    
-    background-size: cover;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    overflow-y: auto;
+    overflow-x: hidden;
     
     /* Sửa lỗi Footer: Xếp dọc các thành phần */
     display: flex;
@@ -203,8 +205,10 @@ body {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.85);
     z-index: 999;
-    /* Mặc định flex để căn giữa, JS sẽ chỉnh display */
-    display: flex; justify-content: center; align-items: center;
+    /* Mặc định ẩn, JS sẽ hiển thị khi cần */
+    display: none;
+    justify-content: center; 
+    align-items: center;
 }
 
 .modal-content {
@@ -213,12 +217,30 @@ body {
     border: 5px solid #3498db;
     box-shadow: 0 0 30px rgba(52, 152, 219, 0.6);
 }
-.modal-content h2 { color: #2980b9; font-size: 2em; margin-top: 0; }
+
+.modal-content h2 { 
+    color: #2980b9; 
+    font-size: 2em; 
+    margin-top: 0; 
+}
+
+.modal-content p {
+    color: #2c3e50;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
 
 .instruction { 
     background: #eaf2f8; padding: 15px; border-radius: 10px; 
-    text-align: left; margin: 20px 0; color: #333;
+    text-align: left; margin: 20px 0; 
     border-left: 5px solid #3498db;
+}
+
+.instruction p {
+    color: #2c3e50;
+    margin: 8px 0;
+    font-size: 1rem;
+    line-height: 1.6;
 }
 
 .level-select, .modal-actions { display: flex; gap: 15px; justify-content: center; margin-top: 20px; }
