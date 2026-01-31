@@ -116,15 +116,14 @@
     box-shadow: 0 8px 20px rgba(26, 115, 232, 0.4);
 }
 
-/* Background cho body */
+/* Background cho body - Override home.css */
 body {
-    background: var(--bg-color);
+    background: #ffffff !important;
+    background-color: #ffffff !important;
     background-attachment: fixed;
     min-height: 100vh;
     overflow-y: auto;
     overflow-x: hidden;
-    
-    background-color: #f9fbfd;
     color: var(--text-dark);
     line-height: 1.6;
 }
