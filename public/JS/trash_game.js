@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const trashItems = document.querySelectorAll(".trash-item");
     const dropzones = document.querySelectorAll(".trash-bin");
     const scoreDisplay = document.getElementById("score"); 
+    const sortedCountDisplay = document.getElementById("sortedCount");
     const resetButton = document.getElementById("trashResetButton");
 
     // *** Lấy các phần tử cốt truyện ***
@@ -90,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let feedbackTimer; // Biến hẹn giờ
 
     startGameButton.addEventListener('click', () => {
-        introModal.style.display = 'none';
+        introModal.classList.remove('active');
     });
 
     // 1. Xử lý kéo
@@ -141,6 +142,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 playSuccessSound(); // Play success sound
                 droppedItem.classList.add("dropped");
                 correctDrops++;
+                
+                // Update sorted count display
+                if (sortedCountDisplay) {
+                    sortedCountDisplay.textContent = correctDrops;
+                }
+                
                 let points = 0;
 
                 if (attempt === 1) {
