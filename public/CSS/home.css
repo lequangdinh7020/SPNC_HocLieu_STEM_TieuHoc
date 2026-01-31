@@ -693,32 +693,58 @@ footer {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
     gap: 50px;
-    padding: 60px 0 40px 0;
+    padding: 50px 0 40px 0;
+    align-items: start;
 }
 
-.footer-logo {
+.footer-section:first-child p {
+    margin-top: 0;
+    line-height: 1.5;
+}
+
+.footer-logo-wrapper {
     display: flex;
-    align-items: center;
     gap: 15px;
+    align-items: flex-start;
+}
+
+.footer-text-content {
+    flex: 1;
+}
+
+.footer-title {
     font-family: 'Baloo 2', cursive;
     font-size: 1.3rem;
-    margin-bottom: 20px;
+    margin: 0 0 5px 0;
     color: white;
+}
+
+.footer-text-content p {
+    margin: 0;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .footer-section h4 {
-    margin-bottom: 25px;
+    margin-bottom: 1px;
     color: white;
-    font-size: 1.1rem;
+    font-size: 1.3rem;
+    font-family: 'Baloo 2', cursive;
 }
 
 .footer-section a {
     display: block;
     color: rgba(255, 255, 255, 0.7);
     text-decoration: none;
-    margin-bottom: 10px;
+    margin-bottom: 1px;
     transition: all 0.3s ease;
     padding: 5px 0;
+    line-height: 1.6;
+}
+
+.footer-section p {
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .footer-section a:hover {
@@ -727,7 +753,7 @@ footer {
 }
 
 .social-links {
-    margin-top: -1rem;
+    margin-top: 0.25rem;
     display: flex;
     gap: 25px;
 }
