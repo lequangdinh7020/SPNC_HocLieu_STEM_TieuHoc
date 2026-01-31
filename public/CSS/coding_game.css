@@ -1,9 +1,17 @@
-/* Theme Sơn Tinh Thủy Tinh */
+body {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
 .coding-game {
     width: 98%;
     max-width: 1200px;
     margin: 110px auto 20px auto;
-    background: #e8f6f3; /* Màu xanh ngọc nhạt */
+    background: #e8f6f3; 
     padding: 20px;
     border-radius: 15px;
     font-family: 'Segoe UI', sans-serif;
@@ -32,7 +40,6 @@
     text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
 }
 
-/* Thanh thời gian Thủy Tinh */
 .timer-container {
     width: 300px;
     position: relative;
@@ -54,7 +61,7 @@
 .timer-bar-fill {
     height: 100%;
     background: linear-gradient(90deg, #3498db, #2980b9);
-    width: 0%; /* Sẽ tăng dần bằng JS */
+    width: 0%; 
     transition: width 1s linear;
 }
 #wave-icon {
@@ -71,7 +78,6 @@
     height: 550px;
 }
 
-/* Cột 1: Kho lệnh */
 #block-sidebar {
     width: 22%;
     background: #fff;
@@ -112,12 +118,10 @@
 }
 .command-block:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.2); cursor: grabbing; }
 
-/* Màu sắc khối lệnh */
 .command-block.move { background-color: #3498db; border: 1px solid #2980b9; } /* Xanh dương */
 .command-block.loop { background-color: #f1c40f; border: 1px solid #f39c12; color: #333; } /* Vàng */
 .command-block.condition { background-color: #e74c3c; border: 1px solid #c0392b; } /* Đỏ */
 
-/* Cột 2: Khu vực Code */
 #coding-space {
     width: 33%;
     display: flex;
@@ -144,11 +148,10 @@
     padding: 10px;
     overflow-y: auto;
 }
-/* Khối lặp lại chứa khối con */
 .container-block {
-    background-color: #f9e79f; /* Màu nền bên trong vòng lặp */
+    background-color: #f9e79f; 
     border: 2px dashed #f39c12;
-    padding: 5px 5px 15px 15px; /* Padding trái lớn để thụt lề */
+    padding: 5px 5px 15px 15px; 
     border-radius: 5px;
     margin-top: 5px;
     min-height: 30px;
@@ -170,7 +173,6 @@
 }
 .remove-block:hover { opacity: 1; font-weight: bold; }
 
-/* Cột 3: Bản đồ */
 #stage-container {
     width: 45%;
     background: #fff;
@@ -203,7 +205,6 @@
 .grid-cell.water { background-image: url('../images/coding/nuoc.png'); }
 .grid-cell.bridge { background-image: url('../images/coding/cau.png'); }
 
-/* Đích đến (Sính lễ) */
 .grid-cell.goal::after {
     content: '';
     position: absolute;
@@ -216,7 +217,6 @@
 }
 @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-5px); } }
 
-/* Sơn Tinh */
 #robot {
     position: absolute;
     width: 60px;
@@ -229,7 +229,6 @@
     transition: all 0.5s ease;
 }
 
-/* Buttons */
 .game-btn {
     padding: 10px 20px;
     border: none;
@@ -247,7 +246,6 @@
 .game-btn.next { width: 100%; margin-top: 10px;}
 .game-btn.reset:hover { background: #e74c3c; }
 
-/* Modal */
 .modal {
     display: none;
     position: fixed;

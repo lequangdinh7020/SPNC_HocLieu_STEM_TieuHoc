@@ -1,6 +1,6 @@
 <?php require_once __DIR__ . '/../template/header.php'; ?>
 
-<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/home.css">
+<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/home.css?v=<?= time() . rand(1000, 9999) ?>">
 <link rel="stylesheet" href="<?= $base_url ?>/public/CSS/coding_game.css?v=<?php echo time(); ?>">
 
 <div id="story-modal" class="modal" style="display: none;">

@@ -1,3 +1,12 @@
+body {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
 .thach-sanh-game {
     width: 100%;
     max-width: 1000px;
@@ -15,7 +24,6 @@
     position: relative;
 }
 
-/* HUD */
 .game-hud {
     position: absolute;
     top: 15px; 
@@ -44,7 +52,6 @@
     font-weight: bold;
 }
 
-/* Thạch Sanh */
 #thach-sanh {
     position: absolute;
     bottom: 20px;
@@ -59,7 +66,6 @@
     height: 100%;
     object-fit: contain;
 }
-/* Hiệu ứng rung khi gõ sai */
 .shake {
     animation: shake-anim 0.5s;
 }
@@ -71,7 +77,6 @@
     100% { transform: translateX(-50%) rotate(0deg); }
 }
 
-/* Kẻ thù (Chằn tinh / Đại bàng) */
 .enemy {
     position: absolute;
     width: 100px;
@@ -89,7 +94,6 @@
     object-fit: contain;
     filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
 }
-/* Chữ cái trên đầu quái vật */
 .enemy-word {
     background: #fff;
     padding: 5px 15px;
@@ -102,12 +106,10 @@
     box-shadow: 0 3px 0 #999;
     white-space: nowrap;
 }
-/* Ký tự đã gõ đúng -> đổi màu xanh */
 .typed {
     color: #2ecc71;
 }
 
-/* Hiệu ứng tên bay */
 .arrow-projectile {
     position: absolute;
     width: 10px;
@@ -118,7 +120,6 @@
     transition: top 0.3s linear;
 }
 
-/* Modal */
 .modal {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.85);
@@ -144,7 +145,6 @@
 .lvl-btn { background: #3498db; }
 .lvl-btn.hard { background: #e74c3c; }
 
-/* Feedback visual (khi gõ sai) */
 #visual-feedback {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
     font-size: 5em; font-weight: bold; color: red; opacity: 0; pointer-events: none;
@@ -159,10 +159,8 @@
 }
 .score-box { color: #f1c40f; border-color: #f1c40f; }
 
-/* Hộp mạng sống */
 .lives-box { color: #e74c3c; border-color: #e74c3c; gap: 5px; }
 
-/* Hiệu ứng mũi tên bay */
 .arrow {
     position: absolute;
     width: 40px; height: 10px;
@@ -173,7 +171,6 @@
     transform-origin: center center;
 }
 
-/* Hiệu ứng khi quái vật chạm đất (Nháy đỏ khung game) */
 .village-damage {
     animation: damage-flash 0.5s;
 }
@@ -182,7 +179,6 @@
     50% { box-shadow: inset 0 0 50px 20px rgba(231, 76, 60, 0.8); }
 }
 
-/* Đồng hồ */
 .time-box {
     color: #2ecc71;
     border-color: #2ecc71;
@@ -191,20 +187,18 @@
     justify-content: center;
 }
 
-/* Quick-complete button: position under Exit at top-right and match exit colors */
 .game-hud .quick-complete {
     position: absolute;
     right: 15px;
-    top: 55px; /* slightly below the exit button */
+    top: 55px; 
     padding: 8px 12px;
     border-radius: 8px;
     background: rgba(255,255,255,0.9);
-    color: #c0392b; /* match exit text color */
+    color: #c0392b; 
     border: 2px solid #c0392b;
     font-weight: bold;
 }
 
-/* Modal action buttons (Chơi lại / Quay lại) should match exit color */
 .modal .game-btn {
     background: rgba(255,255,255,0.95);
     color: #c0392b;
@@ -213,5 +207,4 @@
     border-radius: 8px;
 }
 
-/* final percent text styling */
 .final-pct { font-size: 1.2em; font-weight: bold; margin: 10px 0; }

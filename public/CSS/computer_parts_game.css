@@ -1,3 +1,12 @@
+body {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
 .computer-game {
     width: 95%; max-width: 1000px; margin: 110px auto 20px auto;
     background: #f4f9ff; padding: 20px; border-radius: 15px;
@@ -31,7 +40,6 @@
     flex-wrap: wrap;
 }
 
-/* 1. Ngân hàng bộ phận */
 #parts-bank {
     flex: 1;
     min-width: 200px;
@@ -82,12 +90,11 @@
     pointer-events: none;
 }
 
-/* 2. Bàn máy tính */
 #desk-area {
     flex: 3;
     min-width: 600px;
     height: 500px;
-    position: relative; /* Quan trọng để định vị dropzone */
+    position: relative;
     background: #fff;
     border: 2px solid #bdc3c7;
     border-radius: 8px;
@@ -102,7 +109,6 @@
     opacity: 0.8;
 }
 
-/* 3. Khu vực thả */
 .dropzone {
     position: absolute;
     z-index: 10;
@@ -111,7 +117,6 @@
     transition: all 0.2s;
     background: rgba(52, 152, 219, 0.05);
     
-    /* Dùng để chứa ảnh sau khi thả */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -121,7 +126,6 @@
     border-style: solid;
     border-color: #3498db;
 }
-/* Khi thả đúng */
 .dropzone.filled {
     border: none;
     background: none;
@@ -134,7 +138,6 @@
     object-fit: contain;
     padding: 0px;
 }
-/* Hiệu ứng rung lắc khi sai */
 .dropzone.shake {
     animation: shake-hard 0.5s ease-in-out;
 }
@@ -147,8 +150,6 @@
     100% { transform: translateX(0); }
 }
 
-
-/* 4. Modal */
 .modal {
     display: none; position: fixed; z-index: 999;
     left: 0; top: 0; width: 100%; height: 100%;

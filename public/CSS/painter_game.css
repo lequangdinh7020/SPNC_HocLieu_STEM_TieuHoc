@@ -1,9 +1,15 @@
-/* --- KHUNG TRÒ CHƠI CHÍNH (KHUNG GỖ) --- */
+body {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
 .painter-game {
     width: 98%;
     max-width: 1200px;
     margin: 110px auto 20px auto;
-    /* Hiệu ứng nền gỗ và viền khung tranh */
     background: url('https://www.transparenttextures.com/patterns/wood-pattern.png'), #d3a673;
     border: 15px solid #8b5a2b;
     border-radius: 10px;
@@ -13,7 +19,6 @@
     box-sizing: border-box;
 }
 
-/* --- HEADER --- */
 .header-game {
     display: flex;
     justify-content: space-between;
@@ -43,14 +48,12 @@
     color: #2980b9;
 }
 
-/* Left controls wrapper (home + submit) */
 .header-game .left-controls {
     display: flex;
     gap: 8px;
     align-items: center;
 }
 
-/* Submit button (Nộp bài) - match size/feel of home button and use #2980b9 */
 .header-game .submit-btn {
     background: #2980b9;
     color: #ffffff;
@@ -70,7 +73,6 @@
 .header-game .submit-btn:hover { transform: translateY(-1px); background: #2471a3; }
 
 
-/* Đồng hồ đếm ngược */
 .timer-box {
     font-size: 1.5em;
     font-weight: bold;
@@ -82,14 +84,12 @@
     border: 2px solid #555;
 }
 
-/* --- KHU VỰC LÀM VIỆC --- */
 .workspace {
     display: flex;
     gap: 15px;
     height: 600px;
 }
 
-/* --- 1. THANH CÔNG CỤ TRÁI --- */
 .sidebar-tools {
     width: 110px;
     background: #fff;
@@ -119,7 +119,6 @@
     text-align: center;
 }
 
-/* Style cho nút công cụ */
 .tool-btn {
     width: 40px;
     height: 40px;
@@ -142,7 +141,6 @@
     filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.1));
 }
 
-/* Hiệu ứng khi nút được chọn */
 .tool-btn.active {
     background: #e3f2fd;
     border-color: #2196f3;
@@ -150,7 +148,6 @@
     box-shadow: 0 2px 5px rgba(33, 150, 243, 0.3);
 }
 
-/* Nút Undo */
 #undo-btn {
     background-color: #fff8e1;
     border-color: #ffe082;
@@ -160,13 +157,11 @@
     background-color: #ffecb3;
 }
 
-/* Slider nét vẽ */
 #size-slider {
     width: 100%;
     cursor: pointer;
 }
 
-/* Nhóm nút hành động (Xóa, Lưu) */
 .action-group {
     margin-top: auto;
 }
@@ -198,7 +193,6 @@
 }
 #save-btn:hover { background: #c8e6c9; }
 
-/* --- 2. KHU VỰC VẼ --- */
 .canvas-area {
     flex-grow: 1;
     background: #fff;
@@ -209,7 +203,6 @@
     justify-content: center;
     align-items: center;
     cursor: crosshair;
-    /* Họa tiết nền trong suốt */
     background-image: none;
     background-size: 20px 20px;
     background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
@@ -220,7 +213,6 @@ canvas {
     background: #fff;
 }
 
-/* --- 3. THANH BÊN PHẢI (MÀU & CHỦ ĐỀ) --- */
 .sidebar-right {
     width: 150px;
     background: #fff;
@@ -234,7 +226,6 @@ canvas {
     overflow: hidden;
 }
 
-/* Bảng màu */
 .color-palette {
     flex-shrink: 0;
 }
@@ -279,7 +270,6 @@ canvas {
     background: none;
 }
 
-/* --- DANH SÁCH CHỦ ĐỀ --- */
 .topic-selector {
     display: flex;
     flex-direction: column;
@@ -302,7 +292,6 @@ canvas {
     padding-bottom: 10px;
 }
 
-/* Tùy chỉnh thanh cuộn (Webkit - Chrome, Safari) */
 .topic-list::-webkit-scrollbar {
     width: 6px;
 }
@@ -318,7 +307,6 @@ canvas {
     background: #aaa; 
 }
 
-/* Nút chủ đề */
 .topic-btn {
     display: flex;
     flex-direction: column;

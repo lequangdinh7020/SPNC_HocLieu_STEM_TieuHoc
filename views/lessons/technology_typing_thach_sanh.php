@@ -1,7 +1,7 @@
 <?php require_once __DIR__ . '/../template/header.php'; ?>
 
-<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/home.css">
-<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/typing_thach_sanh.css">
+<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/home.css?v=<?= time() . rand(1000, 9999) ?>">
+<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/typing_thach_sanh.css?v=<?= time() . rand(1000, 9999) ?>">
 
 <div id="story-modal" class="modal">
     <div class="modal-content story-content">
@@ -53,7 +53,6 @@
         </div>
     </div>
 
-    <!-- Quick completion summary modal -->
     <div id="quick-complete-modal" class="modal" style="display: none;">
         <div class="modal-content">
             <h3>Hoàn thành nhanh</h3>

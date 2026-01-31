@@ -20,13 +20,17 @@
 }
 
 body {
-    background-color: #f9fbfd;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
     color: var(--text-dark);
     line-height: 1.6;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Quicksand', sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
-/* Modal Overlay */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -131,7 +135,6 @@ body {
     box-sizing: border-box;
 }
 
-/* Game Header Bar */
 .game-header-bar {
     display: flex;
     align-items: center;
@@ -213,7 +216,6 @@ body {
     opacity: 0.5;
 }
 
-/* Control buttons */
 .menu-btn,
 .reset-btn {
     display: flex;
@@ -264,7 +266,6 @@ body {
     box-shadow: 0 5px 15px rgba(244,67,54,0.4);
 }
 
-/* Game Instructions */
 .game-instructions {
     background: white;
     border-radius: 12px;
@@ -298,7 +299,6 @@ body {
     margin: 0;
 }
 
-/* User Feedback */
 #userFeedback {
     text-align: center;
     padding: 15px;
@@ -325,7 +325,6 @@ body {
     border: 2px solid var(--wrong-color);
 }
 
-/* --- HEADER (TIÊU ĐỀ, NÚT HOME, TRÁI TIM) --- */
 .header-game {
     display: flex;
     justify-content: space-between;
@@ -372,7 +371,6 @@ body {
     opacity: 0.5;
 }
 
-/* --- KHU VỰC CHƠI --- */
 #game-area {
     display: flex;
     gap: 20px;
@@ -380,7 +378,6 @@ body {
     align-items: flex-start;
 }
 
-/* 1. KHU VỰC CÂY */
 #tree-canvas {
     flex: 2;
     min-width: 600px;
@@ -393,7 +390,6 @@ body {
     box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
 }
 
-/* 2. KHU VỰC CÔNG CỤ */
 #character-bank-container {
     flex: 1;
     min-width: 300px;
@@ -402,9 +398,6 @@ body {
     gap: 15px;
 }
 
-/* --- CÁC NHÂN VẬT --- */
-
-/* Class chung cho cả nhân vật trong ngân hàng và trên cây */
 .draggable-char, .person-node {
     width: 90px;
     height: 115px;
@@ -419,7 +412,6 @@ body {
     transition: transform 0.2s;
 }
 
-/* Nhân vật trong ngân hàng */
 .draggable-char {
     position: relative; 
     width: 80px;
@@ -435,7 +427,6 @@ body {
     opacity: 0.5;
 }
 
-/* Hình ảnh tròn */
 .draggable-char img, .person-node img {
     width: 80px;
     height: 140px;
@@ -447,7 +438,6 @@ body {
     pointer-events: none;
 }
 
-/* Tên nhân vật */
 .char-name {
     margin-top: 2px;
     font-weight: bold;
@@ -460,9 +450,6 @@ body {
     white-space: nowrap;
 }
 
-/* --- TRẠNG THÁI ĐẶC BIỆT CỦA NODE --- */
-
-/* Nhân vật cố định (đề bài cho sẵn) */
 .person-node.current-char {
     cursor: default;
 }
@@ -470,18 +457,15 @@ body {
     border-color: #8e44ad;
 }
 
-/* Ô TRỐNG - MÀU XÁM */
 .drop-slot {
     background-size: 70px 70px;
     background-position: top center;
     background-repeat: no-repeat;
     border-radius: 50%;
     
-    /* --- MÀU XÁM --- */
     background-color: #e0e0e0; 
     border: 3px dashed #999;
     filter: grayscale(100%);
-    /* ---------------- */
     
     display: flex;
     justify-content: center;
@@ -489,13 +473,11 @@ body {
     transition: all 0.2s ease;
 }
 
-/* Khi chưa thả gì vào */
 .drop-slot.empty img, 
 .drop-slot.empty span {
     display: none;
 }
 
-/* Khi kéo nhân vật qua ô trống */
 .drop-slot.hovered {
     transform: scale(1.1);
     background-color: #d6eaf8;
@@ -503,7 +485,6 @@ body {
     filter: none;
 }
 
-/* Khi đã thả nhân vật vào */
 .drop-slot.filled {
     border-radius: 50%;
     background-color: none;
@@ -517,13 +498,11 @@ body {
     display: block;
 }
 
-/* Kết quả Đúng/Sai */
 .drop-slot.correct img { 
     border-color: #2ecc71;
     box-shadow: 0 0 15px #2ecc71;
 }
 
-/* Final Result */
 .final-result {
     display: none;
     text-align: center;
@@ -611,7 +590,6 @@ body {
     box-shadow: 0 6px 15px rgba(26, 115, 232, 0.3);
 }
 
-/* Game Hints */
 .game-hints {
     background: white;
     border-radius: 12px;
@@ -652,7 +630,6 @@ body {
     margin-right: 10px;
 }
 
-/* Responsive Design */
 @media screen and (max-width: 992px) {
     .game-header-bar {
         flex-direction: column;
@@ -724,7 +701,6 @@ body {
     animation: shake 0.5s;
 }
 
-/* --- ĐƯỜNG KẺ --- */
 .line {
     position: absolute;
     background-color: #95a5a6;
@@ -734,7 +710,6 @@ body {
 .line.horizontal { height: 4px; }
 .line.vertical { width: 4px; }
 
-/* --- GỢI Ý & NGÂN HÀNG NHÂN VẬT --- */
 #clues-box {
     background: #eaf2f8;
     border: 1px solid #aed6f1;
@@ -770,7 +745,6 @@ body {
     min-height: 220px;
 }
 
-/* --- NÚT BẤM --- */
 .game-btn {
     width: 100%;
     padding: 12px;
@@ -794,7 +768,6 @@ body {
     transform: none;
 }
 
-/* --- THÔNG BÁO --- */
 .feedback-message {
     text-align: center;
     font-size: 1.2em;
@@ -807,7 +780,6 @@ body {
 .feedback-message.success { color: #27ae60; background: #eafaf1; border: 1px solid #27ae60; }
 .feedback-message.error { color: #c0392b; background: #f9e79f; border: 1px solid #f1c40f; }
 
-/* --- MODAL (GAME OVER / WIN) --- */
 .modal {
     display: none;
     position: fixed;
@@ -826,7 +798,6 @@ body {
 .modal-content h2 { margin-top: 0; color: #2c3e50; }
 .modal-content p { color: #555; margin-bottom: 20px; }
 
-/* Đảm bảo nhân vật trên cây (đã thả) dùng absolute để định vị */
 #tree-canvas .person-node,
 #tree-canvas .draggable-char {
     position: absolute !important;
@@ -843,9 +814,8 @@ body {
     user-select: none !important;
 }
 
-/* Đảm bảo nhân vật trong ngân hàng không bị chồng lên nhau */
 #character-bank .draggable-char {
-    position: relative !important; /* Bắt buộc dùng relative */
+    position: relative !important;
     top: auto !important;
     left: auto !important;
     z-index: 100 !important;
@@ -853,39 +823,33 @@ body {
     margin: 5px;
 }
 
-/* Hiệu ứng khi đang kéo */
 .draggable-char:active {
     cursor: grabbing !important;
 }
 
-/* Class này sẽ được JS thêm vào khi thả sai */
 .drop-slot.wrong-immediate img {
     border-color: #e74c3c !important;
     box-shadow: 0 0 15px #e74c3c !important;
     animation: shake-hard 0.5s ease-in-out;
 }
 
-/* Class này dùng khi thả đúng */
 .drop-slot.correct-immediate img {
     border-color: #2ecc71 !important;
     box-shadow: 0 0 15px #2ecc71 !important;
     transition: all 0.3s;
 }
 
-/* khi thả SAI */
 .drop-slot.wrong-immediate img {
     border-color: #e74c3c !important;
     box-shadow: 0 0 15px #e74c3c !important;
     animation: shake-hard 0.5s ease-in-out;
 }
 
-/* thả ĐÚNG */
 .drop-slot.correct img { 
     border-color: #2ecc71 !important;
     box-shadow: 0 0 15px #2ecc71 !important;
 }
 
-/* hiệu ứng rung lắc */
 @keyframes shake-hard {
     0% { transform: translateX(0); }
     20% { transform: translateX(-6px) rotate(-3deg); }
@@ -896,5 +860,5 @@ body {
 }
 
 .drop-slot.hovered {
-    z-index: 200 !important; /* Đảm bảo khi kéo qua, ô nhận luôn nổi lên trên cùng */
+    z-index: 200 !important;
 }
