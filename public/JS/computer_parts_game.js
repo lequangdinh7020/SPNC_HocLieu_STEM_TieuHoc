@@ -7,8 +7,49 @@ document.addEventListener("DOMContentLoaded", () => {
     const feedback = document.getElementById("game-feedback");
     const winModal = document.getElementById("win-modal");
     const restartBtn = document.getElementById("restart-game-btn");
+    const introModal = document.getElementById("intro-modal");
+    const startBtn = document.getElementById("start-game-btn");
 
     let correctDrops = 0;
+    let startTime = null;
+    let timerInterval = null;
+    
+    // Xử lý nút bắt đầu game
+    if (startBtn) {
+        startBtn.addEventListener('click', () => {
+            if (introModal) {
+                introModal.classList.remove('active');
+                setTimeout(() => {
+                    introModal.style.display = 'none';
+                }, 300);
+            }
+            startTimer();
+        });
+    }
+    
+    // Hàm đếm thời gian
+    function startTimer() {
+        startTime = Date.now();
+        const timerDisplay = document.getElementById('timer-display');
+        
+        if (timerDisplay) {
+            timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            }, 1000);
+        }
+    }
+    
+    // Cập nhật số lượng
+    function updateStats() {
+        const placedCount = document.getElementById('placed-count');
+        const remainingCount = document.getElementById('remaining-count');
+        
+        if (placedCount) placedCount.textContent = correctDrops;
+        if (remainingCount) remainingCount.textContent = TOTAL_PARTS - correctDrops;
+    }
     
     // --- Xử lý KÉO ---
     draggables.forEach(part => {
@@ -60,8 +101,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 draggedElement.style.display = 'none';
 
                 correctDrops++;
+                updateStats(); // Cập nhật số liệu
 
                 if (correctDrops === TOTAL_PARTS) {
+                    if (timerInterval) clearInterval(timerInterval); // Dừng đồng hồ
                     setTimeout(() => {
                         showModal(true);
                         // send commit to server to save completion (100%)
@@ -94,6 +137,22 @@ document.addEventListener("DOMContentLoaded", () => {
     restartBtn.addEventListener('click', () => {
         window.location.reload();
     });
+    
+    // Nút chơi lại ở main controls
+    const restartBtnMain = document.getElementById('restart-game-btn-main');
+    if (restartBtnMain) {
+        restartBtnMain.addEventListener('click', () => {
+            window.location.reload();
+        });
+    }
+    
+    // Nút gợi ý
+    const hintBtn = document.getElementById('hint-btn');
+    if (hintBtn) {
+        hintBtn.addEventListener('click', () => {
+            showFeedback("Gợi ý: Màn hình ở giữa, chuột ở phải bàn phím, loa ở góc phải!", "success");
+        });
+    }
 
     // Back to technology page button
     const backBtn = document.getElementById('back-to-tech-btn');
@@ -107,7 +166,10 @@ document.addEventListener("DOMContentLoaded", () => {
     function showFeedback(message, type) {
         feedback.textContent = message;
         feedback.className = type;
-        setTimeout(() => feedback.textContent = '', 2000); 
+        setTimeout(() => {
+            feedback.textContent = '';
+            feedback.className = '';
+        }, 3000); 
     }
     
     function showModal(isWin) {
@@ -115,4 +177,5 @@ document.addEventListener("DOMContentLoaded", () => {
             winModal.style.display = 'flex';
         }
     }
+
 });
