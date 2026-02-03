@@ -2,17 +2,57 @@
 
 <link rel="stylesheet" href="<?= $base_url ?>/public/CSS/color_mixing_game.css?v=<?php echo time(); ?>"> 
 <link rel="stylesheet" href="<?= $base_url ?>/public/CSS/home.css?v=<?= time() . rand(1000, 9999) ?>">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-<div class="color-game-wrapper"> 
-    <h1>TRÒ CHƠI PHA MÀU</h1>
+<!-- Modal Overlay -->
+<div class="modal-overlay active" id="introModal">
+    <div class="intro-dialogue modal-content">
+        <div class="intro-avatar">
+            <img src="<?= $base_url ?>/public/images/character/painter.png" alt="Color Mixing Character" class="intro-avatar-img">
+        </div>
+        <div class="intro-text-content">
+            <h3>Trò Chơi Pha Màu 🎨</h3>
+            <p>Hãy trộn các màu cơ bản để tạo ra màu đích! Thử thách khả năng quan sát màu sắc của bạn.</p>
+            <button id="startGameButton" class="start-btn">
+                <i class="fas fa-play"></i> Bắt đầu chơi
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="game-wrapper color-game-wrapper">
+    <!-- Game Header -->
+    <div class="game-header">
+        <h1>Trò Chơi Pha Màu</h1>
+        <p class="game-subtitle">Khám phá thế giới màu sắc qua việc trộn màu</p>
+    </div>
     
-    <div class="controls-section">
-        <div class="score-box">Điểm của bạn: <span id="totalScore"><?= $_SESSION['total_score'] ?></span></div>
-        
-        <div class="button-row">
-            <a href="<?= $base_url ?>/views/lessons/science.php" class="menu-btn">Menu</a>
-            <button id="resetGameButton" class="reset-btn">Chơi lại</button>
-            <button id="completeButton" class="complete-btn">Kết thúc</button>
+    <!-- Game Stats -->
+    <div class="game-stats">
+        <div class="stat-box correct">
+            <span class="stat-label"><i class="fas fa-star"></i> Điểm Số</span>
+            <span class="stat-value" id="totalScore"><?= $_SESSION['total_score'] ?></span>
+        </div>
+    </div>
+    
+    <!-- Game Controls -->
+    <div class="game-controls">
+        <a href="<?= $base_url ?>/views/lessons/science.php" class="control-btn give-up">
+            <i class="fas fa-arrow-left"></i> Quay về
+        </a>
+        <button id="resetGameButton" class="control-btn reset">
+            <i class="fas fa-redo"></i> Chơi lại
+        </button>
+        <button id="completeButton" class="control-btn complete">
+            <i class="fas fa-check"></i> Kết thúc
+        </button>
+    </div>
+    
+    <!-- Game Instructions -->
+    <div class="game-instructions">
+        <div class="instruction-box">
+            <i class="fas fa-lightbulb"></i>
+            <span>Chọn các màu trong bảng màu và trộn chúng trên canvas để tạo ra màu mục tiêu. Sử dụng tỷ lệ màu phù hợp để đạt kết quả chính xác!</span>
         </div>
     </div>
 

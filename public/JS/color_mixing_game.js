@@ -8,7 +8,19 @@ const resetGameButton = document.getElementById("resetGameButton");
 const completeButton = document.getElementById("completeButton");
 const nextButton = document.getElementById("nextButton");
 const hintBox = document.getElementById("hintBox"); 
-const totalScoreSpan = document.getElementById("totalScore"); 
+const totalScoreSpan = document.getElementById("totalScore");
+
+// Modal handling
+document.addEventListener('DOMContentLoaded', function() {
+    const startButton = document.getElementById('startGameButton');
+    const modal = document.getElementById('introModal');
+    
+    if (startButton && modal) {
+        startButton.addEventListener('click', function() {
+            modal.classList.remove('active');
+        });
+    }
+});
 
 let selectedColors = [];
 let isDrawing = false;
