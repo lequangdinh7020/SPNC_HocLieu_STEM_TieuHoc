@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const resetBtn = document.getElementById('reset-btn');
     const blockCountSpan = document.getElementById('block-count');
     const timerBar = document.getElementById('timer-bar');
+    const timerDisplay = document.getElementById('timer-display');
 
     // Modal elements
     const storyModal = document.getElementById('story-modal');
@@ -93,12 +94,20 @@ document.addEventListener("DOMContentLoaded", () => {
         
         timeLeft = 0;
         const maxTime = timeLimit;
-        timerBar.style.width = '0%';
+        if (timerBar) timerBar.style.width = '0%';
+        if (timerDisplay) timerDisplay.innerText = '00:00';
         
         timerInterval = setInterval(() => {
             timeLeft++;
             const percentage = (timeLeft / maxTime) * 100;
-            timerBar.style.width = `${percentage}%`;
+            if (timerBar) timerBar.style.width = `${percentage}%`;
+            
+            // Hiển thị thời gian dạng MM:SS
+            if (timerDisplay) {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerDisplay.innerText = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            }
             
             if (timeLeft >= maxTime) {
                 gameOver("Nước lũ đã dâng ngập! Thủy Tinh đã thắng.");
@@ -124,6 +133,20 @@ document.addEventListener("DOMContentLoaded", () => {
             e.preventDefault();
             e.stopPropagation();
             element.classList.add('drag-over');
+            
+            // Xử lý sắp xếp lại khi kéo khối đã có trong program-list
+            if (element === programList || element.classList.contains('container-block')) {
+                const draggingElement = document.querySelector('.dragging');
+                const afterElement = getDragAfterElement(element, e.clientY);
+                
+                if (draggingElement) {
+                    if (afterElement == null) {
+                        element.appendChild(draggingElement);
+                    } else {
+                        element.insertBefore(draggingElement, afterElement);
+                    }
+                }
+            }
         });
 
         element.addEventListener('dragleave', (e) => {
@@ -137,6 +160,13 @@ document.addEventListener("DOMContentLoaded", () => {
             element.classList.remove('drag-over');
 
             if (isRunning) return;
+            
+            // Kiểm tra xem có phải đang kéo khối mới từ sidebar không
+            const blockId = e.dataTransfer.getData('block-id');
+            if (blockId) {
+                // Đang kéo khối đã có (chỉ di chuyển, không tạo mới)
+                return;
+            }
             
             const currentBlocks = document.querySelectorAll('#program-list .command-block').length;
             if (currentBlocks >= blockLimit) {
@@ -153,12 +183,49 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+    
+    // Hàm tìm vị trí chèn khi kéo thả
+    function getDragAfterElement(container, y) {
+        const draggableElements = [...container.querySelectorAll('.command-block:not(.dragging)')];
+        
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
 
     function createBlockElement(type, html, container) {
         const div = document.createElement('div');
         div.className = `command-block ${type === 'repeat' ? 'loop' : (type === 'if-water' ? 'condition' : 'move')}`;
         div.dataset.command = type;
         div.innerHTML = html + '<span class="remove-block">×</span>';
+        
+        // Cho phép kéo thả để sắp xếp lại
+        div.draggable = true;
+        
+        // Xử lý khi bắt đầu kéo khối đã thả
+        div.addEventListener('dragstart', (e) => {
+            if (isRunning) {
+                e.preventDefault();
+                return;
+            }
+            e.stopPropagation();
+            div.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('block-id', div.dataset.blockId || Date.now());
+            div.dataset.blockId = e.dataTransfer.getData('block-id') || Date.now();
+        });
+        
+        // Xử lý khi kết thúc kéo
+        div.addEventListener('dragend', (e) => {
+            div.classList.remove('dragging');
+        });
 
         div.querySelector('.remove-block').onclick = (e) => {
             e.stopPropagation();

@@ -1,84 +1,126 @@
-<?php require_once __DIR__ . '/../template/header.php'; ?>
+<?php
+require_once __DIR__ . '/../template/header.php';
+?>
 
-<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/home.css?v=<?= time() . rand(1000, 9999) ?>">
-<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/coding_game.css?v=<?php echo time(); ?>">
+<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/home.css?v=<?= time() ?>">
+<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/coding_game.css?v=<?= time() ?>">
 
-<div id="story-modal" class="modal" style="display: none;">
-    <div class="modal-content story-content">
-        <img src="<?= $base_url ?>/public/images/coding/sontinh.png" class="story-avatar">
-        <h2>Cốt truyện</h2>
-        <p>"Vua Hùng kén rể, thách cưới với: <strong>Voi chín ngà, Gà chín cựa, Ngựa chín hồng mao</strong>.</p>
-        <p>Thủy Tinh đang dâng nước đuổi theo sát nút! Các bạn hãy dùng <strong>'Phép thuật Lập trình'</strong> để giúp mình tìm đủ sính lễ trước khi nước lũ tràn về nhé!"</p>
-        <button id="start-game-btn" class="game-btn run">Giúp Sơn Tinh ngay!</button>
+<div id="story-modal" class="modal-overlay active">
+    <div class="intro-dialogue modal-content">
+        <div class="intro-avatar">
+            <img src="<?= $base_url ?>/public/images/coding/sontinh.png" alt="Sơn Tinh" class="intro-avatar-img">
+        </div>
+        <div class="intro-text-content">
+            <h3>Cốt truyện</h3>
+            <p>"Vua Hùng kén rể, thách cưới với: <strong>Voi chín ngà, Gà chín cựa, Ngựa chín hồng mao</strong>. Thủy Tinh đang dâng nước đuổi theo sát nút! Các bạn hãy dùng <strong>'Phép thuật Lập trình'</strong> để giúp mình tìm đủ sính lễ trước khi nước lũ tràn về nhé!"</p>
+            <button id="start-game-btn" class="start-btn">Giúp Sơn Tinh ngay!</button>
+        </div>
     </div>
 </div>
 
-<div class="game-wrapper coding-game">
-    <div class="header-game">
-        <div class="level-info">
-            <a href="<?= $base_url ?>/views/main_lesson.php" class="home-btn"><i class="fas fa-home"></i></a>
-            <h1>Màn <?= $currentLevel['id'] ?>: <?= $currentLevel['title'] ?></h1>
-            <div class="mission-badge">Mục tiêu: <?= $currentLevel['mission'] ?></div>
+<div class="game-wrapper coding-game"><br><br><br>
+    <div class="game-header">
+        <h1>TRÒ CHƠI LẬP TRÌNH SƠN TINH</h1>
+        <p class="game-subtitle">Màn <?= $currentLevel['id'] ?>: <?= $currentLevel['title'] ?></p>
+    </div>
+    
+    <div class="game-stats">
+        <div class="stat-box correct">
+            <span class="stat-label">MÀN</span>
+            <span class="stat-value"><?= $currentLevel['id'] ?></span>
         </div>
-        
-        <div class="timer-container">
-            <div class="timer-label">Thủy Tinh đang đến!</div>
-            <div class="timer-bar-bg">
-                <div id="timer-bar" class="timer-bar-fill"></div>
-            </div>
-            <img src="<?= $base_url ?>/public/images/coding/thuytinh_wave.png" id="wave-icon">
+        <div class="stat-box timer">
+            <span class="stat-label">THỜI GIAN</span>
+            <span id="timer-display" class="stat-value">00:00</span>
+            <div id="timer-bar" style="display: none;"></div>
+        </div>
+        <div class="stat-box progress">
+            <span class="stat-label">KHỐI LỆNH</span>
+            <span class="stat-value"><span id="block-count">0</span>/<?= $currentLevel['limit'] ?></span>
         </div>
     </div>
     
-    <div id="game-area">
+    <div class="game-controls">
+        <a href="<?= $base_url ?>/views/main_lesson.php" class="control-btn give-up">
+            <i class="fas fa-home"></i> Menu
+        </a>
+        <button id="reset-btn" class="control-btn reset">
+            <i class="fas fa-trash"></i> Xóa phép
+        </button>
+        <button id="run-btn" class="control-btn complete">
+            <i class="fas fa-play"></i> Triển khai
+        </button>
+    </div>
+    
+    <div class="game-instructions">
+        <div class="instruction-box">
+            <i class="fas fa-lightbulb"></i>
+            <span><strong>Nhiệm vụ:</strong> <?= $currentLevel['mission'] ?></span>
+        </div>
+    </div>
+    
+    <div class="game-container coding-container">
+        <div id="game-area">
         
-        <div id="block-sidebar">
-            <h3>Phép thuật</h3>
-            
-            <div class="block-category">Di chuyển</div>
-            <div class="command-block move" draggable="true" data-command="forward">
-                <i class="fas fa-arrow-up"></i> Đi thẳng
-            </div>
-            <div class="command-block move" draggable="true" data-command="turn-left">
-                <i class="fas fa-undo"></i> Quay trái
-            </div>
-            <div class="command-block move" draggable="true" data-command="turn-right">
-                <i class="fas fa-redo"></i> Quay phải
-            </div>
-
-            <?php if (in_array('loop', $currentLevel['concepts'])): ?>
-                <div class="block-category">Vòng lặp</div>
-                <div class="command-block loop" draggable="true" data-command="repeat">
-                    <i class="fas fa-sync"></i> Lặp lại (3 lần)
+            <div id="block-sidebar">
+                <h3>Phép thuật</h3>
+                
+                <div class="block-category">Di chuyển</div>
+                <div class="command-block move" draggable="true" data-command="forward">
+                    <i class="fas fa-arrow-up"></i> Đi thẳng
                 </div>
-            <?php endif; ?>
-
-            <?php if (in_array('condition', $currentLevel['concepts'])): ?>
-                <div class="block-category">Điều kiện</div>
-                <div class="command-block condition" draggable="true" data-command="if-water">
-                    <i class="fas fa-water"></i> Nếu gặp Nước -> Bắc Cầu
+                <div class="command-block move" draggable="true" data-command="turn-left">
+                    <i class="fas fa-undo"></i> Quay trái
                 </div>
-            <?php endif; ?>
-        </div>
-
-        <div id="coding-space">
-            <div class="coding-header">
-                <h3>Sách phép thuật (<span id="block-count">0</span>/<?= $currentLevel['limit'] ?>)</h3>
-                <button id="run-btn" class="game-btn run"><i class="fas fa-play"></i> Triển khai</button>
-            </div>
-            
-            <div id="program-list" class="dropzone main-dropzone">
-                <div class="placeholder-text">Kéo phép thuật vào đây để giúp Sơn Tinh</div>
-            </div>
-            
-            <button id="reset-btn" class="game-btn reset"><i class="fas fa-trash"></i> Xóa phép</button>
-        </div>
-
-        <div id="stage-container">
-            <div id="grid-map">
+                <div class="command-block move" draggable="true" data-command="turn-right">
+                    <i class="fas fa-redo"></i> Quay phải
                 </div>
-        </div>
 
+                <?php if (in_array('loop', $currentLevel['concepts'])): ?>
+                    <div class="block-category">Vòng lặp</div>
+                    <div class="command-block loop" draggable="true" data-command="repeat">
+                        <i class="fas fa-sync"></i> Lặp lại (3 lần)
+                    </div>
+                <?php endif; ?>
+
+                <?php if (in_array('condition', $currentLevel['concepts'])): ?>
+                    <div class="block-category">Điều kiện</div>
+                    <div class="command-block condition" draggable="true" data-command="if-water">
+                        <i class="fas fa-water"></i> Nếu gặp Nước -> Bắc Cầu
+                    </div>
+                <?php endif; ?>
+            </div>
+
+            <div id="coding-space">
+                <div class="coding-header">
+                    <h3>Sách phép thuật</h3>
+                </div>
+                
+                <div id="program-list" class="dropzone main-dropzone">
+                    <div class="placeholder-text">Kéo phép thuật vào đây để giúp Sơn Tinh</div>
+                </div>
+            </div>
+
+            <div id="stage-container">
+                <div id="grid-map">
+                </div>
+            </div>
+
+        </div>
+    </div>
+    
+    <div class="game-hints">
+        <div class="hint-box">
+            <i class="fas fa-trophy"></i>
+            <div class="hint-content">
+                <h4>Mẹo để hoàn thành:</h4>
+                <ul>
+                    <li>Sử dụng vòng lặp để giảm số lượng khối lệnh</li>
+                    <li>Quan sát kỹ bản đồ trước khi lập trình</li>
+                    <li>Kiểm tra hướng của Sơn Tinh trước khi di chuyển</li>
+                </ul>
+            </div>
+        </div>
     </div>
 
     <div id="result-modal" class="modal">
@@ -86,8 +128,10 @@
             <div id="result-icon"></div>
             <h2 id="result-title"></h2>
             <p id="result-message"></p>
-            <button id="next-level-btn" class="game-btn next">Màn tiếp theo</button>
-            <button id="retry-btn" class="game-btn reset">Thử lại</button>
+            <div class="modal-actions">
+                <button id="retry-btn" class="game-btn reset">Thử lại</button>
+                <button id="next-level-btn" class="game-btn next">Màn tiếp theo</button>
+            </div>
         </div>
     </div>
 </div>
@@ -95,7 +139,10 @@
 <script>
     const levelData = <?= json_encode($currentLevel) ?>;
     const totalLevels = <?= $totalLevels ?>;
+    window.baseUrl = window.baseUrl || "<?= $base_url ?>";
 </script>
-<script src="<?= $base_url ?>/public/JS/coding_game.js"></script>
+<script src="<?= $base_url ?>/public/JS/coding_game.js?v=<?= time() ?>" defer></script>
 
-<?php require_once __DIR__ . '/../template/footer.php'; ?>
+<?php
+require_once __DIR__ . '/../template/footer.php';
+?>
