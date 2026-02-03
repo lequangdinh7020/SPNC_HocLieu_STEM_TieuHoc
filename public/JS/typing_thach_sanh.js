@@ -3,6 +3,7 @@ const gameOverModal = document.getElementById('game-over-modal');
 const enemiesContainer = document.getElementById('enemies-container');
 const arrowsContainer = document.getElementById('arrows-container');
 const gameWrapper = document.getElementById('game-wrapper');
+const gameStage = document.getElementById('game-stage');
 
 const scoreEl = document.getElementById('score');
 const livesEl = document.getElementById('lives');
@@ -145,7 +146,7 @@ function victory() {
 function gameLoop() {
     if (!isPlaying) return;
 
-    const gameHeight = gameWrapper.offsetHeight;
+    const gameHeight = (gameStage || gameWrapper).offsetHeight;
 
     activeEnemies.forEach((enemy, index) => {
         // Nếu quái đã chết không cho di chuyển nữa
@@ -301,7 +302,7 @@ function spawnEnemy() {
         word: word,
         remaining: word,
         top: -120,
-        speed: isBoss ? 0.5 : 0.9,
+        speed: isBoss ? 1.2 : 1.4,
         isDead: false 
     });
 }
@@ -360,7 +361,7 @@ function handleTyping(e) {
 function shootArrow(targetEl, onHitCallback) {
     const thachSanhRect = thachSanhEl.getBoundingClientRect();
     const targetRect = targetEl.getBoundingClientRect();
-    const gameRect = gameWrapper.getBoundingClientRect();
+    const gameRect = (gameStage || gameWrapper).getBoundingClientRect();
 
     const startX = thachSanhRect.left + thachSanhRect.width / 2 - gameRect.left;
     const startY = thachSanhRect.top - gameRect.top;
@@ -370,6 +371,17 @@ function shootArrow(targetEl, onHitCallback) {
     const deltaX = endX - startX;
     const deltaY = endY - startY;
     const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
+
+    // Xoay nhân vật theo hướng quái vật
+    if (deltaX < 0) {
+        // Quái vật ở bên trái
+        thachSanhEl.classList.remove('face-right');
+        thachSanhEl.classList.add('face-left');
+    } else {
+        // Quái vật ở bên phải
+        thachSanhEl.classList.remove('face-left');
+        thachSanhEl.classList.add('face-right');
+    }
 
     const arrow = document.createElement('div');
     arrow.className = 'arrow';
