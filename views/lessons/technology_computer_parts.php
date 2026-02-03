@@ -6,7 +6,7 @@ require_once __DIR__ . '/../template/header.php';
 <link rel="stylesheet" href="<?= $base_url ?>/public/CSS/computer_parts_game.css?v=<?= time() ?>">
 
 <div id="intro-modal" class="modal-overlay active">
-    <div class="intro-dialogue modal-content">
+    <div class=" modal-content">
         <div class="intro-avatar">
             <img src="<?= $base_url ?>/public/images/computer_parts/case.png" alt="Máy tính" class="intro-avatar-img">
         </div>
