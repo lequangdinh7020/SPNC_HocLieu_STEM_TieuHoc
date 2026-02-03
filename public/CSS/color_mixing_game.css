@@ -425,6 +425,7 @@ body {
     color: #e67e22;
     font-weight: bold;
     min-height: 25px;
+    text-align: center;
 }
 
 .canvas-section {
@@ -451,10 +452,13 @@ canvas {
     font-size: 20px;
     font-weight: bold;
     min-height: 25px; 
+    text-align: center;
 }
 
 .controls {
     margin-top: 20px;
+    text-align: center;
+    justify-self: center;
 }
 
 #clearButton {
