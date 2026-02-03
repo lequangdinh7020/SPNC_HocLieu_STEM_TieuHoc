@@ -298,13 +298,14 @@ body {
 }
 
 #binContainer {
-    position: relative;
+    position: absolute;
     display: flex;
     gap: 20px;
     z-index: 10;
-    margin-top: 20px;
-    justify-content: center;
-    align-items: center;
+    bottom: 20px;
+    left: 20px;
+    justify-content: flex-start;
+    align-items: flex-end;
 }
 
 .trash-bin {
@@ -371,6 +372,7 @@ body {
     z-index: 20;
     display: flex;
     align-items: flex-end;
+    justify-content: flex-end;
 }
 
 #tam-character {

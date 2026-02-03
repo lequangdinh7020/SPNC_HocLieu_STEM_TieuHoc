@@ -20,11 +20,16 @@ const Engine = Matter.Engine, Render = Matter.Render, Runner = Matter.Runner,
 const engine = Engine.create();
 engine.gravity.scale = 0.002; 
 const world = engine.world;
+
+const gameContainer = document.getElementById('bridge-game-container');
 const render = Render.create({
-    element: document.body, engine: engine,
+    element: gameContainer || document.body,
+    engine: engine,
     options: { 
-        width: window.innerWidth, height: window.innerHeight, 
-        wireframes: false, background: 'transparent' 
+        width: gameContainer ? gameContainer.offsetWidth : window.innerWidth,
+        height: gameContainer ? gameContainer.offsetHeight : window.innerHeight,
+        wireframes: false,
+        background: 'transparent'
     }
 });
 
@@ -35,10 +40,12 @@ const CAT_BRIDGE  = 0x0004; // Cầu
 const CAT_GROUND  = 0x0008; // Đất
 
 // --- CẤU HÌNH KÍCH THƯỚC ---
-const bankWidth = 485; 
-const baseGroundY = window.innerHeight - 150; 
+const bankWidth = 485;
+const containerHeight = gameContainer ? gameContainer.offsetHeight : window.innerHeight;
+const containerWidth = gameContainer ? gameContainer.offsetWidth : window.innerWidth;
+const baseGroundY = containerHeight - 150;
 const leftBankX = bankWidth; 
-const rightBankX = window.innerWidth - bankWidth;
+const rightBankX = containerWidth - bankWidth;
 const defaultGapWidth = rightBankX - leftBankX;
 
 // --- DỮ LIỆU LEVEL ---
@@ -66,6 +73,7 @@ let car;
 let bridgeBars = []; 
 let createdConstraints = []; 
 let isPlaying = false, gameEnded = false;
+let carOnBridge = false; // Theo dõi xe có đang trên cầu không
 
 // --- HÀM TẢI LEVEL ---
 function loadLevel(index) {
@@ -85,16 +93,18 @@ function loadLevel(index) {
     currentLevelIndex = index;
     const levelData = LEVELS_DATA[index];
 
-    // ... (Giữ nguyên phần Reset UI và tạo Địa hình, Đất, Móc neo như cũ) ...
     // Reset UI
     const msg = document.getElementById('status-msg');
-    const btnNext = document.getElementById('btn-next');
+    const btnNext = document.getElementById('nextButton');
+    const currentLevelDisplay = document.getElementById('currentLevel');
+    const gameStatusDisplay = document.getElementById('gameStatus');
+    
     if (msg) msg.style.display = 'none';
     if (btnNext) {
-        btnNext.classList.remove('active');
-        btnNext.style.pointerEvents = 'none'; 
+        btnNext.disabled = true;
     }
-    document.querySelector('.game-info').textContent = levelData.name;
+    if (currentLevelDisplay) currentLevelDisplay.textContent = (index + 1);
+    if (gameStatusDisplay) gameStatusDisplay.textContent = 'Sẵn sàng';
 
     // Địa hình
     const leftY = baseGroundY;
@@ -336,12 +346,99 @@ function startGame() {
 
     Events.on(engine, 'beforeUpdate', function gameLoop() {
         if (!gameEnded && isPlaying) {
+            // Di chuyển xe
             if (car.speed < 10) {
                 Body.applyForce(car, car.position, { x: 0.06, y: 0 });
             }
+            
+            // Xử lý xe đi trên thanh thép
+            handleCarOnBridge();
             checkWinLoseCondition();
         }
     });
+}
+
+function handleCarOnBridge() {
+    if (!car || gameEnded) return;
+    
+    // Tính toán vị trí dưới cùng của xe
+    const carBottom = car.position.y + 45; // 45 là nửa chiều cao xe
+    const carLeft = car.position.x - 110; // 110 là nửa chiều rộng xe
+    const carRight = car.position.x + 110;
+    
+    let highestBridgeTop = null;
+    carOnBridge = false;
+    
+    // Duyệt qua tất cả các thanh thép
+    bridgeBars.forEach(bar => {
+        if (bar.isStatic) return; // Bỏ qua thanh chưa được thả xuống
+        
+        // Lấy tọa độ 4 góc của thanh thép (xoay theo góc)
+        const angle = bar.angle;
+        const halfWidth = bar.barLength / 2;
+        const halfHeight = 10; // Nửa chiều cao thanh thép (20/2)
+        
+        // Tính toán các góc của thanh thép
+        const cos = Math.cos(angle);
+        const sin = Math.sin(angle);
+        
+        // 4 góc của hình chữ nhật xoay
+        const corners = [
+            { // Góc trên trái
+                x: bar.position.x + (-halfWidth * cos - (-halfHeight) * sin),
+                y: bar.position.y + (-halfWidth * sin + (-halfHeight) * cos)
+            },
+            { // Góc trên phải
+                x: bar.position.x + (halfWidth * cos - (-halfHeight) * sin),
+                y: bar.position.y + (halfWidth * sin + (-halfHeight) * cos)
+            },
+            { // Góc dưới trái
+                x: bar.position.x + (-halfWidth * cos - halfHeight * sin),
+                y: bar.position.y + (-halfWidth * sin + halfHeight * cos)
+            },
+            { // Góc dưới phải
+                x: bar.position.x + (halfWidth * cos - halfHeight * sin),
+                y: bar.position.y + (halfWidth * sin + halfHeight * cos)
+            }
+        ];
+        
+        // Tìm Y cao nhất (mặt trên) và thấp nhất của thanh thép
+        const topY = Math.min(corners[0].y, corners[1].y);
+        const bottomY = Math.max(corners[2].y, corners[3].y);
+        
+        // Tìm X trái nhất và phải nhất
+        const leftX = Math.min(corners[0].x, corners[1].x, corners[2].x, corners[3].x);
+        const rightX = Math.max(corners[0].x, corners[1].x, corners[2].x, corners[3].x);
+        
+        // Kiểm tra xe có nằm trên thanh thép theo trục X không
+        const carOverlapsX = carRight > leftX && carLeft < rightX;
+        
+        if (carOverlapsX) {
+            // Kiểm tra xe có gần mặt trên của thanh thép không
+            const distanceToTop = carBottom - topY;
+            
+            // Nếu xe đang ở phía trên và gần mặt trên của thanh (trong khoảng 30 pixel)
+            if (distanceToTop > -30 && distanceToTop < 30) {
+                if (highestBridgeTop === null || topY < highestBridgeTop) {
+                    highestBridgeTop = topY;
+                    carOnBridge = true;
+                }
+            }
+        }
+    });
+    
+    // Nếu xe đang trên cầu, giữ xe ở mặt trên
+    if (carOnBridge && highestBridgeTop !== null) {
+        const targetY = highestBridgeTop - 45; // 45 là nửa chiều cao xe
+        const currentY = car.position.y;
+        
+        // Nếu xe đang chìm xuống dưới mặt cầu, đẩy xe lên
+        if (currentY > targetY) {
+            Body.setPosition(car, { x: car.position.x, y: targetY });
+            // Đặt vận tốc Y về 0 để xe không rơi xuống
+            Body.setVelocity(car, { x: car.velocity.x, y: 0 });
+        }
+    }
 }
 
 function resetGame() { 
@@ -359,27 +456,58 @@ function nextLevel() {
 
 function checkWinLoseCondition() {
     const msg = document.getElementById('status-msg');
-    const btnNext = document.getElementById('btn-next');
+    const btnNext = document.getElementById('nextButton');
+    const gameStatusDisplay = document.getElementById('gameStatus');
     
-    if (car.position.y > window.innerHeight + 200) {
+    if (car.position.y > containerHeight + 200) {
         gameEnded = true; 
         msg.innerText = "❌ RƠI RỒI! THỬ LẠI NHÉ"; 
-        msg.style.color = "red"; msg.style.display = "block"; 
+        msg.style.color = "red"; 
+        msg.style.display = "block";
+        if (gameStatusDisplay) gameStatusDisplay.textContent = 'Thất bại';
         isPlaying = false;
     }
     
     // Điều kiện thắng
-    if (car.position.x > window.innerWidth - 300) {
+    if (car.position.x > containerWidth - 300) {
         gameEnded = true; 
         msg.innerText = "🏆 TUYỆT VỜI! QUA MÀN!"; 
-        msg.style.color = "#2ecc71"; msg.style.display = "block"; 
+        msg.style.color = "#2ecc71"; 
+        msg.style.display = "block";
+        if (gameStatusDisplay) gameStatusDisplay.textContent = 'Hoàn thành';
         if (btnNext) {
-            btnNext.classList.add('active'); 
-            btnNext.style.pointerEvents = 'auto'; 
+            btnNext.disabled = false;
         }
         isPlaying = false;
     }
 }
+
+// --- EVENT LISTENERS FOR NEW UI ---
+document.addEventListener('DOMContentLoaded', () => {
+    // Modal close
+    const startGameButton = document.getElementById('startGameButton');
+    const introModal = document.getElementById('intro-modal');
+    if (startGameButton && introModal) {
+        startGameButton.addEventListener('click', () => {
+            introModal.classList.remove('active');
+        });
+    }
+
+    // Button event listeners
+    const replayButton = document.getElementById('replayButton');
+    const playButton = document.getElementById('playButton');
+    const nextButton = document.getElementById('nextButton');
+
+    if (replayButton) {
+        replayButton.addEventListener('click', resetGame);
+    }
+    if (playButton) {
+        playButton.addEventListener('click', startGame);
+    }
+    if (nextButton) {
+        nextButton.addEventListener('click', nextLevel);
+    }
+});
 
 loadLevel(currentLevelIndex);
 Render.run(render);

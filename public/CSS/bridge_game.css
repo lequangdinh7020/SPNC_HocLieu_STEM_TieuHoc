@@ -1,27 +1,329 @@
-/* public/CSS/bridge_game.css */
-body { 
-    margin: 0; 
-    padding: 0; 
-    overflow: hidden; 
-    background-color: #87CEEB; 
-    font-family: Arial, sans-serif; 
-    user-select: none; 
-    background-image: url('../images/bridge_game/bg_milkyway_stars.png');
+:root {
+    --primary-orange: #e67e22;
+    --primary-orange-light: #f39c12;
+    --primary-orange-pastel: #fef5e7;
+    --secondary-orange: #d35400;
+    --accent-orange: #f39c12;
+    --correct-color: #28a745;
+    --wrong-color: #dc3545;
+    --neutral-gray: #f8f9fa;
+    --text-dark: #343a40;
+    --text-light: #6c757d;
+    --white: #ffffff;
+    --shadow-light: rgba(0, 0, 0, 0.1);
+    --shadow-medium: rgba(0, 0, 0, 0.15);
 }
-#ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
-.header-bar { display: flex; justify-content: space-between; padding: 20px; pointer-events: auto; }
-.btn { width: 60px; height: 60px; border-radius: 50%; border: 3px solid #fff; color: white; font-size: 24px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; transition: transform 0.1s; }
-.btn:active { transform: scale(0.95); }
-.btn-replay { background: #f1c40f; }
-.btn-play { background: #e67e22; }
-.btn-next { background: #2ecc71; opacity: 0.5; pointer-events: none; }
-.btn-next.active { opacity: 1; pointer-events: auto; cursor: pointer; }
-.game-info { font-size: 24px; color: #d35400; font-weight: bold; text-shadow: 1px 1px 0 #fff; }
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f9fbfd;
+    color: var(--text-dark);
+    line-height: 1.6;
+}
+
+.game-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background-color: var(--white);
+    border-radius: 16px;
+    width: 90%;
+    max-width: 600px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    animation: modalAppear 0.5s ease-out;
+}
+
+@keyframes modalAppear {
+    0% { transform: translateY(-30px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+.intro-avatar {
+    flex-shrink: 0;
+}
+
+.intro-avatar-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 5px solid var(--primary-orange-pastel);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.intro-text-content {
+    flex-grow: 1;
+}
+
+.intro-text-content h3 {
+    color: var(--secondary-orange);
+    margin-bottom: 15px;
+    font-size: 1.8rem;
+}
+
+.intro-text-content p {
+    color: var(--text-light);
+    margin-bottom: 25px;
+    font-size: 1.1rem;
+    line-height: 1.7;
+}
+
+.start-btn {
+    background: linear-gradient(135deg, var(--primary-orange), var(--secondary-orange));
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(230, 126, 34, 0.3);
+}
+
+.start-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(230, 126, 34, 0.4);
+}
+
+.game-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--primary-orange-pastel);
+}
+
+.game-header h1 {
+    color: var(--secondary-orange);
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+}
+
+.game-subtitle {
+    color: var(--primary-orange-light);
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.game-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.stat-box {
+    background-color: var(--white);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 5px 15px var(--shadow-light);
+    transition: transform 0.3s ease;
+    border-top: 5px solid transparent;
+}
+
+.stat-box:hover {
+    transform: translateY(-5px);
+}
+
+.stat-box.correct {
+    border-top-color: var(--primary-orange);
+}
+
+.stat-box.progress {
+    border-top-color: var(--accent-orange);
+}
+
+.stat-box.timer {
+    border-top-color: #17a2b8;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-bottom: 8px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-value {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.stat-box.correct .stat-value {
+    color: var(--primary-orange);
+}
+
+.stat-box.progress .stat-value {
+    color: var(--accent-orange);
+}
+
+.stat-box.timer .stat-value {
+    color: #17a2b8;
+}
+
+.game-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 30px;
+    justify-content: center;
+}
+
+.control-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px var(--shadow-light);
+}
+
+.control-btn i {
+    font-size: 1.1rem;
+}
+
+.control-btn.reset {
+    background-color: #ffd166;
+    color: var(--text-dark);
+}
+
+.control-btn.pause {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.control-btn.complete {
+    background-color: var(--correct-color);
+    color: white;
+}
+
+.control-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.control-btn:not(:disabled):hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.game-instructions {
+    background-color: #fff9e6;
+    border-left: 5px solid #ffc107;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 3px 10px rgba(255, 193, 7, 0.1);
+}
+
+.instruction-box {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.instruction-box i {
+    font-size: 2rem;
+    color: #ffc107;
+}
+
+.instruction-box span {
+    color: var(--text-dark);
+    font-size: 1.05rem;
+    line-height: 1.6;
+}
+
+#bridge-game-container {
+    position: relative;
+    width: 100%;
+    height: 450px;
+    background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 100%);
+    background-image: url('../images/bridge_game/bg_milkyway_stars.png');
+    background-size: cover;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px var(--shadow-medium);
+}
 
 #supply-zone {
-    position: absolute; top: 15%; left: 50%; transform: translateX(-50%);
-    width: 400px; height: 150px; border: 4px solid #e67e22; border-radius: 10px;
-    background: rgba(255, 255, 255, 0.2); display: flex; justify-content: center; align-items: center; pointer-events: none;
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    height: 100px;
+    border: 3px solid var(--primary-orange);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
 }
-#supply-label { position: absolute; top: -25px; color: #e67e22; font-weight: bold; background: white; padding: 0 10px; border-radius: 5px; }
-#status-msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 40px; font-weight: bold; color: white; text-shadow: 2px 2px 4px #000; display: none; z-index: 10; }
+
+#supply-label {
+    position: absolute;
+    top: -25px;
+    color: var(--primary-orange);
+    font-weight: bold;
+    background: white;
+    padding: 0 10px;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+#status-msg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+    font-weight: bold;
+    color: white;
+    text-shadow: 2px 2px 4px #000;
+    display: none;
+    z-index: 10;
+}
