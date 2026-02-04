@@ -1,71 +1,295 @@
+:root {
+    --primary-blue: #4a6fa5;
+    --primary-blue-light: #6b8cbc;
+    --primary-blue-pastel: #e8f0fe;
+    --secondary-blue: #166088;
+    --accent-blue: #17a2b8;
+    --correct-color: #28a745;
+    --wrong-color: #dc3545;
+    --neutral-gray: #f8f9fa;
+    --text-dark: #343a40;
+    --text-light: #6c757d;
+    --white: #ffffff;
+    --shadow-light: rgba(0, 0, 0, 0.1);
+    --shadow-medium: rgba(0, 0, 0, 0.15);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Quicksand', sans-serif;
+}
+
+body {
+    background-color: #f9fbfd;
+    color: var(--text-dark);
+    line-height: 1.6;
+}
+
+.game-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Modal Overlay for Intro */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background-color: var(--white);
+    border-radius: 16px;
+    width: 90%;
+    max-width: 600px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    animation: modalAppear 0.5s ease-out;
+}
+
+@keyframes modalAppear {
+    0% { transform: translateY(-30px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+.intro-avatar {
+    flex-shrink: 0;
+}
+
+.intro-avatar-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 5px solid var(--primary-blue-pastel);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.intro-text-content {
+    flex-grow: 1;
+}
+
+.intro-text-content h3 {
+    color: var(--secondary-blue);
+    margin-bottom: 15px;
+    font-size: 1.8rem;
+}
+
+.intro-text-content p {
+    color: var(--text-light);
+    margin-bottom: 25px;
+    font-size: 1.1rem;
+    line-height: 1.7;
+}
+
+.start-btn {
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(26, 115, 232, 0.3);
+}
+
+.start-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(26, 115, 232, 0.4);
+}
+
+.game-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--primary-blue-pastel);
+}
+
+.game-header h1 {
+    color: var(--secondary-blue);
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+}
+
+.game-subtitle {
+    color: var(--primary-blue-light);
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.game-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.stat-box {
+    background-color: var(--white);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 5px 15px var(--shadow-light);
+    transition: transform 0.3s ease;
+    border-top: 5px solid transparent;
+}
+
+.stat-box:hover {
+    transform: translateY(-5px);
+}
+
+.stat-box.remaining {
+    border-top-color: var(--primary-blue);
+}
+
+.stat-box.timer {
+    border-top-color: var(--accent-blue);
+}
+
+.stat-box.progress {
+    border-top-color: var(--primary-blue-light);
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-bottom: 8px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-value {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.stat-box.remaining .stat-value {
+    color: var(--primary-blue);
+}
+
+.stat-box.timer .stat-value {
+    color: var(--accent-blue);
+}
+
+.stat-box.progress .stat-value {
+    color: var(--primary-blue-light);
+}
+
+.game-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 30px;
+    justify-content: center;
+}
+
+.control-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px var(--shadow-light);
+}
+
+.control-btn i {
+    font-size: 1.1rem;
+}
+
+.control-btn.give-up {
+    background-color: #ff6b6b;
+    color: white;
+}
+
+.control-btn.reset {
+    background-color: #ffd166;
+    color: var(--text-dark);
+}
+
+.control-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.game-instructions {
+    margin-bottom: 30px;
+}
+
+.instruction-box {
+    background-color: var(--primary-blue-pastel);
+    border-left: 5px solid var(--primary-blue);
+    padding: 20px;
+    border-radius: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.instruction-box i {
+    color: var(--primary-blue);
+    font-size: 1.5rem;
+    margin-top: 3px;
+}
+
+.instruction-box span {
+    color: var(--text-dark);
+    font-size: 1.05rem;
+}
+
+/* Game Container */
+.game-container {
+    position: relative;
+    background-color: var(--white);
+    border-radius: 12px;
+    padding: 0;
+    box-shadow: 0 8px 25px var(--shadow-light);
+    overflow: hidden;
+    min-height: 600px;
+}
+
 body,
 html {
     height: 100%;
     margin: 0;
-    overflow: hidden;
-    background: #2c3e50;
-}
-
-.tower-game-mode.game-wrapper {
-    width: 100vw;
-    height: 100vh;
-    margin: 0;
-    padding: 0;
-    border: none;
-    border-radius: 0;
-    position: relative;
-}
-
-/* UI Layer (Nằm trên canvas) */
-.game-ui-layer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    padding: 20px;
-    pointer-events: none;
-    display: flex;
-    justify-content: space-between;
-    box-sizing: border-box;
-    z-index: 10;
-}
-
-.header-game,
-.instruction-box {
-    pointer-events: auto;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 15px 25px;
-    border-radius: 15px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    color: #2c3e50;
-}
-
-.header-game h1 {
-    margin: 0 0 0 15px;
-    font-size: 1.5em;
-    color: #d35400;
-}
-
-.instruction-box {
-    max-width: 400px;
-}
-
-.instruction-box small {
-    display: block;
-    margin-top: 5px;
-    color: #7f8c8d;
-    font-style: italic;
 }
 
 /* Container chứa Matter.js Canvas */
 #physics-container {
     width: 100%;
-    height: 100%;
+    height: 600px;
     /* Ảnh nền giống trong ví dụ */
     background: linear-gradient(to bottom, #d4e6f1 0%, #87ceeb 100%);
-    position: absolute;
-    top: 0;
-    left: 0;
+    position: relative;
 }
 
 /* Canvas do Matter.js tạo ra */
@@ -73,73 +297,10 @@ html {
     display: block;
 }
 
-.game-btn {
-    padding: 12px 30px;
-    font-size: 1.2em;
-    border: none;
-    border-radius: 30px;
-    cursor: pointer;
-    font-weight: bold;
-    color: white;
-    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
-    transition: transform 0.1s;
-}
-
-.reset {
-    background: #e74c3c;
-}
-
-.reset:hover {
-    background: #c0392b;
-}
-
-.reset:active {
-    transform: translateY(2px);
-    box-shadow: none;
-}
-
-/* Modal */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    justify-content: center;
-    align-items: center;
-
-    /* --- BẮT BUỘC THÊM 2 DÒNG NÀY --- */
-    z-index: 1000;
-    /* Đảm bảo nổi lên trên cùng */
-    pointer-events: auto;
-    /* BẬT LẠI khả năng click chuột */
-}
-
-.modal-content {
-    background: white;
-    padding: 40px;
-    border-radius: 20px;
-    text-align: center;
-    border: 5px solid #2ecc71;
-}
-
-.modal-content h2 {
-    color: #2ecc71;
-    font-size: 2.5em;
-    margin: 0;
-}
-
-/* Ẩn controls layer cũ */
-.controls-layer {
-    display: none;
-}
-
 /* THANH CÔNG CỤ MỚI */
 .build-toolbar {
     position: absolute;
-    top: 20px;
+    bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
     background: rgba(255, 255, 255, 0.95);
@@ -209,27 +370,6 @@ html {
     opacity: 1;
 }
 
-/* Nút Reset nhỏ gọn */
-.tool-btn {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    border: none;
-    background: #e74c3c;
-    color: white;
-    font-size: 1.2em;
-    cursor: pointer;
-    box-shadow: 0 4px 0 #c0392b;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.tool-btn:active {
-    transform: translateY(2px);
-    box-shadow: none;
-}
-
 /* Ghost Node (Hình mờ đi theo chuột khi kéo từ UI ra) */
 .node-ghost {
     width: 30px;
@@ -244,9 +384,37 @@ html {
     /* Mặc định ẩn */
 }
 
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    pointer-events: auto;
+}
+
+.modal .modal-content {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    border: 5px solid #2ecc71;
+}
+
+.modal .modal-content h2 {
+    color: #2ecc71;
+    font-size: 2.5em;
+    margin: 0 0 15px 0;
+}
+
 .lose-content {
     border: 5px solid #e74c3c !important;
-    /* Viền đỏ */
 }
 
 .lose-content h2 {
@@ -261,6 +429,32 @@ html {
     margin-top: 20px;
 }
 
+.game-btn {
+    padding: 12px 30px;
+    font-size: 1.2em;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
+    transition: transform 0.1s;
+    background: #2ecc71;
+}
+
+.game-btn.reset {
+    background: #e74c3c;
+}
+
+.game-btn.reset:hover {
+    background: #c0392b;
+}
+
+.game-btn:active {
+    transform: translateY(2px);
+    box-shadow: none;
+}
+
 /* Nút về trang chủ */
 .home-btn-ui {
     background: #34495e;
@@ -270,4 +464,47 @@ html {
 
 .home-btn-ui:hover {
     background: #2c3e50;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .game-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .game-controls {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .control-btn {
+        width: 100%;
+        max-width: 300px;
+        justify-content: center;
+    }
+    
+    #physics-container {
+        height: 500px;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .modal-content {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .intro-avatar-img {
+        width: 90px;
+        height: 90px;
+    }
+    
+    #physics-container {
+        height: 400px;
+    }
 }

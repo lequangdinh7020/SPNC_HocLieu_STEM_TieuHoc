@@ -302,7 +302,7 @@ function spawnEnemy() {
         word: word,
         remaining: word,
         top: -120,
-        speed: isBoss ? 1.2 : 1.4,
+        speed: isBoss ? 0.8 : 1.0,
         isDead: false 
     });
 }

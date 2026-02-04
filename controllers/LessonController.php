@@ -2593,13 +2593,13 @@ class LessonController {
                 'config' => [
                     // Mục tiêu nằm chính giữa
                     'targets' => [ 
-                        ['x' => '50%', 'y' => '50%'] 
+                        ['x' => '50%', 'y' => '40%'] 
                     ],
                     'anchors' => [ 
                         ['x' => '44%', 'y' => '96%'],
                         ['x' => '56%', 'y' => '96%']
                     ],
-                    'freeNodes' => 15,
+                    'freeNodes' => 10,
                     'connectDistance' => 130
                 ]
             ],

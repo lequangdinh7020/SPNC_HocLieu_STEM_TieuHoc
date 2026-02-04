@@ -17,8 +17,8 @@ const CONF = {
     maxLinkLength: levelConfig.connectDistance, 
     
     // Cấu hình Sức bền vật liệu
-    linkStiffness: 0.65,    
-    breakThreshold: 0.0025, 
+    linkStiffness: 0.40,    
+    breakThreshold: 0.002, 
     
     colors: {
         node: '#95a5a6',
@@ -49,8 +49,33 @@ const nodeSource = document.getElementById('node-source');
 const container = document.getElementById('physics-container');
 
 // Khởi chạy
-document.addEventListener("DOMContentLoaded", initGame);
-document.getElementById('reset-btn').addEventListener('click', () => window.location.reload());
+document.addEventListener("DOMContentLoaded", () => {
+    // Intro modal handling
+    const introModal = document.getElementById('intro-modal');
+    const startGameButton = document.getElementById('startGameButton');
+    
+    if (startGameButton) {
+        startGameButton.addEventListener('click', () => {
+            introModal.classList.remove('active');
+            initGame();
+        });
+    }
+    
+    // Button event listeners
+    const resetBtnMain = document.getElementById('reset-btn-main');
+    const giveUpButton = document.getElementById('giveUpButton');
+    
+    if (resetBtnMain) {
+        resetBtnMain.addEventListener('click', () => window.location.reload());
+    }
+    
+    if (giveUpButton) {
+        giveUpButton.addEventListener('click', () => {
+            window.location.href = baseUrl + '/views/main_lesson.php';
+        });
+    }
+});
+
 
 // --- HÀM TIỆN ÍCH: CHUYỂN ĐỔI % SANG PIXEL ---
 function parseVal(val, maxDimension) {
