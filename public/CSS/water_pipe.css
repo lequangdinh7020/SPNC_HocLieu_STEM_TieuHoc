@@ -1,117 +1,308 @@
-/* --- 1. CẤU HÌNH CHUNG --- */
-body {
-    font-family: 'Quicksand', sans-serif;
-    margin: 0;
-    padding: 0;
-    background: #ffffff !important;
-    background-color: #ffffff !important;
-    overflow-y: auto;
-    overflow-x: hidden;
-    
-    /* Sửa lỗi Footer: Xếp dọc các thành phần */
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+:root {
+    --primary-blue: #4a6fa5;
+    --primary-blue-light: #6b8cbc;
+    --primary-blue-pastel: #e8f0fe;
+    --secondary-blue: #166088;
+    --accent-blue: #17a2b8;
+    --correct-color: #28a745;
+    --wrong-color: #dc3545;
+    --neutral-gray: #f8f9fa;
+    --text-dark: #343a40;
+    --text-light: #6c757d;
+    --white: #ffffff;
+    --shadow-light: rgba(0, 0, 0, 0.1);
+    --shadow-medium: rgba(0, 0, 0, 0.15);
 }
 
-/* KHUNG GAME (WRAPPER) */
-.pipe-game {
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Quicksand', sans-serif;
+}
+
+body {
+    background-color: #f9fbfd;
+    color: var(--text-dark);
+    line-height: 1.6;
+}
+
+.game-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Modal Overlay for Intro */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    max-width: 1000px;
-    height: 600px;
-    
-    /* Margin: Cách trên 110px (né Header), Cách dưới 50px (né Footer) */
-    margin: 110px auto 50px auto; 
-    background: url('../images/water_pipe/ground_stage.png') no-repeat bottom center;
-    background-size: cover;
-    
-    position: relative;
-    overflow: hidden;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    
-    /* Màu nền phụ nếu ảnh lỗi */
-    background-color: #87CEEB;
-    
-    /* Đảm bảo khung không bị co lại */
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background-color: var(--white);
+    border-radius: 16px;
+    width: 90%;
+    max-width: 600px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    animation: modalAppear 0.5s ease-out;
+}
+
+@keyframes modalAppear {
+    0% { transform: translateY(-30px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+.intro-avatar {
     flex-shrink: 0;
 }
 
-/* --- 2. HUD (HEADER GAME) --- */
-.game-hud {
-    position: absolute;
-    top: 15px; left: 15px; right: 15px;
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    z-index: 100;
-    pointer-events: none; /* Để chuột bấm xuyên qua vùng trống */
+.intro-avatar-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 5px solid var(--primary-blue-pastel);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
-/* Các phần tử con của HUD nhận sự kiện chuột */
-.game-hud > * { pointer-events: auto; }
-
-.score-box {
-    background: rgba(0, 0, 0, 0.6);
-    color: #f1c40f;
-    padding: 10px 25px;
-    border-radius: 25px;
-    font-size: 1.2em; font-weight: bold;
-    border: 2px solid #f1c40f;
-    display: flex; align-items: center;
+.intro-text-content {
+    flex-grow: 1;
 }
 
-.exit-btn {
-    background: rgba(255, 255, 255, 0.9);
-    padding: 8px 15px;
-    border-radius: 10px;
-    text-decoration: none;
-    color: #c0392b;
-    font-weight: bold;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.2);
-    transition: transform 0.2s;
+.intro-text-content h3 {
+    color: var(--secondary-blue);
+    margin-bottom: 15px;
+    font-size: 1.8rem;
 }
-.exit-btn:hover { transform: scale(1.05); }
 
-.hud-controls { display: flex; gap: 10px; }
-
-/* Nút bấm */
-.game-btn {
-    padding: 10px 20px; font-size: 1em; border: none; border-radius: 10px;
-    cursor: pointer; font-weight: bold; color: white;
-    transition: transform 0.2s; box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+.intro-text-content p {
+    color: var(--text-light);
+    margin-bottom: 25px;
+    font-size: 1.1rem;
+    line-height: 1.7;
 }
-.run { background: #3498db; }
-.run:hover { background: #2980b9; }
-.reset { background: #e67e22; }
-.reset:hover { background: #d35400; }
-.lvl-btn { background: #2ecc71; font-size: 1.2em; padding: 12px 30px; }
-.game-btn:active { transform: translateY(3px); box-shadow: none; }
 
+.start-btn {
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(26, 115, 232, 0.3);
+}
 
-/* --- 3. GAME STAGE (KHU VỰC CHƠI) --- */
+.start-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(26, 115, 232, 0.4);
+}
+
+.game-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--primary-blue-pastel);
+}
+
+.game-header h1 {
+    color: var(--secondary-blue);
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+}
+
+.game-subtitle {
+    color: var(--primary-blue-light);
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.game-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.stat-box {
+    background-color: var(--white);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 5px 15px var(--shadow-light);
+    transition: transform 0.3s ease;
+    border-top: 5px solid transparent;
+}
+
+.stat-box:hover {
+    transform: translateY(-5px);
+}
+
+.stat-box.remaining {
+    border-top-color: var(--primary-blue);
+}
+
+.stat-box.timer {
+    border-top-color: var(--accent-blue);
+}
+
+.stat-box.progress {
+    border-top-color: var(--primary-blue-light);
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-bottom: 8px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-value {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.stat-box.remaining .stat-value {
+    color: var(--primary-blue);
+}
+
+.stat-box.timer .stat-value {
+    color: var(--accent-blue);
+}
+
+.stat-box.progress .stat-value {
+    color: var(--primary-blue-light);
+}
+
+.game-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 30px;
+    justify-content: center;
+}
+
+.control-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px var(--shadow-light);
+}
+
+.control-btn i {
+    font-size: 1.1rem;
+}
+
+.control-btn.give-up {
+    background-color: #ff6b6b;
+    color: white;
+}
+
+.control-btn.reset {
+    background-color: #ffd166;
+    color: var(--text-dark);
+}
+
+.control-btn.complete {
+    background-color: var(--correct-color);
+    color: white;
+}
+
+.control-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.game-instructions {
+    margin-bottom: 30px;
+}
+
+.instruction-box {
+    background-color: var(--primary-blue-pastel);
+    border-left: 5px solid var(--primary-blue);
+    padding: 20px;
+    border-radius: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.instruction-box i {
+    color: var(--primary-blue);
+    font-size: 1.5rem;
+    margin-top: 3px;
+}
+
+.instruction-box span {
+    color: var(--text-dark);
+    font-size: 1.05rem;
+}
+
+/* Game Container */
+.game-container-pipe {
+    background-color: var(--white);
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 8px 25px var(--shadow-light);
+    min-height: 600px;
+}
+
+/* --- GAME STAGE (KHU VỰC CHƠI) --- */
 #game-stage {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    display: flex; justify-content: center; align-items: center;
-    z-index: 10;
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    padding: 20px;
 }
 
 .game-board-container {
+    background: url('../images/water_pipe/ground_stage.png') no-repeat center center;
     background-size: cover;
-    
+    background-color: #fdd769;
     padding: 25px;
     border-radius: 15px;
-    border: 4px solid rgba(93, 64, 55, 0.8); /* Viền nâu đất */
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-    margin-top: 40px; /* Đẩy xuống một chút tránh HUD */
-    background-color: #fdd769;
+    border: 4px solid rgba(93, 64, 55, 0.8);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
 }
 
 .pipe-grid {
-    display: grid; gap: 0; /* Không khoảng cách để ống liền mạch */
-    width: 450px; height: 450px;
-    /* Nền lưới hơi tối để làm nổi ống */
+    display: grid; 
+    gap: 0;
+    width: 450px; 
+    height: 450px;
     background: rgba(0, 0, 0, 0.2);
     border-radius: 5px;
 }
@@ -200,47 +391,119 @@ body {
 }
 @keyframes leakPulse { 0% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(2.5); } }
 
-/* --- 7. MODAL --- */
+/* --- MODAL --- */
 .modal {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
     background: rgba(0,0,0,0.85);
     z-index: 999;
-    /* Mặc định ẩn, JS sẽ hiển thị khi cần */
     display: none;
     justify-content: center; 
     align-items: center;
 }
 
-.modal-content {
-    background: white; padding: 40px; border-radius: 20px;
-    text-align: center; max-width: 500px; 
+.modal .modal-content.result-content {
+    background: white; 
+    padding: 40px; 
+    border-radius: 20px;
+    text-align: center; 
+    max-width: 500px; 
     border: 5px solid #3498db;
     box-shadow: 0 0 30px rgba(52, 152, 219, 0.6);
 }
 
-.modal-content h2 { 
+.modal .modal-content.result-content h2 { 
     color: #2980b9; 
     font-size: 2em; 
     margin-top: 0; 
 }
 
-.modal-content p {
+.modal .modal-content.result-content p {
     color: #2c3e50;
     font-size: 1.1rem;
     line-height: 1.6;
 }
 
-.instruction { 
-    background: #eaf2f8; padding: 15px; border-radius: 10px; 
-    text-align: left; margin: 20px 0; 
-    border-left: 5px solid #3498db;
+.modal-actions { 
+    display: flex; 
+    gap: 15px; 
+    justify-content: center; 
+    margin-top: 20px; 
 }
 
-.instruction p {
-    color: #2c3e50;
-    margin: 8px 0;
-    font-size: 1rem;
-    line-height: 1.6;
+/* Game buttons */
+.game-btn {
+    padding: 10px 20px; 
+    font-size: 1em; 
+    border: none; 
+    border-radius: 10px;
+    cursor: pointer; 
+    font-weight: bold; 
+    color: white;
+    transition: transform 0.2s; 
+    box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+    background: #3498db;
 }
 
-.level-select, .modal-actions { display: flex; gap: 15px; justify-content: center; margin-top: 20px; }
+.game-btn:hover { 
+    background: #2980b9; 
+}
+
+.game-btn.lvl-btn { 
+    background: #2ecc71; 
+    font-size: 1.2em; 
+    padding: 12px 30px; 
+}
+
+.game-btn:active { 
+    transform: translateY(3px); 
+    box-shadow: none; 
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .game-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .game-controls {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .control-btn {
+        width: 100%;
+        max-width: 300px;
+        justify-content: center;
+    }
+    
+    .pipe-grid {
+        width: 350px;
+        height: 350px;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .modal-content {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .intro-avatar-img {
+        width: 90px;
+        height: 90px;
+    }
+    
+    .pipe-grid {
+        width: 280px;
+        height: 280px;
+    }
+}
