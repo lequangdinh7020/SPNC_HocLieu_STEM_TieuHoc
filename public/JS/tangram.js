@@ -257,9 +257,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // DOUBLE CLICK: Xoay mảnh
-    canvas.addEventListener('dblclick', (e) => {
+    // SINGLE CLICK: Xoay mảnh
+    canvas.addEventListener('click', (e) => {
         if (isGameComplete) return;
+        if (isDragging) return; // Không xoay khi đang kéo
         const mouse = getMousePos(canvas, e);
         for (let i = pieces.length - 1; i >= 0; i--) {
             const p = pieces[i];
