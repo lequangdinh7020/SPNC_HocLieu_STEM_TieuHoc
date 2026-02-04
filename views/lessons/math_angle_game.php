@@ -1,53 +1,62 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hậu Nghệ Bắn Mặt Trời - STEM Universe</title>
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<?php require_once __DIR__ . '/../template/header.php'; ?>
 
-    <link rel="stylesheet" href="<?= $base_url ?>/public/CSS/main.css">
-    <link rel="stylesheet" href="<?= $base_url ?>/public/CSS/math_angle_game.css">
-    
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background: #2c3e50;
-        }
-        .math-game.game-wrapper {
-            margin: 0;
-            width: 100vw;
-            height: 100vh;
-            max-width: none;
-            border: none;
-            border-radius: 0;
-        }
-    </style>
-</head>
-<body>
+<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/home.css?v=<?= time() ?>">
+<link rel="stylesheet" href="<?= $base_url ?>/public/CSS/math_angle_game.css?v=<?= time() ?>">
 
-    <div class="game-wrapper math-game full-screen-mode">
-        
-        <div class="game-ui-layer">
-            <div class="header-game">
-                <a href="<?= $base_url ?>/views/main_lesson.php" class="home-btn" title="Thoát game">
-                    <i class="fas fa-home"></i>
-                </a>
-                <h1>Màn <?= $currentLevel['id'] ?>: <?= $currentLevel['title'] ?></h1>
-            </div>
-            
-            <div class="instruction-box">
-                <p><?= $currentLevel['desc'] ?></p>
-                <div class="angle-hint">
-                    Góc: <span id="angle-value">0</span>° (<span id="angle-type">...</span>)
-                </div>
-            </div>
+<div id="intro-modal" class="modal-overlay active">
+    <div class="intro-dialogue modal-content">
+        <div class="intro-avatar">
+            <img src="<?= $base_url ?>/public/images/character/Pythagoras_Math.png" alt="Bậc thầy góc" class="intro-avatar-img">
         </div>
+        <div class="intro-text-content">
+            <h3>Chào bạn, mình là Angle Master!</h3>
+            <p>Chào mừng bạn đến với trò chơi "HẬU NGHỆ BẮN MẶT TRỜI". Nhiệm vụ của bạn là tính toán góc bắn chính xác để bắn hạ các mặt trời. Bạn sẵn sàng chưa?</p>
+            <button id="startGameButton" class="start-btn">Bắt đầu thôi!</button>
+        </div>
+    </div>
+</div>
 
+<div class="game-wrapper angle-game"><br><br><br>
+    <div class="game-header">
+        <h1>Màn <?= $currentLevel['id'] ?>: <?= $currentLevel['title'] ?></h1>
+        <p class="game-subtitle">Thử thách toán học - Rèn luyện tư duy góc</p>
+    </div>
+    
+    <div class="game-stats">
+        <div class="stat-box angle">
+            <span class="stat-label">GÓC BẮN</span>
+            <span id="angle-value" class="stat-value">0°</span>
+        </div>
+        <div class="stat-box type">
+            <span class="stat-label">LOẠI GÓC</span>
+            <span id="angle-type" class="stat-value">...</span>
+        </div>
+        <div class="stat-box level">
+            <span class="stat-label">MÀN CHƠI</span>
+            <span class="stat-value"><?= $currentLevel['id'] ?>/<?= $totalLevels ?></span>
+        </div>
+    </div>
+    
+    <div class="game-controls">
+        <button id="giveUpButton" class="control-btn give-up">
+            <i class="fas fa-home"></i> Menu
+        </button>
+        <button id="resetButton" class="control-btn reset">
+            <i class="fas fa-redo"></i> Làm lại
+        </button>
+        <button id="fire-btn" class="control-btn complete">
+            <i class="fas fa-bullseye"></i> Bắn!
+        </button>
+    </div>
+    
+    <div class="game-instructions">
+        <div class="instruction-box">
+            <i class="fas fa-lightbulb"></i>
+            <span><strong>Nhiệm vụ:</strong> <?= $currentLevel['desc'] ?></span>
+        </div>
+    </div>
+    
+    <div class="game-container">
         <div id="game-stage">
             <canvas id="gameCanvas"></canvas>
             
@@ -56,30 +65,58 @@
                     <div class="protractor-bg"></div>
                     <input type="range" id="angle-slider" min="0" max="180" value="0" step="1">
                 </div>
-                </div>
-
-            <button id="fire-btn" class="fire-btn">BẮN!</button>
+            </div>
             
             <div id="miss-feedback" class="miss-feedback hidden">TRƯỢT RỒI! THỬ LẠI NHÉ</div>
         </div>
+    </div>
+</div>
 
-        <div id="result-modal" class="modal">
-            <div class="modal-content">
-                <h2 id="modal-title"></h2>
-                <p id="modal-message"></p>
-                <button id="next-level-btn" class="game-btn">Màn tiếp theo ➡️</button>
-                <button id="retry-btn" class="game-btn">Thử lại 🏹</button>
-            </div>
+<div id="result-modal" class="modal">
+    <div class="modal-content result-content">
+        <h2 id="modal-title"></h2>
+        <p id="modal-message"></p>
+        <div class="modal-buttons">
+            <button id="next-level-btn" class="game-btn">Màn tiếp theo</button>
+            <button id="retry-btn" class="game-btn">Thử lại</button>
+            <button id="back-btn" class="game-btn back-btn">Quay lại</button>
         </div>
     </div>
+</div>
 
-    <script>
-        const baseUrl = "<?= $base_url ?>";
-        const levelData = <?= json_encode($currentLevel) ?>;
-        const totalLevels = <?= $totalLevels ?>;
-    </script>
-    
-    <script src="<?= $base_url ?>/public/JS/math_angle_game.js"></script>
+<script>
+    const levelData = <?= json_encode($currentLevel) ?>;
+    const totalLevels = <?= $totalLevels ?>;
+</script>
 
-</body>
-</html>
+<script src="<?= $base_url ?>/public/JS/math_angle_game.js?v=<?= time() ?>"></script>
+
+<script>
+    // Intro modal handling
+    document.addEventListener('DOMContentLoaded', () => {
+        const introModal = document.getElementById('intro-modal');
+        const startGameButton = document.getElementById('startGameButton');
+        const giveUpButton = document.getElementById('giveUpButton');
+        const backButton = document.getElementById('back-btn');
+        
+        if (startGameButton) {
+            startGameButton.addEventListener('click', () => {
+                introModal.classList.remove('active');
+            });
+        }
+        
+        if (giveUpButton) {
+            giveUpButton.addEventListener('click', () => {
+                window.location.href = '<?= $base_url ?>/views/main_lesson.php';
+            });
+        }
+        
+        if (backButton) {
+            backButton.addEventListener('click', () => {
+                window.location.href = '<?= $base_url ?>/views/lessons/math.php';
+            });
+        }
+    });
+</script>
+
+<?php require_once __DIR__ . '/../template/footer.php'; ?>
