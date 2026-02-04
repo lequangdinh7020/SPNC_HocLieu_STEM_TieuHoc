@@ -75,13 +75,13 @@ require_once __DIR__ . '/../template/header.php';
             <div id="desk-area">
                 <img src="<?= $base_url ?>/public/images/computer_parts/desk_outline.png" class="desk-bg-outline" alt="Bàn máy tính">
 
-                <div class="dropzone" data-target="monitor"    style="top: 18%; left: 23.5%; width: 38.1%; height: 45.9%;"></div>
-                <div class="dropzone" data-target="case"       style="top: 22.5%; left: 64.5%; width: 20%; height: 41%;"></div>
-                <div class="dropzone" data-target="printer"    style="top: 41.5%; left: 3.2%;  width: 20%; height: 22.3%;"></div>
-                <div class="dropzone" data-target="keyboard"   style="top: 68.85%; left: 22.2%; width: 42.1%; height: 17%;"></div>
-                <div class="dropzone" data-target="mouse"      style="top: 69.4%; left: 66%; width: 6.5%;  height: 16.8%;"></div>
-                <div class="dropzone" data-target="speaker"    style="top: 43%; left: 86.4%; width: 10.2%;  height: 20.2%;"></div>
-                <div class="dropzone" data-target="microphone" style="top: 69%; left: 74.6%; width: 8.4%;  height: 17.8%;"></div>
+                <div class="dropzone" data-target="monitor"    style="top: 13.3%; left: 27.5%; width: 32.1%; height: 53.5%;"></div>
+                <div class="dropzone" data-target="case"       style="top: 18.5%; left: 62%; width: 17.1%; height: 47.5%;"></div>
+                <div class="dropzone" data-target="printer"    style="top: 39.5%; left: 10.7%;  width: 16.5%; height: 26.7%;"></div>
+                <div class="dropzone" data-target="keyboard"   style="top: 71.85%; left: 26.7%; width: 35.4%; height: 19.3%;"></div>
+                <div class="dropzone" data-target="mouse"      style="top: 72.7%; left: 63.7%; width: 5.2%;  height: 18.8%;"></div>
+                <div class="dropzone" data-target="speaker"    style="top: 42.7%; left: 80.4%; width: 9.1%;  height: 23.2%;"></div>
+                <div class="dropzone" data-target="microphone" style="top: 72%; left: 70.6%; width: 7.3%;  height: 21%;"></div>
             </div>
         </div>
     </div>
