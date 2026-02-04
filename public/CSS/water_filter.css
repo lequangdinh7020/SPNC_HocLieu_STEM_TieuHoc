@@ -1,168 +1,597 @@
-/* Override body background từ home.css */
+:root {
+    --primary-blue: #4a6fa5;
+    --primary-blue-light: #6b8cbc;
+    --primary-blue-pastel: #e8f0fe;
+    --secondary-blue: #166088;
+    --accent-blue: #17a2b8;
+    --correct-color: #28a745;
+    --wrong-color: #dc3545;
+    --neutral-gray: #f8f9fa;
+    --text-dark: #343a40;
+    --text-light: #6c757d;
+    --white: #ffffff;
+    --shadow-light: rgba(0, 0, 0, 0.1);
+    --shadow-medium: rgba(0, 0, 0, 0.15);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Quicksand', sans-serif;
+}
+
 body {
-    background: #ffffff !important;
-    background-color: #ffffff !important;
+    background-color: #f9fbfd;
+    color: var(--text-dark);
+    line-height: 1.6;
 }
 
-/* Container chính */
-.filter-game {
-    width: 95%; max-width: 1000px; margin: 110px auto 20px auto;
-    background: #e0f2fe;
-    padding: 20px; border-radius: 15px;
-    font-family: 'Segoe UI', sans-serif;
+.game-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Modal Overlay for Intro */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background-color: var(--white);
+    border-radius: 16px;
+    width: 90%;
+    max-width: 600px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    animation: modalAppear 0.5s ease-out;
+}
+
+@keyframes modalAppear {
+    0% { transform: translateY(-30px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+.intro-avatar {
+    flex-shrink: 0;
+}
+
+.intro-avatar-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 5px solid var(--primary-blue-pastel);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.intro-text-content {
+    flex-grow: 1;
+}
+
+.intro-text-content h3 {
+    color: var(--secondary-blue);
+    margin-bottom: 15px;
+    font-size: 1.8rem;
+}
+
+.intro-text-content p {
+    color: var(--text-light);
+    margin-bottom: 25px;
+    font-size: 1.1rem;
+    line-height: 1.7;
+}
+
+.start-btn {
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    color: white;
     border: none;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    min-height: 600px;
-    display: flex; flex-direction: column;
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(26, 115, 232, 0.3);
 }
 
-.header-game h1 { color: #0284c7; margin: 0; text-align: center; }
+.start-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(26, 115, 232, 0.4);
+}
 
-.game-area {
+.game-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--primary-blue-pastel);
+}
+
+.game-header h1 {
+    color: var(--secondary-blue);
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+}
+
+.game-subtitle {
+    color: var(--primary-blue-light);
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.game-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.stat-box {
+    background-color: var(--white);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 5px 15px var(--shadow-light);
+    transition: transform 0.3s ease;
+    border-top: 5px solid transparent;
+}
+
+.stat-box:hover {
+    transform: translateY(-5px);
+}
+
+.stat-box.remaining {
+    border-top-color: var(--primary-blue);
+}
+
+.stat-box.timer {
+    border-top-color: var(--accent-blue);
+}
+
+.stat-box.progress {
+    border-top-color: var(--primary-blue-light);
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-bottom: 8px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-value {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.stat-box.remaining .stat-value {
+    color: var(--primary-blue);
+}
+
+.stat-box.timer .stat-value {
+    color: var(--accent-blue);
+}
+
+.stat-box.progress .stat-value {
+    color: var(--primary-blue-light);
+}
+
+.game-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 30px;
+    justify-content: center;
+}
+
+.control-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px var(--shadow-light);
+}
+
+.control-btn i {
+    font-size: 1.1rem;
+}
+
+.control-btn.give-up {
+    background-color: #ff6b6b;
+    color: white;
+}
+
+.control-btn.reset {
+    background-color: #ffd166;
+    color: var(--text-dark);
+}
+
+.control-btn.complete {
+    background-color: var(--correct-color);
+    color: white;
+}
+
+.control-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.game-instructions {
+    margin-bottom: 30px;
+}
+
+.instruction-box {
+    background-color: var(--primary-blue-pastel);
+    border-left: 5px solid var(--primary-blue);
+    padding: 20px;
+    border-radius: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.instruction-box i {
+    color: var(--primary-blue);
+    font-size: 1.5rem;
+    margin-top: 3px;
+}
+
+.instruction-box span {
+    color: var(--text-dark);
+    font-size: 1.05rem;
+}
+
+/* Game Container */
+.game-container-filter {
+    background-color: var(--white);
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: 0 8px 25px var(--shadow-light);
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    gap: 40px;
-    margin-top: 40px;
+    gap: 60px;
+    min-height: 600px;
     flex-wrap: wrap;
 }
 
-/* --- 1. KHO VẬT LIỆU --- */
+/* --- KHO VẬT LIỆU --- */
 .materials-panel {
-    background: white; padding: 20px; border-radius: 15px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    background: white; 
+    padding: 25px; 
+    border-radius: 15px;
+    box-shadow: 0 5px 15px var(--shadow-light);
     text-align: center;
-    width: 150px;
+    min-width: 180px;
 }
+
+.materials-panel h3 {
+    color: var(--secondary-blue);
+    margin-bottom: 20px;
+    font-size: 1.3rem;
+}
+
 .materials-grid {
-    display: flex; flex-direction: column; gap: 15px; margin-top: 15px;
+    display: grid; 
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
 }
 
 .material-item {
     cursor: grab;
-    transition: transform 0.2s;
-    display: flex; flex-direction: column; align-items: center;
-    padding: 10px; border-radius: 10px; border: 2px solid transparent;
+    transition: all 0.3s;
+    display: flex; 
+    flex-direction: column; 
+    align-items: center;
+    padding: 12px; 
+    border-radius: 12px; 
+    border: 2px solid #e9ecef;
+    background: var(--neutral-gray);
 }
-.material-item:hover { transform: scale(1.05); background: #f0f9ff; border-color: #3b82f6; }
+
+.material-item:hover { 
+    transform: scale(1.05); 
+    background: var(--primary-blue-pastel); 
+    border-color: var(--primary-blue); 
+}
 
 /* Icon tròn mô phỏng vật liệu */
 .mat-icon {
-    width: 60px; height: 60px; border-radius: 50%;
-    background-size: cover; background-position: center;
-    border: 2px solid #ddd;
-    margin-bottom: 5px;
+    width: 60px; 
+    height: 60px; 
+    border-radius: 50%;
+    background-size: cover; 
+    background-position: center;
+    border: 3px solid #ddd;
+    margin-bottom: 8px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
 }
+
+.material-item span {
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
 /* Màu nền fallback nếu ảnh lỗi */
 .mat-gravel .mat-icon { background-color: #78716c; }
 .mat-sand .mat-icon { background-color: #fcd34d; }
 .mat-charcoal .mat-icon { background-color: #333; }
 .mat-cotton .mat-icon { background-color: #fff; }
 
-.hint-text { font-size: 0.9em; color: #64748b; margin-top: 10px; font-style: italic; }
 
-
-/* --- 2. HỆ THỐNG CHAI --- */
+/* --- HỆ THỐNG CHAI --- */
 .bottle-system {
     position: relative;
-    width: 200px; height: 450px;
-    display: flex; flex-direction: column; align-items: center;
+    width: 200px; 
+    height: 500px;
+    display: flex; 
+    flex-direction: column; 
+    align-items: center;
 }
 
 /* Cái chai */
 .bottle {
-    width: 100%; height: 300px;
-    border: 4px solid #3b82f6; border-top: none; /* Viền xanh dương */
-    border-radius: 0 0 30px 30px; /* Bo tròn đáy */
-    background: rgba(255, 255, 255, 0.6); /* Trong suốt */
+    width: 100%; 
+    height: 300px;
+    border: 4px solid #3b82f6; 
+    border-top: none;
+    border-radius: 0 0 30px 30px;
+    background: rgba(255, 255, 255, 0.6);
     position: relative;
     overflow: hidden;
-    /* Flex đảo ngược để xếp từ dưới lên */
-    display: flex; flex-direction: column-reverse; 
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    display: flex; 
+    flex-direction: column-reverse; 
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
     z-index: 10;
 }
 
 /* Cổ chai */
 .bottle-neck {
-    width: 50px; height: 30px;
+    width: 50px; 
+    height: 30px;
     background: #3b82f6;
     border-radius: 0 0 8px 8px;
     margin-bottom: 20px;
     z-index: 10;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
 }
 
 /* Các lớp bên trong chai */
 .layer {
-    width: 100%; height: 25%; /* Chia đều 4 phần */
-    display: flex; align-items: center; justify-content: center;
-    color: white; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-    background-size: cover; background-position: center;
+    width: 100%; 
+    height: 25%;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    color: white; 
+    font-weight: bold; 
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    background-size: cover; 
+    background-position: center;
     animation: dropIn 0.3s ease-out;
     position: relative;
 }
-@keyframes dropIn { from { height: 0; opacity: 0; } to { height: 25%; opacity: 1; } }
+
+@keyframes dropIn { 
+    from { height: 0; opacity: 0; } 
+    to { height: 25%; opacity: 1; } 
+}
 
 /* Placeholder khi chai rỗng */
 .layer-placeholder {
-    position: absolute; top: 50%; width: 100%; text-align: center;
-    color: #94a3b8; pointer-events: none;
+    position: absolute; 
+    top: 50%; 
+    width: 100%; 
+    text-align: center;
+    color: #94a3b8; 
+    pointer-events: none;
+    transform: translateY(-50%);
+    font-style: italic;
 }
 
 /* Cốc hứng */
 .beaker {
-    width: 140px; height: 100px;
-    border: 3px solid #94a3b8; border-top: none;
+    width: 140px; 
+    height: 100px;
+    border: 3px solid #94a3b8; 
+    border-top: none;
     background: rgba(255,255,255,0.4);
     border-radius: 0 0 15px 15px;
-    position: relative; overflow: hidden;
+    position: relative; 
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
+
 .beaker-water {
-    width: 100%; height: 0%;
-    background: #854d0e; /* Màu nâu mặc định */
-    position: absolute; bottom: 0;
+    width: 100%; 
+    height: 0%;
+    background: #854d0e;
+    position: absolute; 
+    bottom: 0;
     transition: height 2s ease-out, background-color 1s;
 }
 
-/* --- 3. HIỆU ỨNG NƯỚC RƠI --- */
+/* --- HIỆU ỨNG NƯỚC RƠI --- */
 .water-container {
-    position: absolute; top: -50px; left: 0; width: 100%; height: 100%;
-    pointer-events: none; z-index: 5; /* Nước nằm sau chai một chút */
+    position: absolute; 
+    top: -50px; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
+    pointer-events: none; 
+    z-index: 5;
 }
+
 .water-drop {
-    position: absolute; width: 12px; height: 12px; border-radius: 50%;
-    background: #854d0e; /* Nâu */
-    left: 50%; top: -20px; opacity: 0;
+    position: absolute; 
+    width: 12px; 
+    height: 12px; 
+    border-radius: 50%;
+    background: #854d0e;
+    left: 50%; 
+    top: -20px; 
+    opacity: 0;
 }
+
 @keyframes fall {
     0% { transform: translateY(0); opacity: 1; }
     100% { transform: translateY(400px); opacity: 0; }
 }
-.clean-water { background-color: #3b82f6 !important; } /* Xanh dương */
 
-
-/* --- 4. CONTROLS --- */
-.controls-panel {
-    display: flex; flex-direction: column; gap: 15px; justify-content: center;
+.clean-water { 
+    background-color: #3b82f6 !important; 
 }
-.game-btn {
-    padding: 12px 25px; border: none; border-radius: 50px;
-    font-weight: bold; color: white; cursor: pointer;
-    font-size: 1em; box-shadow: 0 4px 0 rgba(0,0,0,0.2);
-    transition: transform 0.1s;
-}
-.game-btn:active { transform: translateY(2px); box-shadow: none; }
-.run { background: #2563eb; }
-.run:hover { background: #1d4ed8; }
-.reset { background: #ef4444; }
-.reset:hover { background: #dc2626; }
 
-/* Modal giữ nguyên style cũ cho đẹp */
+
+/* --- MODAL --- */
 .modal {
-    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 100;
+    display: none; 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
+    background: rgba(0,0,0,0.7); 
+    justify-content: center; 
+    align-items: center; 
+    z-index: 100;
 }
-.modal-content {
-    background: white; padding: 30px; border-radius: 20px; text-align: center;
-    border: 4px solid #3b82f6; max-width: 400px;
+
+.modal .modal-content.result-content {
+    background: white; 
+    padding: 35px; 
+    border-radius: 20px; 
+    text-align: center;
+    border: 4px solid #3b82f6; 
+    max-width: 500px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.modal .modal-content.result-content h2 {
+    color: #2980b9;
+    font-size: 2em;
+    margin: 0 0 15px 0;
+}
+
+.modal .modal-content.result-content p {
+    color: #2c3e50;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+#science-explanation {
+    background: #eaf2f8;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 20px 0;
+    border-left: 5px solid #3b82f6;
+    text-align: left;
+}
+
+/* Game buttons */
+.game-btn {
+    padding: 12px 28px; 
+    border: none; 
+    border-radius: 50px;
+    font-weight: bold; 
+    color: white; 
+    cursor: pointer;
+    font-size: 1.1em; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transition: all 0.3s;
+    background: #3498db;
+}
+
+.game-btn:hover { 
+    background: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+}
+
+.game-btn:active { 
+    transform: translateY(1px); 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .game-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .game-controls {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .control-btn {
+        width: 100%;
+        max-width: 300px;
+        justify-content: center;
+    }
+    
+    .game-container-filter {
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .modal-content {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .intro-avatar-img {
+        width: 90px;
+        height: 90px;
+    }
 }
