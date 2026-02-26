@@ -5,7 +5,7 @@ $skill_trees = [
         'name' => 'Khoa học',
         'color' => '#4CAF50',
         'gradient' => 'linear-gradient(135deg, #2d7a3e 0%, #4a9d5f 100%)',
-        'icon' => '🔬',
+        'icon' => '/SPNC_HocLieu_STEM_TieuHoc/public/images/logoSubject/logoScience.png',
         'description' => 'Khám phá thế giới tự nhiên kỳ diệu',
         'page' => 'science', 
         'skills' => [
@@ -44,7 +44,7 @@ $skill_trees = [
         'name' => 'Công nghệ',
         'color' => '#2196F3',
         'gradient' => 'linear-gradient(135deg, #0d5a7d 0%, #1a7db0 100%)',
-        'icon' => '💻',
+        'icon' => '/SPNC_HocLieu_STEM_TieuHoc/public/images/logoSubject/logoTechnology.png',
         'description' => 'Làm chủ công nghệ trong thời đại số',
         'page' => 'technology', 
         'skills' => [
@@ -81,7 +81,7 @@ $skill_trees = [
         'name' => 'Kỹ thuật',
         'color' => '#FF9800',
         'gradient' => 'linear-gradient(135deg, #b8620e 0%, #d9792e 100%)',
-        'icon' => '⚙️',
+        'icon' => '/SPNC_HocLieu_STEM_TieuHoc/public/images/logoSubject/logoEngineering.png',
         'description' => 'Sáng tạo và xây dựng những điều tuyệt vời',
         'page' => 'engineering', 
         'skills' => [
@@ -118,7 +118,7 @@ $skill_trees = [
         'name' => 'Toán học',
         'color' => '#9C27B0',
         'gradient' => 'linear-gradient(135deg, #5a1f72 0%, #7a389a 100%)',
-        'icon' => '🔢',
+        'icon' => '/SPNC_HocLieu_STEM_TieuHoc/public/images/logoSubject/logoMath.png',
         'description' => 'Khám phá vẻ đẹp của những con số',
         'page' => 'math', 
         'skills' => [
@@ -320,7 +320,13 @@ require_once './template/header.php';
                          data-page-url="./lessons/<?php echo $subject['page']; ?>.php">
                         <div class="subject-card-header" style="background: <?php echo $subject['gradient']; ?>">
                             <div class="subject-main-info">
-                                <div class="subject-icon"><?php echo $subject['icon']; ?></div>
+                                <div class="subject-icon">
+                                    <?php if (strpos($subject['icon'], '/') !== false || strpos($subject['icon'], '.') !== false): ?>
+                                        <img src="<?php echo $subject['icon']; ?>" alt="<?php echo $subject['name']; ?>" style="width: 100%; height: 100%; object-fit: contain;">
+                                    <?php else: ?>
+                                        <?php echo $subject['icon']; ?>
+                                    <?php endif; ?>
+                                </div>
                                 <div class="subject-title">
                                     <h3><?php echo $subject['name']; ?></h3>
                                     <p><?php echo $subject['description']; ?></p>
