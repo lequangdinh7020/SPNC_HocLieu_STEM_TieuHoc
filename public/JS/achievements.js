@@ -1,11 +1,11 @@
-const basePath = window.location.origin + '/SPNC_HocLieu_STEM_TieuHoc/public/images/achievements';
+const basePath = window.location.origin + '/SPNC_HocLieu_STEM_TieuHoc/public/images/certificate';
 
 // Base certificate templates (static artwork + titles)
 const baseCertificates = [
-    { title: "CHỨNG NHẬN", subtitle: "HOÀN THÀNH", topic: "Khoa học", background: `${basePath}/science-cert.jpg`, signatures: [{ name: "HANNAH MORALES", title: "HIỆU TRƯỞNG" }, { name: "LARS PETERS", title: "GIÁO VIÊN" }] },
-    { title: "CHỨNG NHẬN", subtitle: "HOÀN THÀNH XUẤT SẮC", topic: "Công nghệ", background: `${basePath}/tech-cert.jpg`, signatures: [{ name: "HANNAH MORALES", title: "HIỆU TRƯỞNG" }, { name: "LARS PETERS", title: "GIÁO VIÊN" }] },
-    { title: "CHỨNG NHẬN", subtitle: "NHÀ SÁNG TẠO TÀI NĂNG", topic: "Kỹ thuật", background: `${basePath}/engineering-cert.jpg`, signatures: [{ name: "HANNAH MORALES", title: "HIỆU TRƯỞNG" }, { name: "LARS PETERS", title: "GIÁO VIÊN" }] },
-    { title: "CHỨNG NHẬN", subtitle: "NHÀ TOÁN HỌC TƯƠNG LAI", topic: "Toán học", background: `${basePath}/math-cert.jpg`, signatures: [{ name: "HANNAH MORALES", title: "HIỆU TRƯỞNG" }, { name: "LARS PETERS", title: "GIÁO VIÊN" }] }
+    { title: "CHỨNG NHẬN", subtitle: "HOÀN THÀNH", topic: "Khoa học", background: `${basePath}/certificateScience.png`, signatures: [{ name: "HANNAH MORALES", title: "HIỆU TRƯỞNG" }, { name: "LARS PETERS", title: "GIÁO VIÊN" }] },
+    { title: "CHỨNG NHẬN", subtitle: "HOÀN THÀNH XUẤT SẮC", topic: "Công nghệ", background: `${basePath}/certificateTechnology.png`, signatures: [{ name: "HANNAH MORALES", title: "HIỆU TRƯỞNG" }, { name: "LARS PETERS", title: "GIÁO VIÊN" }] },
+    { title: "CHỨNG NHẬN", subtitle: "NHÀ SÁNG TẠO TÀI NĂNG", topic: "Kỹ thuật", background: `${basePath}/certificateEngineering.png`, signatures: [{ name: "HANNAH MORALES", title: "HIỆU TRƯỞNG" }, { name: "LARS PETERS", title: "GIÁO VIÊN" }] },
+    { title: "CHỨNG NHẬN", subtitle: "NHÀ TOÁN HỌC TƯƠNG LAI", topic: "Toán học", background: `${basePath}/certificateMath.png`, signatures: [{ name: "HANNAH MORALES", title: "HIỆU TRƯỞNG" }, { name: "LARS PETERS", title: "GIÁO VIÊN" }] }
 ];
 
 // Will be populated from server and combined with baseCertificates
@@ -52,19 +52,8 @@ async function updateCertificate() {
     certificateElement.style.removeProperty('background-repeat');
 
     certificateElement.innerHTML = `
-        <div class="certificate-content" style="position:relative; z-index:2; background:transparent;">
-            <div class="certificate-header">
-                <h1 class="certificate-main-title">${cert.title}</h1>
-                <div class="certificate-subtitle">${cert.subtitle}</div>
-            </div>
-            <div class="certificate-body">
-                <p class="awarded-to">ĐÃ ĐƯỢC TRAO CHO</p>
-                <h3 class="student-name">${cert.student}</h3>
-                <p class="certificate-topic">Chủ đề: ${cert.topic}</p>
-            </div>
-            <div class="certificate-signatures">
-                ${cert.signatures.map(sig => `<div class="signature-column"><p class="signature-name">${sig.name}</p><p class="signature-title">${sig.title}</p></div>`).join('')}
-            </div>
+        <div class="certificate-content" style="position:absolute; z-index:2; background:transparent; top:50%; left:50%; transform:translate(-50%, -50%); width:90%; display:flex; align-items:center; justify-content:center;">
+            <h3 class="student-name">${cert.student}</h3>
         </div>
     `;
 
@@ -113,7 +102,7 @@ async function downloadCertificate() {
         const objUrl = URL.createObjectURL(blob);
         a.href = objUrl;
         const safeTopic = cert.topic.replace(/[^a-z0-9\-]/gi, '_');
-        a.download = `certificate_${safeTopic}.jpg`;
+        a.download = `certificate_${safeTopic}.png`;
         document.body.appendChild(a);
         a.click();
         a.remove();

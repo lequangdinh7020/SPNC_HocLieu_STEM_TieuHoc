@@ -1,10 +1,8 @@
-const CACHE_NAME = 'stem-app-cache-v1';
+const CACHE_NAME = 'stem-app-cache-v2';
 // Danh sách các file cần lưu vào bộ nhớ đệm (Cache)
 // Bạn hãy kiểm tra lại tên file trong thư mục public/CSS và public/JS của bạn
 
 const urlsToCache = [
-  '/SPNC_HocLieu_STEM_TieuHoc/', 
-  '/SPNC_HocLieu_STEM_TieuHoc/index.php',
   '/SPNC_HocLieu_STEM_TieuHoc/public/CSS/style.css',     
   '/SPNC_HocLieu_STEM_TieuHoc/public/JS/script.js',      
   '/SPNC_HocLieu_STEM_TieuHoc/public/images/logo.png'
@@ -23,6 +21,12 @@ self.addEventListener('install', (event) => {
 
 // 2. Lấy dữ liệu: Ưu tiên lấy từ Cache, nếu không có mới tải từ mạng
 self.addEventListener('fetch', (event) => {
+  // Không cache các file PHP (động)
+  if (event.request.url.includes('.php')) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+  
   event.respondWith(
     caches.match(event.request)
       .then((response) => {

@@ -101,46 +101,100 @@ document.addEventListener('DOMContentLoaded', function() {
         const fullname = document.getElementById('fullname').value.trim();
         const username = document.getElementById('username').value.trim();
         const email = document.getElementById('email').value.trim();
+        const classInput = document.getElementById('class').value.trim();
+        const phone = document.getElementById('phone').value.trim();
         const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
         const agreeTerms = document.querySelector('input[name="agree_terms"]');
-        
-        let isValid = true;
         
         clearAllErrors();
         
+        // Kiểm tra theo thứ tự từ trên xuống - dừng ở lỗi đầu tiên
+        
+        // 1. Kiểm tra Họ và tên
+        if (!fullname) {
+            showFieldError('fullname', 'Vui lòng nhập họ và tên');
+            return false;
+        }
+        
         if (fullname.length < 2) {
             showFieldError('fullname', 'Họ tên phải có ít nhất 2 ký tự');
-            isValid = false;
+            return false;
+        }
+        
+        // 2. Kiểm tra Tên đăng nhập
+        if (!username) {
+            showFieldError('username', 'Vui lòng nhập tên đăng nhập');
+            return false;
         }
         
         if (username.length < 3) {
             showFieldError('username', 'Tên đăng nhập phải có ít nhất 3 ký tự');
-            isValid = false;
-        } else if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+            return false;
+        }
+        
+        if (!/^[a-zA-Z0-9_]+$/.test(username)) {
             showFieldError('username', 'Tên đăng nhập chỉ được chứa chữ cái, số và dấu gạch dưới');
-            isValid = false;
+            return false;
+        }
+        
+        // 3. Kiểm tra Email
+        if (!email) {
+            showFieldError('email', 'Vui lòng nhập email');
+            return false;
         }
         
         if (!isValidEmail(email)) {
             showFieldError('email', 'Email không hợp lệ');
-            isValid = false;
+            return false;
+        }
+        
+        // 4. Kiểm tra Lớp
+        if (!classInput) {
+            showFieldError('class', 'Vui lòng nhập lớp');
+            return false;
+        }
+        
+        // 5. Kiểm tra Số điện thoại
+        if (!phone) {
+            showFieldError('phone', 'Vui lòng nhập số điện thoại');
+            return false;
+        }
+        
+        if (!/^\d{10}$/.test(phone)) {
+            showFieldError('phone', 'Số điện thoại phải đúng 10 chữ số');
+            return false;
+        }
+        
+        // 6. Kiểm tra Mật khẩu
+        if (!password) {
+            showFieldError('password', 'Vui lòng nhập mật khẩu');
+            return false;
         }
         
         if (password.length < 6) {
             showFieldError('password', 'Mật khẩu phải có ít nhất 6 ký tự');
-            isValid = false;
+            return false;
         }
         
-        if (!validatePasswordMatch()) {
-            isValid = false;
+        // 7. Kiểm tra Xác nhận mật khẩu
+        if (!confirmPassword) {
+            showFieldError('confirm_password', 'Vui lòng xác nhận mật khẩu');
+            return false;
         }
         
+        if (password !== confirmPassword) {
+            showFieldError('confirm_password', 'Mật khẩu xác nhận không khớp');
+            return false;
+        }
+        
+        // 8. Kiểm tra Điều khoản sử dụng
         if (!agreeTerms.checked) {
             showFormError('Vui lòng đồng ý với điều khoản sử dụng');
-            isValid = false;
+            return false;
         }
         
-        return isValid;
+        return true;
     }
     
     function isValidEmail(email) {
@@ -213,7 +267,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (errorAlert) errorAlert.remove();
     }
     
-    const inputs = document.querySelectorAll('input[type="text"], input[type="email"]');
+    const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"]');
     inputs.forEach(input => {
         input.addEventListener('blur', function() {
             const fieldId = this.id;
@@ -245,8 +299,29 @@ document.addEventListener('DOMContentLoaded', function() {
                         clearFieldError(fieldId);
                     }
                     break;
+                    
+                case 'class':
+                    if (value.length > 0) {
+                        clearFieldError(fieldId);
+                    }
+                    break;
+                    
+                case 'phone':
+                    if (value.length > 0 && !/^\d{10}$/.test(value)) {
+                        showFieldError(fieldId, 'Số điện thoại phải đúng 10 chữ số');
+                    } else if (value.length > 0) {
+                        clearFieldError(fieldId);
+                    }
+                    break;
             }
         });
+        
+        // Real-time validation for phone (chỉ cho phép nhập số)
+        if (input.id === 'phone') {
+            input.addEventListener('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '').substring(0, 10);
+            });
+        }
     });
     if (confirmPasswordInput) {
         confirmPasswordInput.addEventListener('blur', function() {

@@ -12,37 +12,71 @@ try {
     $authController = new AuthController();
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $fullname = trim($_POST['fullname']);
-    $username = trim($_POST['username']);
-        $email = trim($_POST['email']);
-        $password = $_POST['password'];
-        $confirm_password = $_POST['confirm_password'];
-        $class = isset($_POST['class']) ? trim($_POST['class']) : null;
-        $phone = isset($_POST['phone']) ? trim($_POST['phone']) : null;
+        $fullname = trim($_POST['fullname'] ?? '');
+        $username = trim($_POST['username'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+        $class = trim($_POST['class'] ?? '');
+        $phone = trim($_POST['phone'] ?? '');
+        $password = $_POST['password'] ?? '';
+        $confirm_password = $_POST['confirm_password'] ?? '';
         
         $error = '';
-        if (empty($fullname) || empty($username) || empty($email) || empty($password)) {
-            $error = "Vui lòng điền đầy đủ thông tin bắt buộc";
+        
+        // Kiểm tra theo thứ tự từ trên xuống
+        // 1. Kiểm tra Họ và tên
+        if (empty($fullname)) {
+            $error = "Vui lòng nhập họ và tên";
+        }
+        // 2. Kiểm tra Tên đăng nhập
+        elseif (empty($username)) {
+            $error = "Vui lòng nhập tên đăng nhập";
         } elseif (strlen($username) < 3) {
             $error = "Tên đăng nhập phải có ít nhất 3 ký tự";
-        } elseif ($password !== $confirm_password) {
-            $error = "Mật khẩu xác nhận không khớp";
-        } elseif (strlen($password) < 6) {
-            $error = "Mật khẩu phải có ít nhất 6 ký tự";
+        } elseif (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
+            $error = "Tên đăng nhập chỉ được chứa chữ cái, số và dấu gạch dưới";
+        }
+        // 3. Kiểm tra Email
+        elseif (empty($email)) {
+            $error = "Vui lòng nhập email";
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $error = "Email không hợp lệ";
         }
+        // 4. Kiểm tra Lớp
+        elseif (empty($class)) {
+            $error = "Vui lòng nhập lớp";
+        }
+        // 5. Kiểm tra Số điện thoại
+        elseif (empty($phone)) {
+            $error = "Vui lòng nhập số điện thoại";
+        } elseif (!preg_match('/^\d{10}$/', $phone)) {
+            $error = "Số điện thoại phải đúng 10 chữ số";
+        }
+        // 6. Kiểm tra Mật khẩu
+        elseif (empty($password)) {
+            $error = "Vui lòng nhập mật khẩu";
+        } elseif (strlen($password) < 6) {
+            $error = "Mật khẩu phải có ít nhất 6 ký tự";
+        }
+        // 7. Kiểm tra Xác nhận mật khẩu
+        elseif (empty($confirm_password)) {
+            $error = "Vui lòng xác nhận mật khẩu";
+        } elseif ($password !== $confirm_password) {
+            $error = "Mật khẩu xác nhận không khớp";
+        }
         
-           // Ensure user agreed to terms on server-side as well
-           $agree = isset($_POST['agree_terms']) && $_POST['agree_terms'] ? true : false;
+        // 8. Kiểm tra Điều khoản sử dụng
+        $agree = isset($_POST['agree_terms']) && $_POST['agree_terms'] ? true : false;
+        if (empty($error) && !$agree) {
+            $error = "Vui lòng đồng ý với điều khoản sử dụng";
+        }
 
-           if (empty($error)) {
-               if ($authController->register($fullname, $username, $email, $password, $class, $phone, $agree)) {
-        $_SESSION['success'] = "Đăng ký thành công! Một mã xác thực đã được gửi tới email của bạn. Vui lòng kiểm tra hộp thư và xác thực trước khi đăng nhập.";
-        header('Location: signin.php');
-        exit;
+        if (empty($error)) {
+            if ($authController->register($fullname, $username, $email, $password, $class, $phone, $agree)) {
+                $_SESSION['success'] = "Đăng ký thành công! Một mã xác thực đã được gửi tới email của bạn. Vui lòng kiểm tra hộp thư và xác thực trước khi đăng nhập.";
+                header('Location: signin.php');
+                exit;
             } else {
-        $error = "Tên đăng nhập hoặc email đã tồn tại";
+                $error = "Tên đăng nhập hoặc email đã tồn tại";
             }
         }
     }
@@ -155,8 +189,8 @@ try {
                         <i class="fas fa-graduation-cap"></i>
                         Lớp
                     </label>
-                    <input type="text" id="class" name="class" 
-                           placeholder="Ví dụ: 10A1, 11B2..."
+                    <input type="text" id="class" name="class" required
+                           placeholder="Ví dụ: 4A1, 5B2..."
                            value="<?php echo isset($_POST['class']) ? htmlspecialchars($_POST['class']) : ''; ?>">
                 </div>
 
@@ -165,8 +199,8 @@ try {
                         <i class="fas fa-phone"></i>
                         Số điện thoại
                     </label>
-                    <input type="tel" id="phone" name="phone" 
-                           placeholder="Nhập số điện thoại (tùy chọn)"
+                    <input type="tel" id="phone" name="phone" required
+                           placeholder="Nhập số điện thoại (10 chữ số)"
                            value="<?php echo isset($_POST['phone']) ? htmlspecialchars($_POST['phone']) : ''; ?>">
                 </div>
 

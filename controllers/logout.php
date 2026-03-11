@@ -28,11 +28,20 @@ if (ini_get("session.use_cookies")) {
         $params["path"], $params["domain"],
         $params["secure"], $params["httponly"]
     );
+    
+    // Unset cookie ở $_COOKIE để ngăn việc khôi phục session
+    unset($_COOKIE[session_name()]);
 }
 
 session_destroy();
 
 error_log("Session destroyed, redirecting to site index");
+
+// Xóa remember token cookie
+if (isset($_COOKIE['remember'])) {
+    setcookie('remember', '', time() - 42000, '/');
+    unset($_COOKIE['remember']);
+}
 
 // Chuyển hướng về trang index của dự án
 header("Location: " . $base_url . "/index.php");
