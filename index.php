@@ -286,8 +286,87 @@ switch ($route) {
             echo $auth->resetPassword();
         }
         break;
-    
-    // --- ROUTE CHO TRANG CHỦ ---
+
+    // ─── Certificate issuance (AJAX POST) ────────────────────────────────────
+    case '/api/issue-certificate':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            header('Content-Type: application/json; charset=utf-8');
+            if (empty($_SESSION['user_id'])) {
+                http_response_code(401);
+                echo json_encode(['success' => false, 'message' => 'Bạn cần đăng nhập để nhận chứng chỉ']);
+                exit;
+            }
+            $rawInput = file_get_contents('php://input');
+            $input    = json_decode($rawInput, true);
+            $topicId  = isset($input['topic_id']) ? (int)$input['topic_id'] : 0;
+            if ($topicId <= 0) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'message' => 'Chủ đề không hợp lệ']);
+                exit;
+            }
+            try {
+                $certDb   = new Database();
+                $certConn = $certDb->getConnection();
+                $userId   = (int)$_SESSION['user_id'];
+
+                // Verify topic exists
+                $tChk = $certConn->prepare("SELECT id FROM stem_fields WHERE id = :tid LIMIT 1");
+                $tChk->execute([':tid' => $topicId]);
+                if (!$tChk->fetch()) {
+                    http_response_code(404);
+                    echo json_encode(['success' => false, 'message' => 'Chủ đề không tồn tại']);
+                    exit;
+                }
+
+                // Check completion ≥ 90 %
+                $cStmt = $certConn->prepare("
+                    SELECT COUNT(DISTINCT g.id) AS total_games,
+                    COALESCE(SUM(CASE WHEN us.best_score IS NOT NULL
+                        AND (g.passing_score IS NULL OR us.best_score >= g.passing_score)
+                        THEN 1 ELSE 0 END), 0) AS completed_games
+                    FROM games g
+                    LEFT JOIN (
+                        SELECT game_id, MAX(score_percentage) AS best_score
+                        FROM scores WHERE user_id = :uid GROUP BY game_id
+                    ) us ON us.game_id = g.id
+                    WHERE g.topic_id = :tid
+                ");
+                $cStmt->execute([':uid' => $userId, ':tid' => $topicId]);
+                $cRow = $cStmt->fetch(PDO::FETCH_ASSOC);
+                $ttotal = $cRow ? (int)$cRow['total_games']     : 0;
+                $tdone  = $cRow ? (int)$cRow['completed_games'] : 0;
+                $tpct   = $ttotal > 0 ? (int)round(($tdone / $ttotal) * 100) : 0;
+
+                if ($tpct < 90) {
+                    $needed = max(0, (int)ceil($ttotal * 0.9) - $tdone);
+                    echo json_encode([
+                        'success' => false,
+                        'message' => "Bạn cần hoàn thành thêm {$needed} bài học nữa để nhận chứng chỉ (hiện tại {$tpct}%)"
+                    ]);
+                    exit;
+                }
+
+                // Issue (idempotent INSERT IGNORE)
+                $ins = $certConn->prepare(
+                    "INSERT IGNORE INTO certificates (user_id, topic_id, issued_at) VALUES (:uid, :tid, NOW())"
+                );
+                $ins->execute([':uid' => $userId, ':tid' => $topicId]);
+                $alreadyExisted = $ins->rowCount() === 0;
+
+                echo json_encode([
+                    'success'         => true,
+                    'already_existed' => $alreadyExisted,
+                    'message'         => $alreadyExisted
+                        ? 'Chứng nhận đã được cấp trước đó'
+                        : 'Chứng nhận đã được cấp thành công!',
+                ]);
+            } catch (Exception $e) {
+                error_log('issue_certificate error: ' . $e->getMessage());
+                http_response_code(500);
+                echo json_encode(['success' => false, 'message' => 'Lỗi hệ thống, vui lòng thử lại']);
+            }
+        }
+        break;
     case '/':
     case '/index.php':
         // Gọi hàm hiển thị trang chủ

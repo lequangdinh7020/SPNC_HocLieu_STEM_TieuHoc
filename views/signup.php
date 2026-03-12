@@ -22,10 +22,11 @@ try {
         
         $error = '';
         
-        // Kiểm tra theo thứ tự từ trên xuống
         // 1. Kiểm tra Họ và tên
         if (empty($fullname)) {
             $error = "Vui lòng nhập họ và tên";
+        } elseif (str_word_count($fullname) < 2) {
+            $error = "Họ và tên phải có ít nhất 2 từ (ví dụ: Nguyễn Văn A) để hiển thị đúng trên chứng nhận";
         }
         // 2. Kiểm tra Tên đăng nhập
         elseif (empty($username)) {

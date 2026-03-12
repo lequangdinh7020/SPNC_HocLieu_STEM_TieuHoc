@@ -109,7 +109,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         clearAllErrors();
         
-        // Kiểm tra theo thứ tự từ trên xuống - dừng ở lỗi đầu tiên
         
         // 1. Kiểm tra Họ và tên
         if (!fullname) {
@@ -117,8 +116,8 @@ document.addEventListener('DOMContentLoaded', function() {
             return false;
         }
         
-        if (fullname.length < 2) {
-            showFieldError('fullname', 'Họ tên phải có ít nhất 2 ký tự');
+        if (fullname.split(/\s+/).filter(Boolean).length < 2) {
+            showFieldError('fullname', 'Họ và tên phải có ít nhất 2 từ (ví dụ: Nguyễn Văn A) để hiển thị đúng trên chứng nhận');
             return false;
         }
         
