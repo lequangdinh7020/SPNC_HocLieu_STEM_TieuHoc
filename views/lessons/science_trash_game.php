@@ -11,9 +11,9 @@ require_once __DIR__ . '/../template/header.php';
             <img src="<?= $base_url ?>/public/images/character/tam.png" alt="Tấm" class="intro-avatar-img">
         </div>
         <div class="intro-text-content">
-            <h3>Chào bạn, mình là Tấm!</h3>
-            <p>Vậy là bạn đã học được cách phân loại rác rồi nhé. Giờ để thực hành, bạn có thể giúp mình dọn dẹp nhà được không?</p>
-            <button id="startGameButton" class="start-btn">Bắt đầu thôi!</button>
+            <h3>Cô Tấm</h3>
+            <p id="storyText">Chào các bạn nhỏ! Cô Tấm hiền lành đang rất muốn đi trẩy hội mùa xuân. Nhưng mụ dì ghẻ độc ác lại bắt Tấm phải phân loại xong đống rác trong sân vào 3 thùng: Hữu cơ, Vô cơ và Tái chế!</p>
+            <button id="nextStoryButton" class="start-btn">Tiếp theo</button>
         </div>
     </div>
 </div>

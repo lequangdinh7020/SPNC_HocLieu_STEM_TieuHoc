@@ -8,13 +8,13 @@
 <div class="modal-overlay active" id="introModal">
     <div class="intro-dialogue modal-content">
         <div class="intro-avatar">
-            <img src="<?= $base_url ?>/public/images/character/painter.png" alt="Color Mixing Character" class="intro-avatar-img">
+            <img src="<?= $base_url ?>/public/images/color/Alice.png" alt="Alice" class="intro-avatar-img">
         </div>
         <div class="intro-text-content">
-            <h3>Trò Chơi Pha Màu 🎨</h3>
-            <p>Hãy trộn các màu cơ bản để tạo ra màu đích! Thử thách khả năng quan sát màu sắc của bạn.</p>
-            <button id="startGameButton" class="start-btn">
-                <i class="fas fa-play"></i> Bắt đầu chơi
+            <h3>LỜI DẪN CHUYỆN: GIÚP ALICE NHUỘM HOA HỒNG</h3>
+            <p id="storyText">Chào các bạn nhỏ! Cô bé Alice đang bị lạc trong một mê cung khổng lồ của Nữ hoàng Đỏ ở Xứ sở Thần tiên. Để thoát ra thì Alice phải nhuộm màu cho những bông hoa hồng theo yêu cầu của Nữ Hoàng, nếu không Alice sẽ bị nhốt ở đây mãi mãi!</p>
+            <button id="nextStoryButton" class="start-btn">
+                <i class="fas fa-forward"></i> Tiếp theo
             </button>
         </div>
     </div>

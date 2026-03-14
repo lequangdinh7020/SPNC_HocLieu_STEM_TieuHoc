@@ -12,11 +12,30 @@ const totalScoreSpan = document.getElementById("totalScore");
 
 // Modal handling
 document.addEventListener('DOMContentLoaded', function() {
-    const startButton = document.getElementById('startGameButton');
+    const nextStoryButton = document.getElementById('nextStoryButton');
     const modal = document.getElementById('introModal');
+    const storyText = document.getElementById('storyText');
+    const storyDialogues = [
+        "Chào các bạn nhỏ! Cô bé Alice đang bị lạc trong một mê cung khổng lồ của Nữ hoàng Đỏ ở Xứ sở Thần tiên. Để thoát ra thì Alice phải nhuộm màu cho những bông hoa hồng theo yêu cầu của Nữ Hoàng, nếu không Alice sẽ bị nhốt ở đây mãi mãi!",
+        "Nhiệm vụ của chúng mình: Hãy lắng nghe yêu cầu của Nữ hoàng và nhanh tay pha đúng màu cho Alice!\nĐỏ + Vàng = Cam\nĐỏ + Xanh Dương = Tím\nVàng + Xanh Dương = Xanh Lá",
+        "Các họa sĩ nhí đã sẵn sàng trổ tài pha màu giúp Alice chưa? 3... 2... 1... Bắt đầu thôi!"
+    ];
+    let currentStoryIndex = 0;
     
-    if (startButton && modal) {
-        startButton.addEventListener('click', function() {
+    if (nextStoryButton && modal && storyText) {
+        nextStoryButton.addEventListener('click', function() {
+            currentStoryIndex++;
+
+            if (currentStoryIndex < storyDialogues.length) {
+                storyText.textContent = storyDialogues[currentStoryIndex];
+
+                if (currentStoryIndex === storyDialogues.length - 1) {
+                    nextStoryButton.innerHTML = '<i class="fas fa-play"></i> Bắt đầu thôi!';
+                }
+
+                return;
+            }
+
             modal.classList.remove('active');
         });
     }

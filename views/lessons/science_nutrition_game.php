@@ -60,12 +60,12 @@ shuffle($foodItems);
 <div id="intro-modal" class="modal-overlay active">
     <div class="intro-dialogue modal-content">
         <div class="intro-avatar">
-            <img src="<?= $base_url ?>/public/images/foods/cam.png" alt="Nutrition Master" class="intro-avatar-img">
+            <img src="<?= $base_url ?>/public/images/foods/Giong.png" alt="Gióng" class="intro-avatar-img">
         </div>
         <div class="intro-text-content">
-            <h3>Chào bạn! Mình là Nutrition Master!</h3>
-            <p>Chào mừng bạn đến với trò chơi "SẮP XẾP THÁP DINH DƯỠNG". Nhiệm vụ của bạn là kéo các món ăn vào đúng nhóm dinh dưỡng của chúng trên tháp. Bạn đã sẵn sàng chưa?</p>
-            <button id="startGameButton" class="start-btn">Bắt đầu thôi!</button>
+            <h3>LỜI DẪN CHUYỆN: GIÚP GIÓNG KHỎE ĐỂ RA TRẬN</h3>
+            <p id="storyText">Chào các bạn nhỏ! Giặc Ân đang tràn vào bờ cõi nước ta. Để Gióng có thể vươn vai đã biến thành một tráng sĩ khổng lồ, cưỡi ngựa sắt ra trận thì bà con cần góp nhiều gạo và cà pháo cho Gióng ăn. Nhưng chỉ ăn Cơm (tinh bột) và Cà (chất xơ) thì Gióng sẽ không đủ sức mạnh để đánh giặc lâu dài! Vì vậy chúng ta cần sắp xếp một bữa ăn cân bằng theo đúng Tháp Dinh Dưỡng cho Gióng!</p>
+            <button id="nextStoryButton" class="start-btn"><i class="fas fa-forward"></i> Tiếp theo</button>
         </div>
     </div>
 </div>

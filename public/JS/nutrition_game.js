@@ -2,10 +2,29 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Handle intro modal
     const introModal = document.getElementById('intro-modal');
-    const startGameButton = document.getElementById('startGameButton');
+    const nextStoryButton = document.getElementById('nextStoryButton');
+    const storyText = document.getElementById('storyText');
+    const storyDialogues = [
+        "Chào các bạn nhỏ! Giặc Ân đang tràn vào bờ cõi nước ta. Để Gióng có thể vươn vai đã biến thành một tráng sĩ khổng lồ, cưỡi ngựa sắt ra trận thì bà con cần góp nhiều gạo và cà pháo cho Gióng ăn. Nhưng chỉ ăn Cơm (tinh bột) và Cà (chất xơ) thì Gióng sẽ không đủ sức mạnh để đánh giặc lâu dài! Vì vậy chúng ta cần sắp xếp một bữa ăn cân bằng theo đúng Tháp Dinh Dưỡng cho Gióng!",
+        "Nhiệm vụ của chúng mình: Hãy kéo thả các món ăn dân làng mang tới vào đúng các tầng của Tháp Dinh Dưỡng nhé!\nTầng 1 (hạn chế): Nhóm đường, mỡ động vật và bánh kẹo\nTầng 2 (Ăn vừa phải): Nhóm chất đạm giúp cơ bắp cuồn cuộn\nTầng 3 (Ăn nhiều): Nhóm Vitamin và chất xơ\nTầng đáy (Ăn đủ): Nhóm cung cấp năng lượng",
+        "Giúp Gióng ăn đúng, ăn khỏe để ra trận nào! 3... 2... 1... Bắt đầu xếp tháp thôi!"
+    ];
+    let currentStoryIndex = 0;
     
-    if (startGameButton && introModal) {
-        startGameButton.addEventListener('click', () => {
+    if (nextStoryButton && introModal && storyText) {
+        nextStoryButton.addEventListener('click', () => {
+            currentStoryIndex++;
+
+            if (currentStoryIndex < storyDialogues.length) {
+                storyText.textContent = storyDialogues[currentStoryIndex];
+
+                if (currentStoryIndex === storyDialogues.length - 1) {
+                    nextStoryButton.innerHTML = '<i class="fas fa-play"></i> Bắt đầu xếp tháp thôi!';
+                }
+
+                return;
+            }
+
             introModal.classList.remove('active');
         });
     }

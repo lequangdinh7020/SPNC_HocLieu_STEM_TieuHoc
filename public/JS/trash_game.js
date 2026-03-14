@@ -9,9 +9,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // *** Lấy các phần tử cốt truyện ***
     const introModal = document.getElementById("intro-modal");
-    const startGameButton = document.getElementById("startGameButton");
+    const nextStoryButton = document.getElementById("nextStoryButton");
+    const storyText = document.getElementById("storyText");
     const tamDialogueBox = document.getElementById("tam-dialogue-box");
     const tamDialogueText = document.getElementById("tam-dialogue-text");
+    
+    // *** Mảng các câu thoại ***
+    const storyDialogues = [
+        "Chào các bạn nhỏ! Cô Tấm hiền lành đang rất muốn đi trẩy hội mùa xuân. Nhưng mụ dì ghẻ độc ác lại bắt Tấm phải phân loại xong đống rác trong sân vào 3 thùng: Hữu cơ, Vô cơ và Tái chế!",
+        "Nhiệm vụ của chúng mình:\nHãy tinh mắt nhìn và nhanh tay kéo thả từng món rác vào đúng thùng nhé!",
+        "Thùng Rác Hữu cơ: Đựng thức ăn thừa, vỏ trái cây, rau củ...\nThùng Rác Vô cơ: Đựng rác không thể tái chế như túi nilon bẩn, vỏ hộp sữa...\nThùng Rác Tái chế: Đựng giấy vụn, vỏ lon, chai nhựa...",
+        "Các bạn đã sẵn sàng giúp cô Tấm dọn sạch sân chưa? 3... 2... 1... Bắt đầu thôi!"
+    ];
+    
+    let currentStoryIndex = 0;
     
     // *** Tạo âm thanh (sử dụng Web Audio API) ***
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -90,8 +101,22 @@ document.addEventListener("DOMContentLoaded", () => {
     let totalDrops = document.querySelectorAll('.trash-item').length || trashItems.length; // Tổng số rác
     let feedbackTimer; // Biến hẹn giờ
 
-    startGameButton.addEventListener('click', () => {
-        introModal.classList.remove('active');
+    // *** Xử lý nút tiếp theo câu chuyện ***
+    nextStoryButton.addEventListener('click', () => {
+        currentStoryIndex++;
+        
+        if (currentStoryIndex < storyDialogues.length) {
+            // Hiển thị câu tiếp theo
+            storyText.textContent = storyDialogues[currentStoryIndex];
+            
+            // Nếu là câu cuối cùng, đổi nút thành "Bắt đầu thôi!"
+            if (currentStoryIndex === storyDialogues.length - 1) {
+                nextStoryButton.textContent = "Bắt đầu thôi!";
+            }
+        } else {
+            // Đóng modal và bắt đầu game
+            introModal.classList.remove('active');
+        }
     });
 
     // 1. Xử lý kéo
