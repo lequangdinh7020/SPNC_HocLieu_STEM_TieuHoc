@@ -11,9 +11,9 @@ require_once __DIR__ . '/../template/header.php';
             <img src="<?= $base_url ?>/public/images/coding/sontinh.png" alt="Sơn Tinh" class="intro-avatar-img">
         </div>
         <div class="intro-text-content">
-            <h3>Cốt truyện</h3>
-            <p>"Vua Hùng kén rể, thách cưới với: <strong>Voi chín ngà, Gà chín cựa, Ngựa chín hồng mao</strong>. Thủy Tinh đang dâng nước đuổi theo sát nút! Các bạn hãy dùng <strong>'Phép thuật Lập trình'</strong> để giúp mình tìm đủ sính lễ trước khi nước lũ tràn về nhé!"</p>
-            <button id="start-game-btn" class="start-btn">Giúp Sơn Tinh ngay!</button>
+            <h3>Tráng sĩ Sơn Tinh</h3>
+            <p id="storyText">Chào các bạn nhỏ! Vua Hùng đang kén rể cho công chúa Mị Nương xinh đẹp. Nhà vua đưa ra một thử thách vô cùng khó khăn: Ai mang được sính lễ gồm "voi chín ngà, gà chín cựa, ngựa chín hồng mao" đến trước sẽ được rước công chúa về dinh.</p>
+            <button id="nextStoryButton" class="start-btn">Tiếp theo</button>
         </div>
     </div>
 </div>

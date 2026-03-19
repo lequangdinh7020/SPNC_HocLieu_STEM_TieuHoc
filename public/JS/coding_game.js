@@ -14,12 +14,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Modal elements
     const storyModal = document.getElementById('story-modal');
-    const startBtn = document.getElementById('start-game-btn');
+    const nextStoryButton = document.getElementById('nextStoryButton');
+    const storyText = document.getElementById('storyText');
     const resultModal = document.getElementById('result-modal');
     const resultTitle = document.getElementById('result-title');
     const resultMsg = document.getElementById('result-message');
     const nextBtn = document.getElementById('next-level-btn');
     const retryBtn = document.getElementById('retry-btn');
+
+    const storyDialogues = [
+        'Chào các bạn nhỏ! Vua Hùng đang kén rể cho công chúa Mị Nương xinh đẹp. Nhà vua đưa ra một thử thách vô cùng khó khăn: Ai mang được sính lễ gồm "voi chín ngà, gà chín cựa, ngựa chín hồng mao" đến trước sẽ được rước công chúa về dinh.',
+        'Chào các bạn nhỏ! Vua Hùng đang kén rể cho công chúa Mị Nương. Thử thách đặt ra là phải tìm được các sính lễ vô cùng quý hiếm: "voi chín ngà, gà chín cựa, ngựa chín hồng mao". Chàng Sơn Tinh đang phải chạy đua với thời gian, vì Thủy Tinh cũng đang cưỡi mây đạp gió, dâng nước ào ào đuổi theo phía sau!',
+        'Nhiệm vụ của chúng mình: Các bạn hãy quan sát và kéo ghép các khối lệnh để tạo thành một đường đi chuẩn xác nhé:\nKhối Đi tới (Di chuyển): Kéo khối này để giúp Sơn Tinh bước lên phía trước vượt qua những đoạn đường thẳng.\nKhối Rẽ (Trái/Phải): Lắp khối này để giúp Sơn Tinh chuyển hướng khéo léo, né tránh những tảng đá to hay khúc gỗ cản đường.\nKhối Lặp lại (Vòng lặp): Bao bọc các lệnh khác bằng khối này để Sơn Tinh đi qua một đoạn đường dài lặp đi lặp lại mà chúng mình không cần phải ghép quá nhiều khối lệnh.',
+        'Thủy Tinh cũng đang hối hả tìm sính lễ rồi, hãy nhanh tay lập trình giúp Sơn Tinh nào! 3... 2... 1... Ghép khối!'
+    ];
+    let currentStoryIndex = 0;
 
     let robotState = { x: 0, y: 0, dir: 0 }; 
     let startState = {};
@@ -32,25 +41,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- KHỞI TẠO & CỐT TRUYỆN ---
     
-    // Kiểm tra xem đã xem cốt truyện chưa
-    const hasSeenIntro = sessionStorage.getItem('hasSeenCodingIntro');
-
-    if (levelData.id === 1 && !hasSeenIntro) {
-        // Nếu là Màn 1 và chưa xem -> Hiện modal cốt truyện
+    if (levelData.id === 1) {
+        // Luôn hiện cốt truyện khi vào màn 1
         if (storyModal) storyModal.style.display = 'flex';
     } else {
-        // Các trường hợp khác (Màn 2, 3... hoặc đã xem) -> Ẩn modal và Tự động bắt đầu
+        // Các màn sau bỏ qua cốt truyện và bắt đầu ngay
         if (storyModal) storyModal.style.display = 'none';
         startTimer(); 
     }
 
-    // Sự kiện nút "Giúp Sơn Tinh ngay!"
-    if (startBtn) {
-        startBtn.onclick = () => {
-            if (storyModal) storyModal.style.display = 'none';
-            // Lưu lại trạng thái đã xem
-            sessionStorage.setItem('hasSeenCodingIntro', 'true');
-            startTimer();
+    // Sự kiện nút chuyển đoạn cốt truyện
+    if (nextStoryButton && storyText) {
+        nextStoryButton.onclick = () => {
+            currentStoryIndex++;
+
+            if (currentStoryIndex < storyDialogues.length) {
+                storyText.textContent = storyDialogues[currentStoryIndex];
+
+                if (currentStoryIndex === storyDialogues.length - 1) {
+                    nextStoryButton.textContent = 'Ghép khối thôi!';
+                }
+            } else {
+                if (storyModal) storyModal.style.display = 'none';
+                startTimer();
+            }
         };
     }
 
