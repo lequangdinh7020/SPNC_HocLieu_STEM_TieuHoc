@@ -9,12 +9,12 @@ require_once __DIR__ . '/../template/header.php';
 <div id="intro-modal" class="modal-overlay active">
     <div class="intro-dialogue modal-content">
         <div class="intro-avatar">
-            <img src="<?= $base_url ?>/public/images/bridge_game/engineer_avatar.png" alt="Kỹ sư nhí" class="intro-avatar-img">
+            <img src="<?= $base_url ?>/public/images/bridge_game/nguu_lang_chuc_nu_holding_hands.png" alt="Ngưu Lang Chức Nữ" class="intro-avatar-img">
         </div>
         <div class="intro-text-content">
-            <h3>Chào bạn, mình là Engineer Master!</h3>
-            <p>Chào mừng bạn đến với trò chơi "XÂY CẦU VƯỢT". Nhiệm vụ của bạn là xây dựng cây cầu vững chắc để xe có thể đi qua an toàn. Bạn sẵn sàng chưa?</p>
-            <button id="startGameButton" class="start-btn">Bắt đầu thôi!</button>
+            <h3>LỜI DẪN CHUYỆN: BẮC CẦU NGÂN HÀ</h3>
+            <p id="storyText">Chào các bạn nhỏ! Chắc hẳn chúng mình đã từng nghe câu chuyện về chàng Ngưu Lang và nàng tiên Chức Nữ rồi đúng không? Hai người bị chia cắt bởi dòng sông Ngân Hà rộng mênh mông và chỉ được gặp nhau mỗi năm đúng một lần.</p>
+            <button id="nextStoryButton" class="start-btn"><i class="fas fa-forward"></i> Tiếp theo</button>
         </div>
     </div>
 </div>

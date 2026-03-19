@@ -37,7 +37,8 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -54,15 +55,17 @@ body {
 
 .modal-content {
     background-color: var(--white);
-    border-radius: 16px;
+    border-radius: 20px;
+    border: 5px solid #e74c3c;
     width: 100%;
-    max-width: 600px;
-    padding: 30px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    max-width: 700px;
+    padding: 40px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
     display: flex;
     align-items: center;
-    gap: 25px;
+    gap: 30px;
     animation: modalAppear 0.5s ease-out;
+    position: relative;
 }
 
 .modal-content-over {
@@ -83,48 +86,55 @@ body {
 
 .intro-avatar {
     flex-shrink: 0;
+    order: 2;
 }
 
 .intro-avatar-img {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    border: 5px solid var(--primary-blue-pastel);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    width: 180px;
+    height: auto;
+    filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.2));
 }
 
 .intro-text-content {
     flex-grow: 1;
+    order: 1;
 }
 
 .intro-text-content h3 {
-    color: var(--secondary-blue);
-    margin-bottom: 15px;
-    font-size: 1.8rem;
+    color: #c0392b;
+    margin-bottom: 20px;
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: left;
 }
 
 .intro-text-content p {
-    color: var(--text-light);
-    margin-bottom: 25px;
-    font-size: 1.1rem;
-    line-height: 1.7;
+    color: #2c3e50;
+    margin-bottom: 30px;
+    font-size: 1.2rem;
+    line-height: 1.8;
+    text-align: left;
+    font-weight: 500;
+    white-space: pre-line;
 }
 
 .start-btn {
-    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
     color: white;
     border: none;
-    padding: 12px 30px;
-    font-size: 1.1rem;
+    padding: 15px 40px;
+    font-size: 1.2rem;
+    font-weight: 600;
     border-radius: 50px;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(26, 115, 232, 0.3);
+    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
 }
 
 .start-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(26, 115, 232, 0.4);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(231, 76, 60, 0.5);
+    background: linear-gradient(135deg, #c0392b, #e74c3c);
 }
 
 .family-tree-game {

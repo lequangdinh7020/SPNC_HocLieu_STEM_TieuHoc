@@ -8,12 +8,12 @@ require_once __DIR__ . '/../template/header.php';
 <div id="intro-modal" class="modal-overlay active">
     <div class="intro-dialogue modal-content">
         <div class="intro-avatar">
-            <img src="<?= $base_url ?>/public/images/plants/plant_hoa_bg.png" alt="Plant Master" class="intro-avatar-img">
+            <img src="<?= $base_url ?>/public/images/plants/MaiAnTiem.png" alt="Mai An Tiem" class="intro-avatar-img">
         </div>
         <div class="intro-text-content">
-            <h3>Chào bạn! Mình là Plant Master!</h3>
-            <p>Chào mừng bạn đến với trò chơi "LẮP GHÉP BỘ PHẬN CÂY". Nhiệm vụ của bạn là kéo các nhãn tên vào đúng vị trí trên cây. Bạn sẵn sàng chưa?</p>
-            <button id="startGameButton" class="start-btn">Bắt đầu thôi!</button>
+            <h3>LỜI DẪN CHUYỆN: GIÚP MAI AN TIÊM TÌM HIỂU VỀ CÂY</h3>
+            <p id="storyText">Chào các bạn nhỏ! Chàng Mai An Tiêm bị nhà vua đày ra một hòn đảo hoang vắng, xung quanh chỉ có cát trắng và nước biển. Một hôm, có một đàn chim bay ngang qua hòn đảo và đánh rơi một vài hạt giống lạ màu đen nhánh. Mai An Tiêm muốn trồng và chăm sóc những hạt giống ấy để xem chúng sẽ mọc lên thành cây gì. Để cây lớn khỏe mạnh, chàng cần hiểu rõ từng bộ phận của cây như rễ, thân, lá và quả.</p>
+            <button id="nextStoryButton" class="start-btn"><i class="fas fa-forward"></i> Tiếp theo</button>
         </div>
     </div>
 </div>

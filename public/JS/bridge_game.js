@@ -8,8 +8,38 @@ const BASE_PATH = (typeof GAME_ASSETS_PATH !== 'undefined')
 const ASSETS = {
     fullCar: BASE_PATH + 'xe.png', 
     groundTexture: BASE_PATH + 'dat_hoan_chinh.png',
-    signTexture: BASE_PATH + 'bien_go.png' 
+    signTexture: BASE_PATH + 'chuc_nu.png' 
 };
+
+document.addEventListener('DOMContentLoaded', () => {
+    const introModal = document.getElementById('intro-modal');
+    const nextStoryButton = document.getElementById('nextStoryButton');
+    const storyText = document.getElementById('storyText');
+    const storyDialogues = [
+        "Chào các bạn nhỏ! Chắc hẳn chúng mình đã từng nghe câu chuyện về chàng Ngưu Lang và nàng tiên Chức Nữ rồi đúng không? Hai người bị chia cắt bởi dòng sông Ngân Hà rộng mênh mông và chỉ được gặp nhau mỗi năm đúng một lần.",
+        "Hôm nay đã đến ngày hẹn, nhưng đàn chim Ô Thước mãi chẳng thấy đâu. Để không lỡ mất cơ hội các bạn nhỏ hãy giúp Ngưu Lang Chức Nữ xây cầu để họ gặp nhau!",
+        "Thời gian trăng lên sắp hết rồi, chúng mình cùng nhanh tay thôi nào! 3... 2... 1... Bắt đầu xây cầu thôi!"
+    ];
+    let currentStoryIndex = 0;
+
+    if (introModal && nextStoryButton && storyText) {
+        nextStoryButton.addEventListener('click', () => {
+            currentStoryIndex++;
+
+            if (currentStoryIndex < storyDialogues.length) {
+                storyText.textContent = storyDialogues[currentStoryIndex];
+
+                if (currentStoryIndex === storyDialogues.length - 1) {
+                    nextStoryButton.innerHTML = '<i class="fas fa-play"></i> Bắt đầu xây cầu thôi!';
+                }
+
+                return;
+            }
+
+            introModal.classList.remove('active');
+        });
+    }
+});
 
 // --- CẤU HÌNH MATTER.JS ---
 const Engine = Matter.Engine, Render = Matter.Render, Runner = Matter.Runner,
@@ -43,10 +73,12 @@ const CAT_GROUND  = 0x0008; // Đất
 const bankWidth = 485;
 const containerHeight = gameContainer ? gameContainer.offsetHeight : window.innerHeight;
 const containerWidth = gameContainer ? gameContainer.offsetWidth : window.innerWidth;
-const baseGroundY = containerHeight - 150;
+const baseGroundY = containerHeight - 120;
 const leftBankX = bankWidth; 
-const rightBankX = containerWidth - bankWidth;
+const rightBankX = containerWidth - bankWidth + 10;
 const defaultGapWidth = rightBankX - leftBankX;
+const CAR_WIDTH = 165;
+const CAR_HEIGHT = 75;
 
 // --- DỮ LIỆU LEVEL ---
 const LEVELS_DATA = [
@@ -114,19 +146,33 @@ function loadLevel(index) {
 
     // ... (Giữ nguyên code tạo Đất, Móc neo, Biển báo) ...
     // Copy lại đoạn tạo Đất từ code cũ của bạn vào đây
-    const groundOpts = { isStatic: true, friction: 0.1, render: { sprite: { texture: ASSETS.groundTexture } }, collisionFilter: { category: CAT_GROUND, mask: CAT_CAR } };
+    const groundVisualOpts = {
+        isStatic: true,
+        friction: 0.1,
+        render: { sprite: { texture: ASSETS.groundTexture } },
+        // Visual layer only, do not use this body for car collision
+        collisionFilter: { category: CAT_GROUND, mask: CAT_DEFAULT }
+    };
+    const groundColliderOpts = {
+        isStatic: true,
+        render: { visible: false },
+        collisionFilter: { category: CAT_GROUND, mask: CAT_CAR }
+    };
     Composite.add(world, [
-        Bodies.rectangle(bankWidth / 2, leftY + 200, bankWidth, 400, groundOpts),
-        Bodies.rectangle(window.innerWidth - (bankWidth / 2), rightY + 200, bankWidth, 400, groundOpts),
+        Bodies.rectangle(bankWidth / 2, leftY + 200, bankWidth, 400, groundVisualOpts),
+        Bodies.rectangle(containerWidth - (bankWidth / 2), rightY + 200, bankWidth, 400, groundVisualOpts),
+        // Invisible physical colliders are raised 40px above the drawn grass edge
+        Bodies.rectangle(bankWidth / 2, leftY - 40, bankWidth, 20, groundColliderOpts),
+        Bodies.rectangle(containerWidth - (bankWidth / 2), rightY - 40, bankWidth, 20, groundColliderOpts),
         Bodies.circle(anchorLeft.x, anchorLeft.y, 8, { isStatic: true, render: { fillStyle: '#333' }, sensor: true }),
         Bodies.circle(anchorRight.x, anchorRight.y, 8, { isStatic: true, render: { fillStyle: '#333' }, sensor: true }),
-        Bodies.rectangle(window.innerWidth - 80, rightY - 50, 100, 100, { isStatic: true, sensor: true, render: { sprite: { texture: ASSETS.signTexture } } })
+        Bodies.rectangle(containerWidth - 85, rightY - 120, 110, 110, { isStatic: true, sensor: true, render: { sprite: { texture: ASSETS.signTexture, xScale: 0.28, yScale: 0.28 } } })
     ]);
 
 
     // Tạo thanh cầu
-    const supplyZoneX = window.innerWidth / 2;
-    let supplyZoneY = 150; 
+    const supplyZoneX = containerWidth / 2;
+    let supplyZoneY = 95; 
 
     levelData.bridgePieces.forEach((pieceData, i) => {
         let actualLength, initialAngle = 0;
@@ -158,27 +204,24 @@ function loadLevel(index) {
         
         bar.barLength = actualLength;
         bridgeBars.push(bar);
-        supplyZoneY += 50; 
+        supplyZoneY += 40; 
     });
 
     Composite.add(world, bridgeBars);
-    createCar(bankWidth / 2, leftY - 50);
+    createCar(bankWidth / 2, leftY - 110);
     setupMouseControl(anchorLeft, anchorRight, levelData);
 }
-
 function createCar(x, y) {
-    const carWidth = 220;
-    const carHeight = 90;
-    
-    car = Bodies.rectangle(x, y, carWidth, carHeight, {
+    car = Bodies.rectangle(x, y, CAR_WIDTH, CAR_HEIGHT, {
         label: 'CarWhole', 
+        isStatic: true,
         density: 0.005,      
-        chamfer: { radius: 45 }, 
+        chamfer: { radius: 30 }, 
         friction: 0,       
         frictionStatic: 0, 
         frictionAir: 0.02,     
         restitution: 0,        
-        render: { sprite: { texture: ASSETS.fullCar } },
+        render: { sprite: { texture: ASSETS.fullCar, xScale: 0.22, yScale: 0.22 } },
         
         // Xe va chạm với TẤT CẢ (Đất, Cầu)
         collisionFilter: { 
@@ -331,16 +374,21 @@ function startGame() {
     if (isPlaying || gameEnded) return;
     isPlaying = true;
 
+    if (car) {
+        Body.setStatic(car, false);
+        Body.setVelocity(car, { x: 0, y: 0 });
+        Body.setAngularVelocity(car, 0);
+        Matter.Sleeping.set(car, false);
+    }
+
     bridgeBars.forEach(bar => {
-        // [QUAN TRỌNG] Dùng Body.set để update an toàn
+        // Giữ thanh thép đứng yên để xe chạy ổn định, chỉ bật va chạm khi bắt đầu chạy
         Body.set(bar, { 
             isSensor: false, 
-            isStatic: false 
+            isStatic: true 
         });
-        // [SỬA] Giảm ma sát khí để vật rơi tự nhiên hơn, tránh bị "bồng bềnh"
-        bar.frictionAir = 0.05; 
+        bar.frictionAir = 0; 
         
-        // [SỬA] Tăng khối lượng để thanh cầu vững hơn khi xe đi qua
         Body.setDensity(bar, 0.1);
     });
 
@@ -348,7 +396,7 @@ function startGame() {
         if (!gameEnded && isPlaying) {
             // Di chuyển xe
             if (car.speed < 10) {
-                Body.applyForce(car, car.position, { x: 0.06, y: 0 });
+                Body.applyForce(car, car.position, { x: 0.02, y: 0 });
             }
             
             // Xử lý xe đi trên thanh thép
@@ -362,9 +410,11 @@ function handleCarOnBridge() {
     if (!car || gameEnded) return;
     
     // Tính toán vị trí dưới cùng của xe
-    const carBottom = car.position.y + 45; // 45 là nửa chiều cao xe
-    const carLeft = car.position.x - 110; // 110 là nửa chiều rộng xe
-    const carRight = car.position.x + 110;
+    const halfCarHeight = CAR_HEIGHT / 2;
+    const halfCarWidth = CAR_WIDTH / 2;
+    const carBottom = car.position.y + halfCarHeight;
+    const carLeft = car.position.x - halfCarWidth;
+    const carRight = car.position.x + halfCarWidth;
     
     let highestBridgeTop = null;
     carOnBridge = false;
@@ -429,7 +479,7 @@ function handleCarOnBridge() {
     
     // Nếu xe đang trên cầu, giữ xe ở mặt trên
     if (carOnBridge && highestBridgeTop !== null) {
-        const targetY = highestBridgeTop - 45; // 45 là nửa chiều cao xe
+        const targetY = highestBridgeTop - halfCarHeight;
         const currentY = car.position.y;
         
         // Nếu xe đang chìm xuống dưới mặt cầu, đẩy xe lên

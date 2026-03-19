@@ -6,12 +6,12 @@
 <div id="intro-modal" class="modal-overlay active">
     <div class="intro-dialogue modal-content">
         <div class="intro-avatar">
-            <img src="<?= $base_url ?>/public/images/family_tree/an.png" alt="Family Master" class="intro-avatar-img">
+            <img src="<?= $base_url ?>/public/images/family_tree/Peppa.png" alt="Peppa" class="intro-avatar-img">
         </div>
         <div class="intro-text-content">
-            <h3>Chào bạn! Mình là Family Master!</h3>
-            <p>Chào mừng bạn đến với trò chơi "XÂY DỰNG CÂY GIA PHỄ". Nhiệm vụ của bạn là kéo các thành viên vào đúng vị trí trên cây gia phổ dựa vào gợi ý. Bạn sẵn sàng chưa?</p>
-            <button id="startGameButton" class="start-btn">Bắt đầu thôi!</button>
+            <h3>LỜI DẪN CHUYỆN: GIÚP PEPPA HỌC VỀ CÂY GIA PHỄ</h3>
+            <p id="storyText">Cô giáo linh dương đã giao cho Peppa một bài tập về cây gia đình nhưng vì mải lo chơi nên Peppa không nhớ những kiến thức cô đã dạy trên lớp. Hãy giúp Peppa hoàn thành bài tập nhé!</p>
+            <button id="nextStoryButton" class="start-btn"><i class="fas fa-forward"></i> Tiếp theo</button>
         </div>
     </div>
 </div>

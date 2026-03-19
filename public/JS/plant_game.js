@@ -2,10 +2,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Handle intro modal
     const introModal = document.getElementById('intro-modal');
-    const startGameButton = document.getElementById('startGameButton');
-    
-    if (startGameButton && introModal) {
-        startGameButton.addEventListener('click', () => {
+    const nextStoryButton = document.getElementById('nextStoryButton');
+    const storyText = document.getElementById('storyText');
+    const storyDialogues = [
+        "Chào các bạn nhỏ! Chàng Mai An Tiêm bị nhà vua đày ra một hòn đảo hoang vắng, xung quanh chỉ có cát trắng và nước biển. Một hôm, có một đàn chim bay ngang qua hòn đảo và đánh rơi một vài hạt giống lạ màu đen nhánh. Mai An Tiêm muốn trồng và chăm sóc những hạt giống ấy để xem chúng sẽ mọc lên thành cây gì. Để cây lớn khỏe mạnh, chàng cần hiểu rõ từng bộ phận của cây như rễ, thân, lá và quả.",
+        "Nhiệm vụ của chúng mình: Các bạn hãy quan sát thật kỹ và kéo thả các bộ phận của cây vào đúng bộ phận của chúng nhé.",
+        "Hãy cẩn thận và nhanh tay giúp Mai An Tiêm nào! 3... 2... 1... Bắt đầu gieo hạt thôi!"
+    ];
+    let currentStoryIndex = 0;
+
+    if (nextStoryButton && introModal && storyText) {
+        nextStoryButton.addEventListener('click', () => {
+            currentStoryIndex++;
+
+            if (currentStoryIndex < storyDialogues.length) {
+                storyText.textContent = storyDialogues[currentStoryIndex];
+
+                if (currentStoryIndex === storyDialogues.length - 1) {
+                    nextStoryButton.innerHTML = '<i class="fas fa-play"></i> Bắt đầu gieo hạt thôi!';
+                }
+
+                return;
+            }
+
             introModal.classList.remove('active');
         });
     }

@@ -1,10 +1,29 @@
 document.addEventListener("DOMContentLoaded", () => {
     // Handle intro modal
     const introModal = document.getElementById('intro-modal');
-    const startGameButton = document.getElementById('startGameButton');
+    const nextStoryButton = document.getElementById('nextStoryButton');
+    const storyText = document.getElementById('storyText');
+    const storyDialogues = [
+        "Cô giáo linh dương đã giao cho Peppa một bài tập về cây gia đình nhưng vì mải lo chơi nên Peppa không nhớ những kiến thức cô đã dạy trên lớp. Hãy giúp Peppa hoàn thành bài tập nhé!",
+        "Nhiệm vụ của chúng mình: Trên màn hình là một cái cây. Các bạn hãy tinh mắt và kéo thả ảnh của từng người vào đúng thế hệ theo hướng dẫn!",
+        "Chúng mình cùng giúp Peppa hoàn thành bài tập về nhà nào! 3... 2... 1... Bắt đầu dán ảnh thôi!"
+    ];
+    let currentStoryIndex = 0;
     
-    if (startGameButton && introModal) {
-        startGameButton.addEventListener('click', () => {
+    if (nextStoryButton && introModal && storyText) {
+        nextStoryButton.addEventListener('click', () => {
+            currentStoryIndex++;
+
+            if (currentStoryIndex < storyDialogues.length) {
+                storyText.textContent = storyDialogues[currentStoryIndex];
+
+                if (currentStoryIndex === storyDialogues.length - 1) {
+                    nextStoryButton.innerHTML = '<i class="fas fa-play"></i> Bắt đầu dán ảnh thôi!';
+                }
+
+                return;
+            }
+
             introModal.classList.remove('active');
         });
     }

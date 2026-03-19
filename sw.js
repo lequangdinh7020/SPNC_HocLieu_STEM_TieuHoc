@@ -1,10 +1,9 @@
-const CACHE_NAME = 'stem-app-cache-v2';
+const CACHE_NAME = 'stem-app-cache-v3';
 // Danh sách các file cần lưu vào bộ nhớ đệm (Cache)
 // Bạn hãy kiểm tra lại tên file trong thư mục public/CSS và public/JS của bạn
 
 const urlsToCache = [
   '/SPNC_HocLieu_STEM_TieuHoc/public/CSS/style.css',     
-  '/SPNC_HocLieu_STEM_TieuHoc/public/JS/script.js',      
   '/SPNC_HocLieu_STEM_TieuHoc/public/images/logo.png'
 ];
 
@@ -14,16 +13,28 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME)
       .then((cache) => {
         console.log('Đã mở cache');
-        return cache.addAll(urlsToCache);
+        return Promise.all(
+          urlsToCache.map((url) =>
+            cache.add(url).catch((err) => {
+              console.warn('Bỏ qua file cache lỗi:', url, err);
+            })
+          )
+        );
       })
   );
 });
 
 // 2. Lấy dữ liệu: Ưu tiên lấy từ Cache, nếu không có mới tải từ mạng
 self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
   // Không cache các file PHP (động)
   if (event.request.url.includes('.php')) {
-    event.respondWith(fetch(event.request));
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match(event.request))
+    );
     return;
   }
   
@@ -35,7 +46,29 @@ self.addEventListener('fetch', (event) => {
           return response;
         }
         // Nếu không thì tải từ mạng
-        return fetch(event.request);
+        return fetch(event.request)
+          .then((networkResponse) => {
+            if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+              return networkResponse;
+            }
+
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
+
+            return networkResponse;
+          });
+      })
+      .catch(() => {
+        if (event.request.destination === 'image') {
+          return caches.match('/SPNC_HocLieu_STEM_TieuHoc/public/images/logo.png');
+        }
+
+        return new Response('Offline', {
+          status: 503,
+          statusText: 'Service Unavailable'
+        });
       })
   );
 });
