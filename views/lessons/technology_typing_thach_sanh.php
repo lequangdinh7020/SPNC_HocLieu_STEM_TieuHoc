@@ -11,9 +11,10 @@ require_once __DIR__ . '/../template/header.php';
             <img src="<?= $base_url ?>/public/images/thachsanh/thach_sanh.png" alt="Thạch Sanh" class="intro-avatar-img">
         </div>
         <div class="intro-text-content">
-            <h3>DŨNG SĨ DIỆT CHẰN TINH</h3>
-            <p>Hỡi dũng sĩ <strong>Thạch Sanh</strong>! Hãy dùng bàn phím để bắn tên bảo vệ buôn làng. Gõ các chữ cái trên người quái vật và đừng để quá 5 quái vật chạm đất!</p>
-            <div class="level-select">
+            <h3 id="storyHeading">Tráng sĩ Thạch Sanh</h3>
+            <p id="storyText">Chào các bạn nhỏ! Ngôi làng yên bình của chúng ta đang gặp một mối nguy hiểm vô cùng to lớn. Lão Chằn Tinh hung ác từ trong núi sâu cùng đàn Đại Bàng khổng lồ đang ầm ầm kéo đến tấn công, đe dọa cuộc sống của người dân.</p>
+            <button id="nextStoryButton" class="start-btn">Tiếp theo</button>
+            <div id="levelSelect" class="level-select" style="display: none;">
                 <button class="game-btn lvl-btn" onclick="startGame('easy')">Cấp độ 1: Cơ bản (Hàng A,S,D...)</button>
                 <button class="game-btn lvl-btn hard" onclick="startGame('hard')">Cấp độ 2: Nâng cao (Từ vựng)</button>
             </div>

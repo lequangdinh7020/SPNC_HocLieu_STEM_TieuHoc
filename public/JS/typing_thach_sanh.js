@@ -1,4 +1,8 @@
 const storyModal = document.getElementById('story-modal');
+const nextStoryButton = document.getElementById('nextStoryButton');
+const storyText = document.getElementById('storyText');
+const storyHeading = document.getElementById('storyHeading');
+const levelSelect = document.getElementById('levelSelect');
 const gameOverModal = document.getElementById('game-over-modal');
 const enemiesContainer = document.getElementById('enemies-container');
 const arrowsContainer = document.getElementById('arrows-container');
@@ -39,6 +43,33 @@ let gameTimerInterval;
 let gameInterval;
 let spawnRate = 2500;
 let isPlaying = false;
+
+const storyDialogues = [
+    'Chào các bạn nhỏ! Ngôi làng yên bình của chúng ta đang gặp một mối nguy hiểm vô cùng to lớn. Lão Chằn Tinh hung ác từ trong núi sâu cùng đàn Đại Bàng khổng lồ đang ầm ầm kéo đến tấn công, đe dọa cuộc sống của người dân.',
+    'Tráng sĩ Thạch Sanh đã dũng cảm mang cung tên và búa thần ra trước cổng làng để chặn đánh yêu quái. Thế nhưng, bọn chúng quá đông và lao đến liên tục! Thạch Sanh đang rất cần các "chiến binh bàn phím" nhí dùng phép thuật của những ngón tay để truyền thêm sức mạnh chiến đấu đấy!',
+    'Nhiệm vụ của chúng mình: Trên màn hình, lũ Chằn Tinh và Đại Bàng đang mang theo những từ vựng tiến thẳng về phía ngôi làng. Các bạn hãy dùng bàn phím để giúp Thạch Sanh tiêu diệt chúng nhé:\nHãy quan sát thật kỹ các chữ cái xuất hiện trên mình lũ yêu quái đang lao tới.\nHai bàn tay đặt đúng tư thế, mắt nhìn màn hình và gõ lại thật chính xác từng chữ cái. Mỗi lần bạn gõ xong một từ, Thạch Sanh sẽ vung búa thần hoặc bắn một mũi tên lửa tiêu diệt ngay con yêu quái đó!',
+    'Dân làng đang rất trông cậy vào chúng ta! Các ngón tay của chúng mình đã khởi động sẵn sàng trên bàn phím chưa? 3... 2... 1... Bắt đầu gõ nào!'
+];
+let currentStoryIndex = 0;
+
+if (storyModal && nextStoryButton && storyText && levelSelect) {
+    nextStoryButton.addEventListener('click', () => {
+        currentStoryIndex++;
+
+        if (currentStoryIndex < storyDialogues.length) {
+            storyText.textContent = storyDialogues[currentStoryIndex];
+
+            if (currentStoryIndex === storyDialogues.length - 1) {
+                nextStoryButton.textContent = 'Chọn cấp độ';
+            }
+        } else {
+            if (storyHeading) storyHeading.textContent = 'Chọn cấp độ chơi';
+            storyText.textContent = 'Hãy chọn cấp độ phù hợp để cùng Thạch Sanh bảo vệ ngôi làng!';
+            nextStoryButton.style.display = 'none';
+            levelSelect.style.display = 'flex';
+        }
+    });
+}
 
 function startGame(level) {
     storyModal.style.display = 'none';
