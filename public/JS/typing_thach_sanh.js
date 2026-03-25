@@ -35,7 +35,7 @@ let lives = maxLives;
 
 let spawnedCount = 0;
 
-const GAME_DURATION = 180; // 3 phút
+const GAME_DURATION = 90; // 1 phút 30 giây
 let timeLeft = GAME_DURATION;
 let gameTimerInterval;
 // ---------------------
@@ -86,7 +86,7 @@ function startGame(level) {
     
     scoreEl.innerText = score;
     livesEl.innerText = lives;
-    updateTimeDisplay(); // Hiện 03:00
+    updateTimeDisplay(); // Hiện 01:30
 
     // Clear previous modal/percent displays so each run is fresh
     try {
@@ -149,7 +149,7 @@ function victory() {
     endTitleEl.innerText = "CHIẾN THẮNG!";
     endTitleEl.style.color = "#2ecc71";
     endMessageEl.innerHTML = `
-        Bạn đã bảo vệ buôn làng thành công trong 3 phút!<br>
+        Bạn đã bảo vệ buôn làng thành công trong 1 phút 30 giây!<br>
         Điểm gốc: ${score}<br>
         Thưởng mạng (${lives}): +${bonusPoints}
     `;
