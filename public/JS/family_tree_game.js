@@ -32,6 +32,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const CURRENT_LEVEL_DATA = currentLevelData; 
     const TOTAL_GAME_LEVELS = totalGameLevels; 
 
+    function goToLevel(levelId) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('level', String(levelId));
+        window.location.href = url.toString();
+    }
+
     // DOM Elements
     const characterBank = document.getElementById('character-bank');
     const feedbackMessage = document.getElementById('game-feedback');
@@ -79,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if(nextLevelBtn) {
             nextLevelBtn.onclick = () => {
                 const nextLevel = CURRENT_LEVEL_DATA.id + 1;
-                window.location.href = `${BASE_URL}/views/lessons/tech-family-tree?level=${nextLevel}`;
+                goToLevel(nextLevel);
             };
         }
         if(restartGameBtn) {
@@ -382,7 +388,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 nextLevelBtn.onclick = () => { 
                     const nextLevelId = currentId + 1;
-                    window.location.href = `${BASE_URL}/views/lessons/technology_family_tree_game?level=${nextLevelId}`;
+                    goToLevel(nextLevelId);
                 };
             } else {
                 nextLevelBtn.style.display = 'none';

@@ -110,6 +110,11 @@ class LessonController {
             session_start();
         }
 
+        $showIntroModal = empty($_SESSION['color_game_intro_seen']);
+        if ($showIntroModal) {
+            $_SESSION['color_game_intro_seen'] = true;
+        }
+
         // 1. KHỞI TẠO ĐIỂM SỐ (dùng chung session 'total_score' cho game)
         if (!isset($_SESSION['total_score'])) {
             $_SESSION['total_score'] = 0;
@@ -158,14 +163,31 @@ class LessonController {
 
         // 4. KHỞI TẠO DANH SÁCH CÂU HỎI
         if (!isset($_SESSION['available_targets'])) {
-            $_SESSION['available_targets'] = $targets;
+            // Chống dữ liệu trùng tên màu trong danh sách mục tiêu.
+            $uniqueTargets = [];
+            foreach ($targets as $item) {
+                $uniqueTargets[$item['name']] = $item;
+            }
+            $_SESSION['available_targets'] = array_values($uniqueTargets);
             shuffle($_SESSION['available_targets']);
         }
 
         // 5. LẤY CÂU HỎI HIỆN TẠI
         if (!isset($_SESSION['current_target'])) {
             if (!empty($_SESSION['available_targets'])) {
-                $_SESSION['current_target'] = array_pop($_SESSION['available_targets']);
+                $candidate = array_pop($_SESSION['available_targets']);
+                if (
+                    isset($_SESSION['last_target_name'])
+                    && $candidate['name'] === $_SESSION['last_target_name']
+                    && !empty($_SESSION['available_targets'])
+                ) {
+                    // Tránh lặp lại liên tiếp cùng một màu nếu còn mục tiêu khác.
+                    array_unshift($_SESSION['available_targets'], $candidate);
+                    $candidate = array_pop($_SESSION['available_targets']);
+                }
+
+                $_SESSION['current_target'] = $candidate;
+                $_SESSION['last_target_name'] = $candidate['name'];
                 $_SESSION['current_attempt'] = 1;
                 $target = $_SESSION['current_target'];
             } else {

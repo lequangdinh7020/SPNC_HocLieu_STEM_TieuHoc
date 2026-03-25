@@ -30,6 +30,26 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Chỉ xử lý cache cho request http/https. Bỏ qua chrome-extension, data, blob...
+  const requestUrl = new URL(event.request.url);
+  if (requestUrl.protocol !== 'http:' && requestUrl.protocol !== 'https:') {
+    return;
+  }
+
+  // Với điều hướng trang (HTML), ưu tiên lấy từ mạng để tránh lặp màn do cache trang động.
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Bỏ qua cache cho URL có query params (vd: ?next=1&points=10&xp=5)
+  if (requestUrl.search) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
   // Không cache các file PHP (động)
   if (event.request.url.includes('.php')) {
     event.respondWith(

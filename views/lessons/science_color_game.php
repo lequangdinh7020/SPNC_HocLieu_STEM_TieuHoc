@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <!-- Modal Overlay -->
-<div class="modal-overlay active" id="introModal">
+<div class="modal-overlay<?= !empty($showIntroModal) ? ' active' : '' ?>" id="introModal">
     <div class="intro-dialogue modal-content">
         <div class="intro-avatar">
             <img src="<?= $base_url ?>/public/images/color/Alice.png" alt="Alice" class="intro-avatar-img">
