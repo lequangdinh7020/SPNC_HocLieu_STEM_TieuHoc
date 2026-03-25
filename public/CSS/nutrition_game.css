@@ -688,7 +688,7 @@ body {
 
 /* Tầng 1: Đỉnh tháp */
 .game-wrapper #level4 {
-    width: 50%;
+    width: 56%;
     background: #fadedb;
     z-index: 4;
     min-height: 100px;
@@ -696,7 +696,7 @@ body {
 }
  /* Tầng 2: Đạm */
 .game-wrapper #level3 {
-    width: 65%;
+    width: 78%;
     background: #fef9e7;
     z-index: 3;
     min-height: 100px;
@@ -704,7 +704,7 @@ body {
 }
 /* Tầng 3: Rau củ */
 .game-wrapper #level2 { 
-    width: 80%;
+    width: 90%;
     background: #e8f8f5;
     z-index: 2;
     min-height: 100px;
@@ -712,7 +712,7 @@ body {
 }
 /* Tầng 4: Đáy */
 .game-wrapper #level1 { 
-    width: 95%;
+    width: 100%;
     background: #e8daef;
     z-index: 1;
     min-height: 100px;
