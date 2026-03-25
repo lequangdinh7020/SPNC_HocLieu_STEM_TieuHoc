@@ -848,17 +848,17 @@ class LessonController {
         $trashItems = [
             // Rác Vô Cơ
             ['id' => 'trash1', 'name' => 'Bao tay rách', 'group' => 'voco', 'img' => 'bao_tay_rach.png', 'top' => '70%', 'left' => '63%'],
-            ['id' => 'trash2', 'name' => 'Túi nilon rách', 'group' => 'voco', 'img' => 'tui_nilon_rach.png', 'top' => '41%', 'left' => '1%'],
+            ['id' => 'trash2', 'name' => 'Túi nilon rách', 'group' => 'voco', 'img' => 'tui_nilon_rach.png', 'top' => '41%', 'left' => '4%'],
             ['id' => 'trash3', 'name' => 'Chai thủy tinh vỡ', 'group' => 'voco', 'img' => 'chai_vo.png', 'top' => '90%', 'left' => '3%'],
-            ['id' => 'trash4', 'name' => 'Cốc vỡ', 'group' => 'voco', 'img' => 'coc_vo.png', 'top' => '42%', 'left' => '60%'],
+            ['id' => 'trash4', 'name' => 'Cốc vỡ', 'group' => 'voco', 'img' => 'coc_vo.png', 'top' => '47%', 'left' => '60%'],
             ['id' => 'trash5', 'name' => 'Áo mưa rách', 'group' => 'voco', 'img' => 'ao_mua_rach.png', 'top' => '73%', 'left' => '38%'],
-            ['id' => 'trash6', 'name' => 'Dép hỏng', 'group' => 'voco', 'img' => 'dep_hong.png', 'top' => '21%', 'left' => '13%'],
-            ['id' => 'trash7', 'name' => 'Bàn chải gãy', 'group' => 'voco', 'img' => 'ban_chai.png', 'top' => '0.1%', 'left' => '60%'],
+            ['id' => 'trash6', 'name' => 'Dép hỏng', 'group' => 'voco', 'img' => 'dep_hong.png', 'top' => '25%', 'left' => '13%'],
+            ['id' => 'trash7', 'name' => 'Bàn chải gãy', 'group' => 'voco', 'img' => 'ban_chai.png', 'top' => '4%', 'left' => '60%'],
             
             // Rác Hữu Cơ
             ['id' => 'trash8', 'name' => 'Vỏ trứng', 'group' => 'huuco', 'img' => 'vo_trung.png', 'top' => '55%', 'left' => '41%'],
             ['id' => 'trash9', 'name' => 'Vỏ chuối', 'group' => 'huuco', 'img' => 'vo_chuoi.png', 'top' => '68%', 'left' => '80%'],
-            ['id' => 'trash10', 'name' => 'Ruột táo', 'group' => 'huuco', 'img' => 'ruot_tao.png', 'top' => '80%', 'left' => '15%'],
+            ['id' => 'trash10', 'name' => 'Ruột táo', 'group' => 'huuco', 'img' => 'ruot_tao.png', 'top' => '70%', 'left' => '15%'],
             ['id' => 'trash11', 'name' => 'Xương cá', 'group' => 'huuco', 'img' => 'xuong_ca.png', 'top' => '17%', 'left' => '83%'],
             ['id' => 'trash12', 'name' => 'Pizza thừa', 'group' => 'huuco', 'img' => 'pizza.png', 'top' => '22%', 'left' => '55%'],
             ['id' => 'trash13', 'name' => 'Vỏ dưa hấu', 'group' => 'huuco', 'img' => 'vo_dua_hau.png', 'top' => '84%', 'left' => '50%'],
