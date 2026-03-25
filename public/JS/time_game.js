@@ -139,13 +139,38 @@ document.addEventListener("DOMContentLoaded", () => {
         return angle + Math.PI / 2; 
     }
 
+    function distancePointToSegment(px, py, x1, y1, x2, y2) {
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const lenSq = dx * dx + dy * dy;
+        if (lenSq === 0) return Math.hypot(px - x1, py - y1);
+
+        let t = ((px - x1) * dx + (py - y1) * dy) / lenSq;
+        t = Math.max(0, Math.min(1, t));
+        const projX = x1 + t * dx;
+        const projY = y1 + t * dy;
+        return Math.hypot(px - projX, py - projY);
+    }
+
     canvas.addEventListener('mousedown', (e) => {
+        isDraggingHour = false;
+        isDraggingMinute = false;
+
         const mouse = getMousePos(e);
-        const dist = Math.sqrt(mouse.x*mouse.x + mouse.y*mouse.y);
-        
-        if (dist < clockRadius * 0.6) {
+        const hourLen = clockRadius * 0.5;
+        const minuteLen = clockRadius * 0.8;
+        const hourTipX = hourLen * Math.sin(hourAngle);
+        const hourTipY = -hourLen * Math.cos(hourAngle);
+        const minuteTipX = minuteLen * Math.sin(minuteAngle);
+        const minuteTipY = -minuteLen * Math.cos(minuteAngle);
+
+        const dHour = distancePointToSegment(mouse.x, mouse.y, 0, 0, hourTipX, hourTipY);
+        const dMinute = distancePointToSegment(mouse.x, mouse.y, 0, 0, minuteTipX, minuteTipY);
+        const hitTolerance = Math.max(12, clockRadius * 0.08);
+
+        if (dHour <= hitTolerance && dHour <= dMinute) {
             isDraggingHour = true;
-        } else {
+        } else if (dMinute <= hitTolerance) {
             isDraggingMinute = true;
         }
     });
@@ -194,9 +219,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const minDiff = Math.abs(userMinDeg - targetMinDeg);
         const hourDiff = Math.abs(userHourDeg - targetHourDeg);
-        
-        const isMinCorrect = minDiff < 7 || (360 - minDiff) < 7;
-        const isHourCorrect = hourDiff < 15 || (360 - hourDiff) < 15;
+
+        const MINUTE_TOLERANCE = 7;
+        // Nới nhẹ sai số kim giờ để giảm trường hợp người học đặt "gần đúng" nhưng bị trượt.
+        const HOUR_TOLERANCE = 23;
+        const isMinCorrect = minDiff < MINUTE_TOLERANCE || (360 - minDiff) < MINUTE_TOLERANCE;
+        const isHourCorrect = hourDiff < HOUR_TOLERANCE || (360 - hourDiff) < HOUR_TOLERANCE;
 
         if (isMinCorrect && isHourCorrect) {
             answersCorrect[currentQIndex] = true;
