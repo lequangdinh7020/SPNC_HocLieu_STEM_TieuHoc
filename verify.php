@@ -9,7 +9,6 @@ try {
         $email = trim($_GET['email']);
         $code = trim($_GET['code']);
 
-        // Load User model directly
         require_once __DIR__ . '/models/Database.php';
         require_once __DIR__ . '/models/User.php';
         $db = (new Database())->getConnection();

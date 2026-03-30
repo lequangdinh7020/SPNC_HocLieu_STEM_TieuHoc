@@ -1,13 +1,11 @@
 <?php
 session_start();
 
-// 1. TẢI CÁC FILE CẦN THIẾT
 require_once 'models/Database.php';
 require_once 'models/User.php';
 require_once 'controllers/LessonController.php';
 require_once 'controllers/AuthController.php';
 
-// KIỂM TRA REMEMBER TOKEN - nếu session hết nhưng có cookie remember
 if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember'])) {
     try {
         $authController = new AuthController();
@@ -17,10 +15,8 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember'])) {
     }
 }
 
-// 2. PHÂN TÍCH URL
 $request_uri = $_SERVER['REQUEST_URI'];
 
-// Xóa tên thư mục con khỏi URL
 $base_path = dirname($_SERVER['SCRIPT_NAME']);
 $base_path = rtrim($base_path, '/\\');
 
@@ -29,23 +25,18 @@ $route = str_replace($base_path, '', $request_uri);
 if (strpos($route, '?') !== false) {
     $route = substr($route, 0, strpos($route, '?'));
 }
-// Đặt route mặc định nếu rỗng
 if (empty($route)) {
     $route = '/';
 }
 
-// 3. ĐIỀU HƯỚNG (ROUTING)
-// Tái tạo logic từ tệp 'routes.php'
 
 $lessonController = new LessonController();
 
 switch ($route) {
-    // Support pretty route used by some front-end links
     case '/science/color-game':
         $lessonController->showColorGame();
         break;
 
-    // --- CÁC ROUTE CỦA GAME ---
     case '/views/lessons/science_color_game':
         $lessonController->showColorGame();
         break;
@@ -168,7 +159,6 @@ switch ($route) {
         break;
         
     case '/views/lessons/engineering_car_builder':
-        // Chuyển sang engineering_water_pipe
         $lessonController->showPipeGame();
         break;
 
@@ -228,12 +218,10 @@ switch ($route) {
         break;
     
     case '/views/lessons/engineering_tower_game':
-        // Route mới cho trò chơi xây tháp
         $lessonController->showTowerGame();
         break;
         
     case '/views/lessons/engineering_room_decor':
-        // Route mới cho trò sắp xếp căn phòng
         $lessonController->showRoomDecorGame();
         break;
     case '/views/lessons/update-room-decor-score':
@@ -249,7 +237,6 @@ switch ($route) {
         break;
 
     case '/views/lessons/engineering_water_pipe':
-        // Route mới cho hệ thống dẫn nước
         $lessonController->showPipeGame();
         break;
 
@@ -259,13 +246,10 @@ switch ($route) {
         }
         break;
 
-    // --- FORGOT PASSWORD VIEW ---
     case '/forgot-password':
-        // serve view directly
         require __DIR__ . '/views/forgot-password.php';
         break;
 
-    // --- AUTH APIs (forgot password) ---
     case '/auth/forgot-password/send-code':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $auth = new AuthController();
@@ -287,7 +271,6 @@ switch ($route) {
         }
         break;
 
-    // ─── Certificate issuance (AJAX POST) ────────────────────────────────────
     case '/api/issue-certificate':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Content-Type: application/json; charset=utf-8');
@@ -309,7 +292,6 @@ switch ($route) {
                 $certConn = $certDb->getConnection();
                 $userId   = (int)$_SESSION['user_id'];
 
-                // Verify topic exists
                 $tChk = $certConn->prepare("SELECT id FROM stem_fields WHERE id = :tid LIMIT 1");
                 $tChk->execute([':tid' => $topicId]);
                 if (!$tChk->fetch()) {
@@ -318,7 +300,6 @@ switch ($route) {
                     exit;
                 }
 
-                // Check completion ≥ 90 %
                 $cStmt = $certConn->prepare("
                     SELECT COUNT(DISTINCT g.id) AS total_games,
                     COALESCE(SUM(CASE WHEN us.best_score IS NOT NULL
@@ -346,7 +327,6 @@ switch ($route) {
                     exit;
                 }
 
-                // Issue (idempotent INSERT IGNORE)
                 $ins = $certConn->prepare(
                     "INSERT IGNORE INTO certificates (user_id, topic_id, issued_at) VALUES (:uid, :tid, NOW())"
                 );
@@ -369,22 +349,15 @@ switch ($route) {
         break;
     case '/':
     case '/index.php':
-        // Gọi hàm hiển thị trang chủ
         showHomePage();
         break;
         
     default:
-        // 404 Not Found
-        // Hiển thị trang chủ nếu không tìm thấy
         showHomePage();
         break;
 }
 
-/**
- * HÀM HIỂN THỊ TRANG CHỦ
- */
 function showHomePage() {
-    // Các biến nằm trong phạm vi (scope) của hàm
     $isLoggedIn = isset($_SESSION['user_id']);
     $userName = $isLoggedIn ? $_SESSION['full_name'] : '';
 

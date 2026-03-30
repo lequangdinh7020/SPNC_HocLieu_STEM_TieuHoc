@@ -11,7 +11,6 @@ try {
 
     $authController = new AuthController();
 
-    // Kiểm tra cookie ghi nhớ đăng nhập
     if (!isset($_SESSION['user_id']) && $authController->checkRememberToken()) {
         header('Location: ../views/home.php');
         exit;

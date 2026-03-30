@@ -1,8 +1,8 @@
 <?php
 return [
     'host' => 'smtp.gmail.com',
-    'username' => 'lequangdinh7020@gmail.com',  //  Gmail 
-    'password' => 'hnxd wbsj aqal chtt',  //Password App 
+    'username' => 'lequangdinh7020@gmail.com',  
+    'password' => 'hnxd wbsj aqal chtt',  
     'port' => 587,
     'secure' => 'tls',
     'from_email' => 'lequangdinh7020@gmail.com',

@@ -6,7 +6,6 @@ $base_url = rtrim($base_url, '/\\');
 
 require_once './template/header.php';
 
-// Load user info from session + database
 $user = [
     'id' => null,
     'username' => 'Khách',
@@ -42,7 +41,6 @@ if (!empty($_SESSION['user_id'])) {
                 $user = array_merge($user, $row);
             }
 
-            // Completed games (distinct game_id, best score >= passing_score)
             $completedStmt = $db->prepare(<<<'SQL'
     SELECT COUNT(*) as cnt FROM (
       SELECT s.game_id, MAX(s.score_percentage) as best
@@ -57,19 +55,16 @@ if (!empty($_SESSION['user_id'])) {
             $completedRow = $completedStmt->fetch(PDO::FETCH_ASSOC);
             $completedCount = $completedRow ? (int)$completedRow['cnt'] : 0;
 
-            // Certificates count
             $cstmt = $db->prepare("SELECT COUNT(*) as cnt FROM certificates WHERE user_id = :uid");
             $cstmt->execute([':uid' => $_SESSION['user_id']]);
             $crow = $cstmt->fetch(PDO::FETCH_ASSOC);
             $certCount = $crow ? (int)$crow['cnt'] : 0;
 
-            // User XP
             $ustmt = $db->prepare("SELECT xp FROM users WHERE id = :uid LIMIT 1");
             $ustmt->execute([':uid' => $_SESSION['user_id']]);
             $urow = $ustmt->fetch(PDO::FETCH_ASSOC);
             $userXp = $urow ? (int)$urow['xp'] : 0;
 
-            // Average of best scores per game
             $avgStmt = $db->prepare(<<<'SQL'
     SELECT IFNULL(ROUND(AVG(best), 1), 0) as avg_best_score FROM (
       SELECT MAX(s.score_percentage) as best
@@ -83,7 +78,6 @@ if (!empty($_SESSION['user_id'])) {
             $avgRow = $avgStmt->fetch(PDO::FETCH_ASSOC);
             $avgScore = $avgRow ? (float)$avgRow['avg_best_score'] : 0;
 
-            // compute some simple stats from scores/works
             $statsStmt = $db->prepare("SELECT
                 (SELECT COUNT(*) FROM games) AS total_lessons,
                 (SELECT COUNT(*) FROM works WHERE user_id = :uid) AS works_count
@@ -94,14 +88,12 @@ if (!empty($_SESSION['user_id'])) {
                 $stats = array_merge($stats, $statsData);
             }
 
-            // Get scores and active days separately
             $scoresStmt = $db->prepare("SELECT COUNT(*) as scores_count, COUNT(DISTINCT DATE(created_at)) as active_days FROM scores WHERE user_id = :uid");
             $scoresStmt->execute([':uid' => $_SESSION['user_id']]);
             $scoresData = $scoresStmt->fetch(PDO::FETCH_ASSOC);
             if ($scoresData) {
                 $stats = array_merge($stats, $scoresData);
             }
-            // DEBUG
             error_log('Profile stats DEBUG: user_id=' . $_SESSION['user_id'] . ', scoresData=' . json_encode($scoresData) . ', stats after merge=' . json_encode($stats));
         }
     } catch (Exception $e) {
@@ -109,7 +101,6 @@ if (!empty($_SESSION['user_id'])) {
     }
 }
 
-// Helper values for template
 $displayName = trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '')) ?: ($user['username'] ?? 'Khách');
 $profileRole = ($user['role'] ?? 'Học sinh') === 'admin' ? 'Quản trị viên' : 'Học sinh';
 $avatarHtml = '<div class="avatar-large">👦</div>';
@@ -118,10 +109,8 @@ if (!empty($user['avatar'])) {
     $avatarHtml = '<img src="' . $avatarPath . '" alt="avatar" class="avatar-img" />';
 }
 
-// DEBUG: Show session info
 echo '<!-- DEBUG: user_id=' . $_SESSION['user_id'] . ', user=' . json_encode($user) . ', stats=' . json_encode($stats) . ' -->';
 
-// Safe stats
 $lessonsCount = isset($stats['total_lessons']) ? (int)$stats['total_lessons'] : 0;
 $achievementsCount = isset($stats['works_count']) ? (int)$stats['works_count'] : 0;
 $daysLearning = isset($stats['active_days']) ? (int)$stats['active_days'] : 0;
@@ -129,7 +118,6 @@ $completedLessons = isset($completedCount) ? $completedCount : 0;
 $certificatesCount = isset($certCount) ? $certCount : 0;
 error_log('Final values: daysLearning=' . $daysLearning . ', active_days=' . $stats['active_days']);
 
-// Function to get level based on XP
 function getLevelFromXp($xp) {
     if ($xp <= 100) {
         return 'Sao Nhí Lấp Lánh';
@@ -144,7 +132,6 @@ function getLevelFromXp($xp) {
 
 $levelBadge = getLevelFromXp($userXp);
 
-// Calculate progress percent
 $totalLessonsCount = 20;
 $progressPercent = $totalLessonsCount ? round(($completedLessons / $totalLessonsCount) * 100) : 0;
 ?>

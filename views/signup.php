@@ -22,13 +22,11 @@ try {
         
         $error = '';
         
-        // 1. Kiểm tra Họ và tên
         if (empty($fullname)) {
             $error = "Vui lòng nhập họ và tên";
         } elseif (str_word_count($fullname) < 2) {
             $error = "Họ và tên phải có ít nhất 2 từ (ví dụ: Nguyễn Văn A) để hiển thị đúng trên chứng nhận";
         }
-        // 2. Kiểm tra Tên đăng nhập
         elseif (empty($username)) {
             $error = "Vui lòng nhập tên đăng nhập";
         } elseif (strlen($username) < 3) {
@@ -36,36 +34,30 @@ try {
         } elseif (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
             $error = "Tên đăng nhập chỉ được chứa chữ cái, số và dấu gạch dưới";
         }
-        // 3. Kiểm tra Email
         elseif (empty($email)) {
             $error = "Vui lòng nhập email";
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $error = "Email không hợp lệ";
         }
-        // 4. Kiểm tra Lớp
         elseif (empty($class)) {
             $error = "Vui lòng nhập lớp";
         }
-        // 5. Kiểm tra Số điện thoại
         elseif (empty($phone)) {
             $error = "Vui lòng nhập số điện thoại";
         } elseif (!preg_match('/^\d{10}$/', $phone)) {
             $error = "Số điện thoại phải đúng 10 chữ số";
         }
-        // 6. Kiểm tra Mật khẩu
         elseif (empty($password)) {
             $error = "Vui lòng nhập mật khẩu";
         } elseif (strlen($password) < 6) {
             $error = "Mật khẩu phải có ít nhất 6 ký tự";
         }
-        // 7. Kiểm tra Xác nhận mật khẩu
         elseif (empty($confirm_password)) {
             $error = "Vui lòng xác nhận mật khẩu";
         } elseif ($password !== $confirm_password) {
             $error = "Mật khẩu xác nhận không khớp";
         }
         
-        // 8. Kiểm tra Điều khoản sử dụng
         $agree = isset($_POST['agree_terms']) && $_POST['agree_terms'] ? true : false;
         if (empty($error) && !$agree) {
             $error = "Vui lòng đồng ý với điều khoản sử dụng";
@@ -82,7 +74,6 @@ try {
         }
     }
 } catch (Exception $e) {
-    // Show actual error in development
     $error = "Lỗi đăng ký: " . $e->getMessage();
     error_log("Signup error: " . $e->getMessage() . "\nStack trace: " . $e->getTraceAsString());
 }

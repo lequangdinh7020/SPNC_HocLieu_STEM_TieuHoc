@@ -2,23 +2,19 @@
 
 class LessonController {
 
-    // Helper: try to find a lesson id that matches a game/lesson name
     private function findLessonIdByName($db, $name) {
         if (!$db || empty($name)) return null;
         try {
-            // 1) exact match
             $stmt = $db->prepare("SELECT id FROM lessons WHERE lesson_name = :name LIMIT 1");
             $stmt->execute([':name' => $name]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($row) return (int)$row['id'];
 
-            // 2) like match
             $stmt = $db->prepare("SELECT id FROM lessons WHERE lesson_name LIKE :like LIMIT 1");
             $stmt->execute([':like' => '%' . $name . '%']);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($row) return (int)$row['id'];
 
-            // 3) try shorter token matches (split words)
             $parts = preg_split('/\s+/', trim($name));
             foreach ($parts as $p) {
                 if (strlen($p) < 3) continue;
@@ -28,12 +24,10 @@ class LessonController {
                 if ($row) return (int)$row['id'];
             }
         } catch (Exception $e) {
-            // ignore and return null
         }
         return null;
     }
 
-    // Helper: get topic_id from a lesson id (returns null if not found)
     private function getTopicIdFromLesson($db, $lessonId) {
         if (!$db || empty($lessonId)) return null;
         try {
@@ -42,12 +36,10 @@ class LessonController {
             $trow = $tstmt->fetch(PDO::FETCH_ASSOC);
             if ($trow && !empty($trow['topic_id'])) return (int)$trow['topic_id'];
         } catch (Exception $e) {
-            // ignore
         }
         return null;
     }
 
-    // API: commit quiz score for lessons like 'Ngày và Đêm'
     public function commitQuizScore() {
         if (session_status() == PHP_SESSION_NONE) session_start();
         header('Content-Type: application/json');
@@ -115,7 +107,6 @@ class LessonController {
             $_SESSION['color_game_intro_seen'] = true;
         }
 
-        // 1. KHỞI TẠO ĐIỂM SỐ (dùng chung session 'total_score' cho game)
         if (!isset($_SESSION['total_score'])) {
             $_SESSION['total_score'] = 0;
         }
@@ -123,15 +114,12 @@ class LessonController {
             $_SESSION['total_xp'] = 0;
         }
 
-        // Handle explicit end request (force finish game and go to result)
         if (isset($_GET['end'])) {
-            // Clear remaining targets so controller treats game as finished
             $_SESSION['available_targets'] = [];
             unset($_SESSION['current_target']);
             unset($_SESSION['current_attempt']);
         }
 
-        // 2. XỬ LÝ KHI QUA CÂU HỎI MỚI (hoặc chơi lại)
         if (isset($_GET['next'])) {
             if (isset($_GET['points'])) {
                 $_SESSION['total_score'] += (int)$_GET['points'];
@@ -142,7 +130,6 @@ class LessonController {
             }
             unset($_SESSION['current_target']);
             unset($_SESSION['current_attempt']);
-            // Allow replaying and re-committing: clear commit flag when user explicitly restarts
             if (isset($_SESSION['color_game_committed'])) {
                 unset($_SESSION['color_game_committed']);
             }
@@ -153,7 +140,6 @@ class LessonController {
             }
         }
 
-        // 3. DANH SÁCH CÂU HỎI
         $targets = [
             ["name" => "orange", "text" => "Hãy pha trộn màu CAM 🍊", "rgb" => [255, 165, 0], "colors" => ["red", "yellow"]],
             ["name" => "green", "text" => "Hãy pha trộn màu XANH LÁ 🍃", "rgb" => [0, 128, 0], "colors" => ["blue", "yellow"]],
@@ -161,9 +147,7 @@ class LessonController {
             ["name" => "gray", "text" => "Hãy pha trộn màu XÁM ⚙️", "rgb" => [128, 128, 128], "colors" => ["black", "white"]]
         ];
 
-        // 4. KHỞI TẠO DANH SÁCH CÂU HỎI
         if (!isset($_SESSION['available_targets'])) {
-            // Chống dữ liệu trùng tên màu trong danh sách mục tiêu.
             $uniqueTargets = [];
             foreach ($targets as $item) {
                 $uniqueTargets[$item['name']] = $item;
@@ -172,7 +156,6 @@ class LessonController {
             shuffle($_SESSION['available_targets']);
         }
 
-        // 5. LẤY CÂU HỎI HIỆN TẠI
         if (!isset($_SESSION['current_target'])) {
             if (!empty($_SESSION['available_targets'])) {
                 $candidate = array_pop($_SESSION['available_targets']);
@@ -181,7 +164,6 @@ class LessonController {
                     && $candidate['name'] === $_SESSION['last_target_name']
                     && !empty($_SESSION['available_targets'])
                 ) {
-                    // Tránh lặp lại liên tiếp cùng một màu nếu còn mục tiêu khác.
                     array_unshift($_SESSION['available_targets'], $candidate);
                     $candidate = array_pop($_SESSION['available_targets']);
                 }
@@ -191,7 +173,7 @@ class LessonController {
                 $_SESSION['current_attempt'] = 1;
                 $target = $_SESSION['current_target'];
             } else {
-                $target = null; // Hết câu hỏi
+                $target = null; 
             }
         } else {
             $target = $_SESSION['current_target'];
@@ -205,12 +187,9 @@ class LessonController {
         }
 
         $base_url = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
-        // Default passing threshold (percentage) for this game
         $passingThreshold = 25;
-        // Nếu đã hết câu hỏi -> có thể lưu điểm/chấm hoàn thành một lần
         $completionResult = null;
         if ($target === null) {
-            // Nếu user đăng nhập và chưa commit điểm cho game này trong session
             if (!empty($_SESSION['user_id']) && empty($_SESSION['color_game_committed'])) {
                 try {
                     require_once __DIR__ . '/../models/Database.php';
@@ -219,29 +198,24 @@ class LessonController {
                     $database = new Database();
                     $db = $database->getConnection();
 
-                    // Tìm game 'Pha màu' trong cơ sở dữ liệu (không tạo mới từ controller)
                     $stmt = $db->prepare("SELECT id FROM games WHERE game_name LIKE :name LIMIT 1");
                     $stmt->execute([':name' => '%Pha màu%']);
                     $row = $stmt->fetch(PDO::FETCH_ASSOC);
                     if ($row) {
                         $gameId = (int)$row['id'];
                     } else {
-                        // Try a looser match and otherwise skip DB save.
                         $stmt2 = $db->prepare("SELECT id FROM games WHERE game_name LIKE :like LIMIT 1");
                         $stmt2->execute([':like' => '%Pha màu%']);
                         $r2 = $stmt2->fetch(PDO::FETCH_ASSOC);
                         if ($r2) {
                             $gameId = (int)$r2['id'];
                         } else {
-                            // No game record found; skip saving to DB and mark completionResult accordingly
                             $completionResult = ['success' => false, 'message' => 'Game "Pha màu" not registered in database'];
                         }
                     }
 
-                    // Lưu điểm và đánh dấu hoàn thành nếu đạt `passing_score` (nếu gameId tồn tại)
                     $userId = (int)$_SESSION['user_id'];
                     $rawScore = isset($_SESSION['total_score']) ? (int)$_SESSION['total_score'] : 0;
-                    // Derive max possible points: number of targets * 10 (JS awards up to 10 per question)
                     $maxPoints = count($targets) * 10;
                     $percentage = 0;
                     if ($maxPoints > 0) {
@@ -250,11 +224,9 @@ class LessonController {
                         if ($percentage < 0) $percentage = 0;
                     }
 
-                    // XP: accumulate from session (per-question xp passed from JS). Cap to game's xp if set.
                     $rawXp = isset($_SESSION['total_xp']) ? (int)$_SESSION['total_xp'] : 0;
                     $xpAwarded = $rawXp;
                     if (!empty($gameId)) {
-                        // fetch game's xp cap
                         $gstmt = $db->prepare("SELECT xp FROM games WHERE id = :gid LIMIT 1");
                         $gstmt->execute([':gid' => $gameId]);
                         $gRow = $gstmt->fetch(PDO::FETCH_ASSOC);
@@ -267,10 +239,8 @@ class LessonController {
                     if (!empty($gameId)) {
                         $completionResult = Score::saveAndMark($userId, $gameId, $percentage, $xpAwarded);
                     } else {
-                        // completionResult already set above when game not found
                     }
 
-                    // Đánh dấu đã commit để tránh double-insert
                     $_SESSION['color_game_committed'] = true;
                 } catch (Exception $e) {
                     error_log('Color game commit error: ' . $e->getMessage());
@@ -278,10 +248,8 @@ class LessonController {
             }
         }
 
-        // compute final percentage for view (even if user not logged in)
         if (!isset($percentage)) {
             $rawScore = isset($_SESSION['total_score']) ? (int)$_SESSION['total_score'] : 0;
-            // JS awards up to 10 points per question, keep calculations consistent
             $maxPoints = count($targets) * 10;
             $percentage = 0;
             if ($maxPoints > 0) {
@@ -291,7 +259,6 @@ class LessonController {
             }
         }
 
-        // 6. TẢI VIEW (GIAO DIỆN)
         require_once __DIR__ . '/../views/lessons/science_color_game.php';
     }
 
@@ -303,13 +270,11 @@ class LessonController {
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
-        // Dùng một session điểm riêng cho game
         if (!isset($_SESSION['nutrition_score'])) {
             $_SESSION['nutrition_score'] = 0;
         }
 
         $foodItems = [
-            // Tầng 4 (Đáy tháp) -> data-group = 1
             ['id' => 'food1', 'name' => 'Hạt', 'group' => 1, 'img' => 'hat.png'],
             ['id' => 'food2', 'name' => 'Đậu', 'group' => 1, 'img' => 'hat_dau.png'],
             ['id' => 'food3', 'name' => 'Bánh mì', 'group' => 1, 'img' => 'banh_mi.png'],
@@ -319,7 +284,6 @@ class LessonController {
             ['id' => 'food7', 'name' => 'Pasta', 'group' => 1, 'img' => 'pasta.png'],
             ['id' => 'food8', 'name' => 'Ngũ cốc', 'group' => 1, 'img' => 'ngu_coc.png'],
 
-            // Tầng 3 (Rau/Trái cây) -> data-group = 2
             ['id' => 'food9', 'name' => 'Cà chua', 'group' => 2, 'img' => 'ca_chua.png'],
             ['id' => 'food10', 'name' => 'Ớt chuông', 'group' => 2, 'img' => 'ot_chuong.png'],
             ['id' => 'food11', 'name' => 'Nấm', 'group' => 2, 'img' => 'nam.png'],
@@ -329,7 +293,6 @@ class LessonController {
             ['id' => 'food15', 'name' => 'Nho', 'group' => 2, 'img' => 'nho.png'],
             ['id' => 'food16', 'name' => 'Dâu', 'group' => 2, 'img' => 'dau.png'],
 
-            // Tầng 2 (Đạm/Sữa) -> data-group = 3
             ['id' => 'food17', 'name' => 'Yogurt', 'group' => 3, 'img' => 'yogurt.png'],
             ['id' => 'food18', 'name' => 'Sữa', 'group' => 3, 'img' => 'sua.png'],
             ['id' => 'food19', 'name' => 'Phô mai', 'group' => 3, 'img' => 'pho_mai.png'],
@@ -339,7 +302,6 @@ class LessonController {
             ['id' => 'food23', 'name' => 'Trứng', 'group' => 3, 'img' => 'trung.png'],
             ['id' => 'food24', 'name' => 'Tôm', 'group' => 3, 'img' => 'tom.png'],
 
-            // Tầng 1 (Đỉnh tháp) -> data-group = 4
             ['id' => 'food25', 'name' => 'Dầu ăn', 'group' => 4, 'img' => 'dau_an.png'],
             ['id' => 'food26', 'name' => 'Đường', 'group' => 4, 'img' => 'duong.png'],
             ['id' => 'food27', 'name' => 'Muối', 'group' => 4, 'img' => 'muoi.png'],
@@ -349,7 +311,6 @@ class LessonController {
 
         $base_url = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
         
-        // Tải view
         require_once __DIR__ . '/../views/lessons/science_nutrition_game.php';
     }
 
@@ -368,13 +329,10 @@ class LessonController {
 
         if ($data) {
             if ($data['action'] === 'add_points' && isset($data['points'])) {
-                // Only update session score here. Do NOT auto-commit to DB.
-                // Commit will only happen when the user presses the Finish button.
                 $_SESSION['nutrition_score'] += (int)$data['points'];
             } elseif ($data['action'] === 'reset') {
                 $_SESSION['nutrition_score'] = 0;
             } elseif ($data['action'] === 'commit') {
-                // Lưu điểm vào database và đánh dấu hoàn thành nếu đạt passing_score
                 require_once __DIR__ . '/../models/Database.php';
                 require_once __DIR__ . '/../models/Score.php';
 
@@ -392,20 +350,17 @@ class LessonController {
                 try {
                     $db = (new Database())->getConnection();
 
-                    // If game_id not provided, find or create the 'Tháp dinh dưỡng' game and set passing_score accordingly
                     if (empty($gameId)) {
                         $stmt = $db->prepare("SELECT id FROM games WHERE game_name = :name LIMIT 1");
                         $stmt->execute([':name' => 'Tháp dinh dưỡng']);
                         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                        // determine threshold based on number of foods (27 items * 10 / 2)
                         $totalFoods = 27;
                         $threshold = (int)ceil(($totalFoods * 10) / 2.0);
 
                             if ($row) {
                                 $gameId = (int)$row['id'];
                             } else {
-                                // Try a looser match; do not create games from controller.
                                 $stmt2 = $db->prepare("SELECT id FROM games WHERE game_name LIKE :like LIMIT 1");
                                 $stmt2->execute([':like' => '%Tháp dinh dưỡng%']);
                                 $r2 = $stmt2->fetch(PDO::FETCH_ASSOC);
@@ -419,7 +374,6 @@ class LessonController {
                             }
                     }
 
-                    // compute percentage
                     $raw = (int)$_SESSION['nutrition_score'];
                     $maxPoints = $totalFoods * 10;
                     $pct = 0;
@@ -429,8 +383,6 @@ class LessonController {
                         if ($pct < 0) $pct = 0;
                     }
 
-                    // Determine passing threshold from DB (games.passing_score). If not set,
-                    // fall back to half of max points as before.
                     $passingScore = null;
                     try {
                         $pstmt = $db->prepare("SELECT passing_score FROM games WHERE id = :gid LIMIT 1");
@@ -440,26 +392,21 @@ class LessonController {
                             $passingScore = (int)$prow['passing_score'];
                         }
                     } catch (Exception $e) {
-                        // ignore and use fallback
                     }
 
                     if ($passingScore === null) {
-                        // fallback: half of max points (expressed as percent)
                         $passingScore = (int)ceil((($totalFoods * 10) / $maxPoints) * 100 / 2);
-                        // The above simplifies to 50, but keep calculation explicit if items change
                         if ($passingScore <= 0) $passingScore = 50;
                     }
 
-                    // For this game we treat a commit/finish as completion regardless of
-                    // the raw points; award a flat 20 XP on commit (per request).
-                    // Prevent duplicate commits within the same session.
+                    
                     if (!empty($_SESSION['nutrition_committed'])) {
                         header('Content-Type: application/json');
                         echo json_encode(['success' => true, 'message' => 'Already committed', 'newScore' => 0]);
                         exit();
                     }
 
-                    $xpAwarded = 20; // default XP for completing this non-question game
+                    $xpAwarded = 20; 
 
                     try {
                         $res = Score::saveAndMark($userId, $gameId, $pct, $xpAwarded);
@@ -469,7 +416,6 @@ class LessonController {
                         exit();
                     }
 
-                    // If save succeeded, reset session score and mark committed
                     if (is_array($res) && !empty($res['success'])) {
                         $_SESSION['nutrition_score'] = 0;
                         $_SESSION['nutrition_committed'] = true;
@@ -487,7 +433,6 @@ class LessonController {
             }
         }
 
-        // return score as percentage for client
         $raw = isset($_SESSION['nutrition_score']) ? (int)$_SESSION['nutrition_score'] : 0;
         $totalFoods = 27;
         $maxPoints = $totalFoods * 10;
@@ -610,16 +555,13 @@ class LessonController {
             ],
         ];
         
-        // Xác định màn hiện tại và màn kế tiếp
-        $keys = array_keys($allPlantsData); // Lấy danh sách các key ['hoa', 'cothu', ...]
+        $keys = array_keys($allPlantsData); 
         $currentIndex = array_search($plantType, $keys);
         $nextType = null;
 
-        // Nếu tìm thấy và không phải màn cuối cùng
         if ($currentIndex !== false && isset($keys[$currentIndex + 1])) {
             $nextType = $keys[$currentIndex + 1];
         }
-        // Xác định màn trước đó (nếu có)
         $prevType = null;
         if ($currentIndex !== false && isset($keys[$currentIndex - 1])) {
             $prevType = $keys[$currentIndex - 1];
@@ -641,13 +583,11 @@ class LessonController {
         $data = json_decode(file_get_contents('php://input'), true);
         header('Content-Type: application/json');
 
-        // Only support commit action for this game now. We no longer track per-plant scores.
         if (!$data || !isset($data['action']) || $data['action'] !== 'commit') {
             echo json_encode(['success' => false, 'message' => 'Unsupported action']);
             exit();
         }
 
-        // commit: mark this game as 100% completed for the logged-in user
         require_once __DIR__ . '/../models/Database.php';
         require_once __DIR__ . '/../models/Score.php';
 
@@ -657,12 +597,10 @@ class LessonController {
             exit();
         }
 
-        // Allow caller to provide game_id; otherwise resolve by game name
         $gameId = isset($data['game_id']) ? (int)$data['game_id'] : null;
 
         try {
             $db = (new Database())->getConnection();
-            // If game_id not provided, look up the game by its canonical name 'Lắp ghép bộ phận'
             if (empty($gameId)) {
                 try {
                     $gstmt = $db->prepare("SELECT id FROM games WHERE game_name = :name LIMIT 1");
@@ -671,28 +609,23 @@ class LessonController {
                     if ($gRow) {
                         $gameId = (int)$gRow['id'];
                     } else {
-                        // looser match
                         $gstmt2 = $db->prepare("SELECT id FROM games WHERE game_name LIKE :like LIMIT 1");
                         $gstmt2->execute([':like' => '%Lắp ghép bộ phận%']);
                         $gRow2 = $gstmt2->fetch(PDO::FETCH_ASSOC);
                         if ($gRow2) $gameId = (int)$gRow2['id'];
                     }
                 } catch (Exception $e) {
-                    // ignore, will validate gameId later
                 }
             }
 
             $pct = 100;
 
-            // Ensure gameId resolved
             if (empty($gameId)) {
                 echo json_encode(['success' => false, 'message' => 'Game "Lắp ghép bộ phận" not registered']);
                 exit();
             }
 
-            // Allow multiple commits; do not block repeated saves from the same session
-
-            // Determine XP to award: prefer client-provided `xp`, otherwise use game's xp value or default 20
+            
             $xpAwarded = 20;
             if (isset($data['xp'])) {
                 $xpAwarded = (int)$data['xp'];
@@ -707,13 +640,11 @@ class LessonController {
                         }
                     }
                 } catch (Exception $e) {
-                    // fallback to default xpAwarded
                 }
             }
 
             $res = Score::saveAndMark((int)$userId, $gameId, $pct, $xpAwarded);
             if (is_array($res) && !empty($res['success'])) {
-                // keep plant_score in session or reset as needed; do not mark committed
             }
             echo json_encode($res);
             exit();
@@ -727,11 +658,9 @@ class LessonController {
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
-        // initialize a session score for shapes game
         if (!isset($_SESSION['shapes_score'])) {
             $_SESSION['shapes_score'] = 0;
         }
-        // track a commit flag to avoid double-insert if desired by views
         if (!isset($_SESSION['shapes_committed'])) {
             $_SESSION['shapes_committed'] = false;
         }
@@ -740,8 +669,8 @@ class LessonController {
     }
 
     /**
-     * API: Commit score for Math Shapes challenge when all levels completed
-     * Game name in DB: 'Trò chơi Hình dạng'
+     * 
+     * Game name: 'Trò chơi Hình dạng'
      */
     public function updateShapesScore() {
         if (session_status() == PHP_SESSION_NONE) session_start();
@@ -769,14 +698,12 @@ class LessonController {
             $db = (new Database())->getConnection();
 
             if (empty($gameId)) {
-                // Prefer exact game name 'Trò chơi Hình dạng'
                 $pstmt = $db->prepare('SELECT id FROM games WHERE game_name = :name LIMIT 1');
                 $pstmt->execute([':name' => 'Trò chơi Hình dạng']);
                 $pr = $pstmt->fetch(PDO::FETCH_ASSOC);
                 if ($pr) {
                     $gameId = (int)$pr['id'];
                 } else {
-                    // Looser match by keyword 'Hình dạng'
                     $lstmt = $db->prepare('SELECT id FROM games WHERE game_name LIKE :like LIMIT 1');
                     $lstmt->execute([':like' => '%Hình dạng%']);
                     $lr = $lstmt->fetch(PDO::FETCH_ASSOC);
@@ -789,13 +716,11 @@ class LessonController {
                 return;
             }
 
-            // Derive percentage: prefer client-sent percentage, else try to derive from session
             $pct = 0;
             if ($scorePct !== null) {
                 $pct = max(0, min(100, $scorePct));
             } else {
                 $raw = isset($_SESSION['shapes_score']) ? (int)$_SESSION['shapes_score'] : 0;
-                // JS awards 100 points per challenge; determine total challenges from posted param if available
                 $totalChallenges = isset($data['total_challenges']) ? (int)$data['total_challenges'] : 6;
                 $maxPoints = max(1, $totalChallenges) * 100;
                 $pct = ($maxPoints > 0) ? (int) round((($raw / $maxPoints) * 100)) : 0;
@@ -811,7 +736,6 @@ class LessonController {
                 $res['xp_awarded'] = $xpAwarded;
             }
 
-            // Mark committed in session to avoid duplicate if desired by UI
             $_SESSION['shapes_committed'] = true;
 
             echo json_encode($res);
@@ -823,7 +747,6 @@ class LessonController {
     }
 
     public function showMathNumberGame() {
-        // khởi tạo session score nếu cần
         if (!isset($_SESSION['number_score'])) {
           $_SESSION['number_score'] = 0;
         }
@@ -844,7 +767,6 @@ class LessonController {
 
         $base_url = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
 
-        // Định nghĩa các loại rác
         $trashItems = [
             // Rác Vô Cơ
             ['id' => 'trash1', 'name' => 'Bao tay rách', 'group' => 'voco', 'img' => 'bao_tay_rach.png', 'top' => '70%', 'left' => '63%'],
@@ -913,15 +835,13 @@ class LessonController {
                 try {
                     $db = (new Database())->getConnection();
 
-                    // Compute percentage from raw session points. JS may send total_drops so
-                    // we can compute a proper percentage: (raw / (total_drops*10)) * 100
+                    
                     $raw = (int)($_SESSION['trash_score'] ?? 0);
                     $totalDropsParam = isset($data['total_drops']) ? (int)$data['total_drops'] : null;
                     if ($totalDropsParam && $totalDropsParam > 0) {
                         $maxPoints = $totalDropsParam * 10;
                         $pct = ($maxPoints > 0) ? (int) round((($raw / $maxPoints) * 100)) : 0;
                     } else {
-                        // fallback: assume 21 items (matching showTrashGame list)
                         $defaultItems = 21;
                         $maxPoints = $defaultItems * 10;
                         $pct = ($maxPoints > 0) ? (int) round((($raw / $maxPoints) * 100)) : 0;
@@ -929,7 +849,6 @@ class LessonController {
                     if ($pct > 100) $pct = 100;
                     if ($pct < 0) $pct = 0;
 
-                    // If game_id not provided, find the game by its canonical name 'Thùng rác thân thiện'
                     if (empty($gameId)) {
                         try {
                             $gstmt = $db->prepare("SELECT id FROM games WHERE game_name = :name LIMIT 1");
@@ -945,11 +864,9 @@ class LessonController {
                                 if ($gRow2) $gameId = (int)$gRow2['id'];
                             }
                         } catch (Exception $e) {
-                            // ignore here; we'll check gameId existence below
                         }
                     }
 
-                    // Get passing_score from games table (if set)
                     $passingScore = null;
                     try {
                         if (!empty($gameId)) {
@@ -961,24 +878,18 @@ class LessonController {
                             }
                         }
                     } catch (Exception $e) {
-                        // ignore and fall back
                     }
 
                     if ($passingScore === null) {
-                        // fallback default: 50
                         $passingScore = 50;
                     }
 
-                        // Ensure we have a valid game id resolved (looked up by name if needed)
                         if (empty($gameId)) {
                             echo json_encode(['success' => false, 'message' => 'Game "Thùng rác thân thiện" not registered']);
                             exit();
                         }
 
-                    // For this game we allow committing regardless of percentage.
-                    // Allow multiple commits for trash game; do not block repeated saves
-
-                    // Determine XP to award: prefer client-provided `xp`, otherwise use game's xp value or default 20
+            
                     $xpAwarded = 20;
                     if (isset($data['xp'])) {
                         $xpAwarded = (int)$data['xp'];
@@ -993,7 +904,6 @@ class LessonController {
                                 }
                             }
                         } catch (Exception $e) {
-                            // ignore and keep default xpAwarded
                         }
                     }
 
@@ -1004,9 +914,7 @@ class LessonController {
                         exit();
                     }
 
-                    // If save succeeded, reset session score and mark committed
                     if (is_array($res) && !empty($res['success'])) {
-                        // reset session score after successful save; do not mark committed so multiple saves allowed
                         $_SESSION['trash_score'] = 0;
                         $res['newScore'] = 0;
                         $res['xp_awarded'] = $xpAwarded;
@@ -1020,8 +928,7 @@ class LessonController {
             }
         }
 
-        // return percentage to client. If client provided total_drops, use it to compute
-        // an accurate percentage; otherwise fall back to default item count.
+        
         $raw = isset($_SESSION['trash_score']) ? (int)$_SESSION['trash_score'] : 0;
         $totalDropsResp = isset($data['total_drops']) ? (int)$data['total_drops'] : null;
         if ($totalDropsResp && $totalDropsResp > 0) {
@@ -1121,12 +1028,11 @@ class LessonController {
         
         $base_url = str_replace('\\', '/', rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\'));
         
-        // DỮ LIỆU 5 LEVEL
         $gameLevels = [
             // LEVEL 1:
             1 => [
                 'id' => 1,
-                'layout_type' => 'type_2p_3c_fixed', // Layout: 2 phụ huynh (1 cố định), 3 con
+                'layout_type' => 'type_2p_3c_fixed', 
                 'level_title' => 'Gia đình của Lan (Dễ)',
                 'fixed_chars' => ['parent1' => ['id' => 'lan', 'name' => 'Lan']], 
                 'available_characters' => ['Hùng', 'Chi', 'An', 'Bình'],
@@ -1146,7 +1052,7 @@ class LessonController {
             // LEVEL 2:
             2 => [
                 'id' => 2,
-                'layout_type' => 'type_2p_2c', // Layout: 2 phụ huynh, 2 con
+                'layout_type' => 'type_2p_2c', 
                 'level_title' => 'Gia đình của Tuấn & Mai (Trung bình)',
                 'fixed_chars' => [],
                 'available_characters' => ['Tuấn', 'Mai', 'Tí', 'Tèo'],
@@ -1165,7 +1071,7 @@ class LessonController {
             // LEVEL 3:
             3 => [
                 'id' => 3,
-                'layout_type' => 'type_vertical_3gen', // Layout: Ông -> Bố -> Cháu
+                'layout_type' => 'type_vertical_3gen', 
                 'level_title' => 'Gia đình 3 thế hệ (Khá)',
                 'fixed_chars' => [],
                 'available_characters' => ['Ba', 'Nam', 'Bi'],
@@ -1255,7 +1161,7 @@ class LessonController {
                     [1, 1, 1, 1, 1]
                 ],
                 'limit' => 10,
-                'time' => 60 // giây
+                'time' => 60 
             ],
             2 => [
                 'id' => 2,
@@ -1263,7 +1169,7 @@ class LessonController {
                 'mission' => 'Tìm Gà chín cựa',
                 'target_img' => 'ga9cua.png',
                 'hint' => 'Đường đi lặp lại giống nhau. Hãy dùng khối [Lặp lại] để leo núi nhanh hơn!',
-                'concepts' => ['loop'], // Vòng lặp
+                'concepts' => ['loop'], 
                 'map' => [
                     [1, 1, 1, 3, 1],
                     [1, 1, 0, 0, 1],
@@ -1280,7 +1186,7 @@ class LessonController {
                 'mission' => 'Tìm Ngựa chín hồng mao',
                 'target_img' => 'ngua9hongmao.png',
                 'hint' => 'Nước lũ dâng cao! Dùng khối [Nếu gặp nước] để bắc cầu.',
-                'concepts' => ['condition'], // Điều kiện
+                'concepts' => ['condition'], 
                 'map' => [
                     [1, 1, 1, 1, 1],
                     [1, 3, 4, 0, 0],
@@ -1301,8 +1207,7 @@ class LessonController {
     }
 
     /**
-     * API: Commit score for Coding game when final level completed
-     * Saves 100% for the user for the game named 'Trò chơi Lập trình'
+     * game named 'Trò chơi Lập trình'
      */
     public function updateCodingScore() {
         if (session_status() == PHP_SESSION_NONE) session_start();
@@ -1329,14 +1234,12 @@ class LessonController {
             $db = (new Database())->getConnection();
 
             if (empty($gameId)) {
-                // Prefer exact game name 'Trò chơi Lập trình'
                 $pstmt = $db->prepare('SELECT id FROM games WHERE game_name = :name LIMIT 1');
                 $pstmt->execute([':name' => 'Trò chơi Lập trình']);
                 $pr = $pstmt->fetch(PDO::FETCH_ASSOC);
                 if ($pr) {
                     $gameId = (int)$pr['id'];
                 } else {
-                    // Looser match by keyword 'Lập trình'
                     $lstmt = $db->prepare('SELECT id FROM games WHERE game_name LIKE :like LIMIT 1');
                     $lstmt->execute([':like' => '%Lập trình%']);
                     $lr = $lstmt->fetch(PDO::FETCH_ASSOC);
@@ -1349,7 +1252,6 @@ class LessonController {
                 return;
             }
 
-            // Allow repeated plays and saves; do not block by session flag.
             $pct = 100;
             $xpAwarded = 20;
             $res = Score::saveAndMark((int)$userId, $gameId, $pct, $xpAwarded);
@@ -1372,7 +1274,6 @@ class LessonController {
         
         $base_url = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
 
-        // Định nghĩa các bộ phận.
         $computerParts = [
             ['id' => 'monitor', 'name' => 'Màn hình', 'img' => 'monitor.png'],
             ['id' => 'case', 'name' => 'Thùng máy', 'img' => 'case.png'],
@@ -1383,9 +1284,8 @@ class LessonController {
             ['id' => 'microphone', 'name' => 'Micrô', 'img' => 'microphone.png']
         ];
         
-        shuffle($computerParts); // Xáo trộn các bộ phận trong ngân hàng
+        shuffle($computerParts); 
 
-        // Tải view
         require_once __DIR__ . '/../views/lessons/technology_computer_parts.php';
     }
 
@@ -1398,7 +1298,6 @@ class LessonController {
         $base_url = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
         $base_url = str_replace('\\', '/', $base_url);
 
-        // Dữ liệu từ vựng theo cấp độ
         $gameData = [
             'easy' => [ // Hàng phím cơ sở
                 'A', 'S', 'D', 'F', 'J', 'K', 'L', 
@@ -1458,9 +1357,8 @@ class LessonController {
             ]
         ];
 
-        // Kiểm tra nếu chủ đề không tồn tại thì quay về 'free'
         $currentConfig = $topicConfig[$topic] ?? $topicConfig['free'];
-        $timeLimit = 300; // Thời gian mặc định 5 phút
+        $timeLimit = 300; 
 
         require_once __DIR__ . '/../views/lessons/technology_painter_game.php';
     }
@@ -1473,14 +1371,13 @@ class LessonController {
 
         $base_url = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
         
-        // Khởi tạo điểm game
         if (!isset($_SESSION['flower_score'])) {
             $_SESSION['flower_score'] = 0;
         }
 
         $base_url = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
 
-        // Dữ liệu game (tuỳ bạn thêm)
+        // Dữ liệu game 
         $flowerParts = [
             ['id' => 'petal', 'name' => 'Cánh hoa'],
             ['id' => 'stamen', 'name' => 'Nhị hoa'],
@@ -1491,7 +1388,6 @@ class LessonController {
 
         shuffle($flowerParts);
 
-        // Load view
         require_once __DIR__ . '/../views/lessons/engineering_flower_mechanism.php';
     }
 
@@ -1526,7 +1422,6 @@ class LessonController {
             $db = (new Database())->getConnection();
 
             if (empty($gameId)) {
-                // Prefer exact match for the flower experiment game name
                 $preferred = ['Hoa yêu thương nở rộ', 'Hoa yêu thương'];
                 foreach ($preferred as $nm) {
                     $pstmt = $db->prepare('SELECT id FROM games WHERE game_name = :name LIMIT 1');
@@ -1534,14 +1429,12 @@ class LessonController {
                     $pr = $pstmt->fetch(PDO::FETCH_ASSOC);
                     if ($pr) { $gameId = (int)$pr['id']; break; }
                 }
-                // Looser match
                 if (empty($gameId)) {
                     $lstmt = $db->prepare('SELECT id FROM games WHERE game_name LIKE :like LIMIT 1');
                     $lstmt->execute([':like' => '%Hoa%']);
                     $lr = $lstmt->fetch(PDO::FETCH_ASSOC);
                     if ($lr) $gameId = (int)$lr['id'];
                 }
-                // Fallback to topic_id
                 if (empty($gameId)) {
                     $stmt = $db->prepare('SELECT id FROM games WHERE topic_id = :tid LIMIT 1');
                     $stmt->execute([':tid' => 4]);
@@ -1565,9 +1458,7 @@ class LessonController {
         }
     }
 
-    /**
-     * API: Commit score for Family Tree game when final level completed
-     */
+    
     public function updateFamilyTreeScore() {
         if (session_status() == PHP_SESSION_NONE) session_start();
         header('Content-Type: application/json');
@@ -1620,10 +1511,7 @@ class LessonController {
         }
     }
 
-    /**
-     * API: Commit score for Computer Parts game when user completes assembly
-     * Saves 100% for the user for a game in topic_id = 3 (Technology)
-     */
+   
     public function updateComputerPartsScore() {
         if (session_status() == PHP_SESSION_NONE) session_start();
         header('Content-Type: application/json');
@@ -1676,10 +1564,7 @@ class LessonController {
         }
     }
 
-    /**
-     * API: Commit score for Thach Sanh typing game
-     * Expects JSON: { action: 'commit', score_pct: <int>, game_name?: string }
-     */
+    
     public function updateThachSanhScore() {
         if (session_status() == PHP_SESSION_NONE) session_start();
         header('Content-Type: application/json');
@@ -1732,7 +1617,6 @@ class LessonController {
                 return;
             }
 
-            // Allow repeated plays and saves; do not block by session flag.
 
             $pct = max(0, min(100, $scorePct));
             $xpAwarded = 20;
@@ -1745,9 +1629,7 @@ class LessonController {
         }
     }
 
-    /**
-     * API: Reset commit flag for Thạch Sanh so user can re-submit after replay
-     */
+    
     public function resetThachSanhCommit() {
         if (session_status() == PHP_SESSION_NONE) session_start();
         header('Content-Type: application/json');
@@ -1763,10 +1645,7 @@ class LessonController {
         }
     }
 
-    /**
-     * API: Commit score for Painter game when user presses submit
-     * Saves 100% for the user for a game in topic_id = 3 (Technology)
-     */
+    
     public function updatePainterScore() {
         if (session_status() == PHP_SESSION_NONE) session_start();
         header('Content-Type: application/json');
@@ -1783,7 +1662,6 @@ class LessonController {
             return;
         }
 
-        // allow caller to provide game_id, otherwise find by topic_id = 3
         $gameId = isset($data['game_id']) ? (int)$data['game_id'] : null;
 
         try {
@@ -1792,14 +1670,12 @@ class LessonController {
 
             $db = (new Database())->getConnection();
             if (empty($gameId)) {
-                // Prefer exact game name 'Em làm họa sĩ máy tính'
                 $pstmt = $db->prepare('SELECT id FROM games WHERE game_name = :name LIMIT 1');
                 $pstmt->execute([':name' => 'Em làm họa sĩ máy tính']);
                 $pr = $pstmt->fetch(PDO::FETCH_ASSOC);
                 if ($pr) {
                     $gameId = (int)$pr['id'];
                 } else {
-                    // Looser match by keyword
                     $lstmt = $db->prepare('SELECT id FROM games WHERE game_name LIKE :like LIMIT 1');
                     $lstmt->execute([':like' => '%họa sĩ%']);
                     $lr = $lstmt->fetch(PDO::FETCH_ASSOC);
@@ -1811,9 +1687,7 @@ class LessonController {
                 return;
             }
 
-            // Allow repeated plays and saves; do not block by session flag.
             $pct = 100;
-            // Award flat 20 XP on completion
             $xpAwarded = 20;
             $res = Score::saveAndMark((int)$userId, $gameId, $pct, $xpAwarded);
             echo json_encode($res);
@@ -1836,7 +1710,6 @@ class LessonController {
         
         $base_url = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
 
-        // Dữ liệu màn chơi (Yêu cầu chỉ số khác nhau)
         $levels = [
             1 => [
                 'id' => 1,
@@ -1853,7 +1726,7 @@ class LessonController {
                 'desc' => 'Ngọn núi rất cao! Xe cần Động cơ mạnh và Bánh lớn để leo dốc.',
                 'bg' => 'bg_hill.jpg',
                 'req_speed' => 30,
-                'req_power' => 70,    // Cần sức mạnh lớn
+                'req_power' => 70,    
                 'req_grip' => 40
             ],
             3 => [
@@ -1863,7 +1736,7 @@ class LessonController {
                 'bg' => 'bg_mud.jpg',
                 'req_speed' => 40,
                 'req_power' => 40,
-                'req_grip' => 80      // Cần độ bám cao
+                'req_grip' => 80      
             ]
         ];
 
@@ -1938,10 +1811,7 @@ class LessonController {
         require_once __DIR__ . '/../views/lessons/math_angle_game.php';
     }
 
-    /**
-     * API: Commit score for Math Angle game when final level completed
-     * Saves 100% for the user for the game named 'Trò chơi Góc và đo lường'
-     */
+    
     public function updateAngleGameScore() {
         if (session_status() == PHP_SESSION_NONE) session_start();
         header('Content-Type: application/json');
@@ -1967,7 +1837,6 @@ class LessonController {
             $db = (new Database())->getConnection();
 
             if (empty($gameId)) {
-                // Prefer exact game name 'Trò chơi Góc và đo lường'
                 $pstmt = $db->prepare('SELECT id FROM games WHERE game_name = :name LIMIT 1');
                 $pstmt->execute([':name' => 'Trò chơi Góc và đo lường']);
                 $pr = $pstmt->fetch(PDO::FETCH_ASSOC);
@@ -1986,7 +1855,6 @@ class LessonController {
                 return;
             }
 
-            // Allow repeated plays and saves; do not block by session flag.
             $pct = 100;
             $xpAwarded = 20;
             $res = Score::saveAndMark((int)$userId, $gameId, $pct, $xpAwarded);
@@ -2002,7 +1870,6 @@ class LessonController {
     }
 
     /**
-     * API: Commit score for Math Number game when user completes activity
      * Game name: 'Trò chơi Số học'
      */
     public function updateNumberScore() {
@@ -2031,14 +1898,12 @@ class LessonController {
             $db = (new Database())->getConnection();
 
             if (empty($gameId)) {
-                // Prefer exact game name 'Trò chơi Số học'
                 $pstmt = $db->prepare('SELECT id FROM games WHERE game_name = :name LIMIT 1');
                 $pstmt->execute([':name' => 'Trò chơi Số học']);
                 $pr = $pstmt->fetch(PDO::FETCH_ASSOC);
                 if ($pr) {
                     $gameId = (int)$pr['id'];
                 } else {
-                    // Looser match by keyword 'Số'
                     $lstmt = $db->prepare('SELECT id FROM games WHERE game_name LIKE :like LIMIT 1');
                     $lstmt->execute([':like' => '%Số%']);
                     $lr = $lstmt->fetch(PDO::FETCH_ASSOC);
@@ -2051,14 +1916,11 @@ class LessonController {
                 return;
             }
 
-            // Allow repeated plays and saves; do not block by session flag.
             $pct = 0;
             if ($scorePct !== null) {
                 $pct = max(0, min(100, $scorePct));
             } else {
-                // try to derive from session if available
                 $raw = isset($_SESSION['number_score']) ? (int)$_SESSION['number_score'] : 0;
-                // assume max 200 points by design (20 inputs * 10)
                 $maxPoints = 20 * 10;
                 if ($maxPoints > 0) {
                     $pct = (int)round(($raw / $maxPoints) * 100);
@@ -2068,13 +1930,11 @@ class LessonController {
             }
 
             $xpAwarded = 20;
-            // Tính xpAwarded từ score_pct: score_pct = (correct_count / 20) * 100
-            // Vậy correct_count = (score_pct / 100) * 20 = xp_awarded
+            
             if ($scorePct !== null) {
                 $correctCount = (int)round(($pct / 100) * 20);
-                $xpAwarded = max(0, min(20, $correctCount)); // max 20 XP
+                $xpAwarded = max(0, min(20, $correctCount));
             }
-            // Allow client to override xp if provided
             if (isset($data['xp'])) $xpAwarded = (int)$data['xp'];
 
             $res = Score::saveAndMark((int)$userId, $gameId, $pct, $xpAwarded);
@@ -2106,7 +1966,6 @@ class LessonController {
                 'desc' => 'Hãy sắp xếp 7 mảnh ghép để tạo thành hình chú mèo.',
                 'silhouetteShape' => 'cat', 
                 
-                // GIẢI PHÁP (Scale 60) - Đã khớp hình con mèo
                 'solution' => [
                     // 1. Đầu mèo (Hình vuông)
                     'square'        => ['x' => 273, 'y' => -99,  'rot' => 0],
@@ -2252,7 +2111,6 @@ class LessonController {
     }
 
     /**
-     * API: Commit score for Tangram game when user completes activity
      * Game name in DB: 'Tangram'
      */
     public function updateTangramScore() {
@@ -2314,9 +2172,7 @@ class LessonController {
         }
     }
 
-    /**
-     * API: Commit score for Tower game (Trò chơi Tháp)
-     */
+    
     public function updateTowerScore() {
         if (session_status() == PHP_SESSION_NONE) session_start();
         header('Content-Type: application/json');
@@ -2386,7 +2242,6 @@ class LessonController {
         $base_url = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
         $base_url = str_replace('\\', '/', $base_url);
 
-        // Dữ liệu Game
         $gameData = [
             'title' => 'Máy Lọc Nước Mini',
             'desc' => 'Hãy sắp xếp các lớp vật liệu để lọc nước bẩn thành nước sạch nhé!',
@@ -2402,9 +2257,6 @@ class LessonController {
         require_once __DIR__ . '/../views/lessons/engineering_water_filter.php';
     }
 
-    /**
-     * API: Commit score for Water Filter game
-     */
     public function updateWaterFilterScore() {
         if (session_status() == PHP_SESSION_NONE) session_start();
         header('Content-Type: application/json');
@@ -2452,7 +2304,6 @@ class LessonController {
 
             $pct = max(0, min(100, $scorePct));
 
-            // Determine xp: allow client to pass xp, otherwise use game's xp or default 20
             $xpAwarded = 20;
             if (isset($data['xp'])) {
                 $xpAwarded = (int)$data['xp'];
@@ -2463,7 +2314,6 @@ class LessonController {
                     $grow = $gstmt->fetch(PDO::FETCH_ASSOC);
                     if ($grow && isset($grow['xp'])) $xpAwarded = (int)$grow['xp'];
                 } catch (Exception $e) {
-                    // ignore
                 }
             }
 
@@ -2489,7 +2339,6 @@ class LessonController {
         $base_url = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
         $base_url = str_replace('\\', '/', $base_url);
 
-        // Dữ liệu Game: Các bài tập
         $levels = [
             1 => [
                 'id' => 1,
@@ -2535,7 +2384,6 @@ class LessonController {
     }
 
     /**
-     * API: Commit score for Time game when user completes activity
      * Game name: 'Trò chơi Thời gian'
      */
     public function updateTimeScore() {
@@ -2606,14 +2454,12 @@ class LessonController {
         $base_url = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
         $base_url = str_replace('\\', '/', $base_url);
 
-        // Dữ liệu màn chơi
         $levels = [
             1 => [
                 'id' => 1,
                 'title' => 'Màn 1: Tháp Vươn Cao',
                 'desc' => 'Xây tháp cao để chạm vào mục tiêu tròn duy nhất.',
                 'config' => [
-                    // Mục tiêu nằm chính giữa
                     'targets' => [ 
                         ['x' => '50%', 'y' => '40%'] 
                     ],
@@ -2630,7 +2476,6 @@ class LessonController {
                 'title' => 'Màn 2: Cầu Treo Thách Thức',
                 'desc' => 'Xây dựng kết cấu chia làm 2 nhánh để chạm cả 2 mục tiêu cùng lúc.',
                 'config' => [
-                    // Hai mục tiêu treo lơ lửng 2 bên
                     'targets' => [ 
                         ['x' => '30%', 'y' => '45%'], // Trái
                         ['x' => '70%', 'y' => '45%']  // Phải
@@ -2681,11 +2526,10 @@ class LessonController {
         $gameData = [
             'title' => 'Kiến Trúc Sư Nhí: Thiết Kế Phòng Ngủ',
             
-            // DANH MỤC ĐỒ NỘI THẤT
             'categories' => [
                 'room_type' => [
                     'label' => 'Chọn Phòng',
-                    'icon' => 'fa-home', // Đổi icon ngôi nhà
+                    'icon' => 'fa-home', 
                     'items' => [
                         ['id' => 'room_1', 'name' => 'Phòng Rừng Xanh', 'type' => 'room', 'img' => 'room_1.png'],
                         ['id' => 'room_2', 'name' => 'Phòng Mộng Mơ', 'type' => 'room', 'img' => 'room_2.png'],
@@ -2728,7 +2572,7 @@ class LessonController {
                 ],
                 'rug' => [
                     'label' => 'Thảm Sàn',
-                    'icon' => 'fa-rug', // Icon thảm
+                    'icon' => 'fa-rug', 
                     'items' => [
                         ['id' => 'rug_1', 'img' => 'rug_1.png', 'w' => 240, 'name' => 'Thảm Tròn'],
                         ['id' => 'rug_2', 'img' => 'rug_2.png', 'w' => 240, 'name' => 'Thảm Vuông'],
@@ -2767,9 +2611,7 @@ class LessonController {
         require_once __DIR__ . '/../views/lessons/engineering_room_decor.php';
     }
 
-    /**
-     * API: Commit score for Room Decor (full score by default)
-     */
+    
     public function updateRoomDecorScore() {
         if (session_status() == PHP_SESSION_NONE) session_start();
         header('Content-Type: application/json');
@@ -2815,7 +2657,6 @@ class LessonController {
             }
 
             $pct = max(0, min(100, $scorePct));
-            // award full xp based on games.xp
             $xpAwarded = 0;
             $gstmt = $db->prepare("SELECT xp FROM games WHERE id = :gid LIMIT 1");
             $gstmt->execute([':gid' => $gameId]);
@@ -2885,7 +2726,6 @@ class LessonController {
                 'title' => 'Cấp độ 4: Đường dài',
                 'desc' => 'Lập kế hoạch cho đường ống dài ngoằn ngoèo.',
                 'grid_size' => 5,
-                // SỬA LẠI LAYOUT NÀY
                 'layout' => [
                     'S', 'I', 'I', 'L', '0',
                     '0', '', '0', 'I', '0',
@@ -2916,9 +2756,7 @@ class LessonController {
         require_once __DIR__ . '/../views/lessons/engineering_water_pipe.php';
     }
 
-    /**
-     * API: Commit score for Water Pipe game (Hệ thống dẫn nước)
-     */
+    
     public function updateWaterPipeScore() {
         if (session_status() == PHP_SESSION_NONE) session_start();
         header('Content-Type: application/json');
@@ -2945,7 +2783,6 @@ class LessonController {
             $db = (new Database())->getConnection();
 
             if (empty($gameId)) {
-                // Prefer exact name in DB
                 $stmt = $db->prepare('SELECT id FROM games WHERE game_name = :name LIMIT 1');
                 $stmt->execute([':name' => 'Hệ thống dẫn nước']);
                 $r = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -2993,11 +2830,7 @@ class LessonController {
         }
     }
 
-    /**
-     * API: Update score for Number Game (Trò chơi Số học)
-     * Mỗi ô nhập đúng số lượng = 1 câu đúng = 1 XP
-     * Tính điểm trung bình: (số ô đúng / 20) * 100 = score_percentage
-     */
+    
     public function updateNumberGameScore() {
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
@@ -3024,13 +2857,11 @@ class LessonController {
 
                 $db = (new Database())->getConnection();
 
-                // Tìm game "Trò chơi Số học" trong bảng games
                 $stmt = $db->prepare("SELECT id FROM games WHERE game_name = :name LIMIT 1");
                 $stmt->execute([':name' => 'Trò chơi Số học']);
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
                 if (!$row) {
-                    // Thử tìm bằng LIKE nếu tên không khớp chính xác
                     $stmt2 = $db->prepare("SELECT id FROM games WHERE game_name LIKE :like LIMIT 1");
                     $stmt2->execute([':like' => '%Số học%']);
                     $r2 = $stmt2->fetch(PDO::FETCH_ASSOC);
@@ -3044,24 +2875,17 @@ class LessonController {
                     $gameId = (int)$row['id'];
                 }
 
-                // score_pct: từ client (tính toán dựa trên số ô đúng / 20 * 100)
                 $scorePct = isset($data['score_pct']) ? max(0, min(100, (int)$data['score_pct'])) : 0;
 
-                // Tính xp_awarded: score_pct / 5 (để mỗi 20 điểm = 1 xp, tối đa 20 xp khi 100%)
-                // hoặc cách khác: (số câu đúng) xp, nhưng vì client gửi score_pct nên tính theo đó
-                // score_pct = (correct_count / 20) * 100
-                // correct_count = (score_pct / 100) * 20
-                // xp_awarded = correct_count
+               
                 $correctCount = (int)round(($scorePct / 100) * 20);
-                $xpAwarded = max(0, min(20, $correctCount)); // max 20 XP
+                $xpAwarded = max(0, min(20, $correctCount)); 
 
-                // Prevent duplicate commits trong session
                 if (!empty($_SESSION['number_game_committed'])) {
                     echo json_encode(['success' => true, 'message' => 'Already committed', 'xp_awarded' => 0]);
                     exit();
                 }
 
-                // Lưu điểm vào database
                 $res = Score::saveAndMark((int)$userId, $gameId, $scorePct, $xpAwarded);
 
                 if (is_array($res) && !empty($res['success'])) {

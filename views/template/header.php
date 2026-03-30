@@ -3,13 +3,11 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$protocol = 'http'; // Mặc định là http
+$protocol = 'http'; 
 
-// 1. Kiểm tra xem Ngrok có đang chuyển hướng HTTPS về không (Quan trọng)
 if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
     $protocol = 'https';
 } 
-// 2. Nếu không phải Ngrok, kiểm tra HTTPS thông thường trên server
 elseif (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
     $protocol = 'https';
 }
@@ -150,9 +148,7 @@ if (!empty($_SESSION['user_id'])) {
 
 </body>
 <!-- <div style="padding: 20px; background: yellow; text-align: center; font-size: 18px; z-index: 9999; position: relative;">
-    <p>Bấm vào link dưới để mở khóa CSS:</p>
     <a href="<?= $base_url ?>/public/CSS/header.css" style="color: red; font-weight: bold; font-size: 24px;">
-        >>> CLICK VÀO ĐÂY ĐỂ SỬA LỖI CSS <<<
     </a>
 </div> -->
 

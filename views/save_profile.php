@@ -25,7 +25,6 @@ $userId = (int)$_SESSION['user_id'];
 $updates = [];
 $params = [];
 
-// get current avatar for deletion if needed
 $oldAvatar = null;
 try {
     $qa = $db->prepare('SELECT avatar FROM users WHERE id = :id LIMIT 1');
@@ -33,10 +32,8 @@ try {
     $ar = $qa->fetch(PDO::FETCH_ASSOC);
     if ($ar && !empty($ar['avatar'])) $oldAvatar = $ar['avatar'];
 } catch (Exception $e) {
-    // ignore
 }
 
-// Handle full name -> split first/last
 if (isset($_POST['fullName'])) {
     $fullName = trim($_POST['fullName']);
     if ($fullName !== '') {
@@ -56,9 +53,7 @@ if (isset($_POST['class'])) {
     $params[':class'] = trim($_POST['class']);
 }
 
-// Optional: other fields (birthDate, school) not stored in DB by schema here
 
-// Handle avatar upload
 $uploadedFilename = null;
 if (isset($_FILES['avatar']) && is_uploaded_file($_FILES['avatar']['tmp_name'])) {
     $file = $_FILES['avatar'];
@@ -73,7 +68,7 @@ if (isset($_FILES['avatar']) && is_uploaded_file($_FILES['avatar']['tmp_name']))
             exit;
         }
 
-        if ($file['size'] > 2 * 1024 * 1024) { // 2MB
+        if ($file['size'] > 2 * 1024 * 1024) { 
             echo json_encode(['success' => false, 'message' => 'Kích thước file quá lớn (max 2MB)']);
             exit;
         }
@@ -90,21 +85,17 @@ if (isset($_FILES['avatar']) && is_uploaded_file($_FILES['avatar']['tmp_name']))
             echo json_encode(['success' => false, 'message' => 'Không thể lưu file']);
             exit;
         }
-        // remove old avatar file if exists
         if ($oldAvatar) {
             $oldPath = __DIR__ . '/../public/uploads/avatars/' . $oldAvatar;
             if (is_file($oldPath)) @unlink($oldPath);
         }
 
-        // Save avatar filename to DB
         $updates[] = 'avatar = :avatar';
         $params[':avatar'] = $uploadedFilename;
     }
 }
 
-// Handle delete avatar request
 if (isset($_POST['delete_avatar']) && $_POST['delete_avatar']) {
-    // delete avatar file on disk
     if ($oldAvatar) {
         $oldPath = __DIR__ . '/../public/uploads/avatars/' . $oldAvatar;
         if (is_file($oldPath)) @unlink($oldPath);
