@@ -56,8 +56,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         drawFace(ctx, clockRadius);
         drawNumbers(ctx, clockRadius);
-        drawHand(ctx, hourAngle, clockRadius * 0.5, 10, "#e74c3c");
-        drawHand(ctx, minuteAngle, clockRadius * 0.8, 6, "#3498db"); 
+        drawHand(ctx, hourAngle, clockRadius * 0.5, 10, "#e74c3c", isDraggingHour);
+        drawHand(ctx, minuteAngle, clockRadius * 0.8, 6, "#3498db", isDraggingMinute); 
         drawCenter(ctx);
     }
 
@@ -105,7 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    function drawHand(ctx, pos, length, width, color) {
+    function drawHand(ctx, pos, length, width, color, isSelected = false) {
         ctx.beginPath();
         ctx.lineWidth = width;
         ctx.lineCap = "round";
@@ -114,6 +114,17 @@ document.addEventListener("DOMContentLoaded", () => {
         ctx.rotate(pos);
         ctx.lineTo(0, -length);
         ctx.stroke();
+        
+        if (isSelected) {
+            ctx.strokeStyle = color;
+            ctx.globalAlpha = 0.3;
+            ctx.lineWidth = width * 3;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(0, -length);
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+        }
         ctx.rotate(-pos);
     }
 
@@ -151,9 +162,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     canvas.addEventListener('mousedown', (e) => {
-        isDraggingHour = false;
-        isDraggingMinute = false;
-
         const mouse = getMousePos(e);
         const hourLen = clockRadius * 0.5;
         const minuteLen = clockRadius * 0.8;
@@ -164,24 +172,51 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const dHour = distancePointToSegment(mouse.x, mouse.y, 0, 0, hourTipX, hourTipY);
         const dMinute = distancePointToSegment(mouse.x, mouse.y, 0, 0, minuteTipX, minuteTipY);
-        const hitTolerance = Math.max(12, clockRadius * 0.08);
+        
+        const hitTolerance = Math.max(15, clockRadius * 0.12);
 
-        if (dHour <= hitTolerance && dHour <= dMinute) {
+        if (dHour <= dMinute && dHour <= hitTolerance) {
             isDraggingHour = true;
+            isDraggingMinute = false;
+            canvas.style.cursor = 'grabbing';
         } else if (dMinute <= hitTolerance) {
             isDraggingMinute = true;
+            isDraggingHour = false;
+            canvas.style.cursor = 'grabbing';
+        } else {
+            isDraggingHour = false;
+            isDraggingMinute = false;
         }
     });
 
     canvas.addEventListener('mousemove', (e) => {
+        const mouse = getMousePos(e);
+        
+        if (!isDraggingHour && !isDraggingMinute) {
+            const hourLen = clockRadius * 0.5;
+            const minuteLen = clockRadius * 0.8;
+            const hourTipX = hourLen * Math.sin(hourAngle);
+            const hourTipY = -hourLen * Math.cos(hourAngle);
+            const minuteTipX = minuteLen * Math.sin(minuteAngle);
+            const minuteTipY = -minuteLen * Math.cos(minuteAngle);
+
+            const dHour = distancePointToSegment(mouse.x, mouse.y, 0, 0, hourTipX, hourTipY);
+            const dMinute = distancePointToSegment(mouse.x, mouse.y, 0, 0, minuteTipX, minuteTipY);
+            const hitTolerance = Math.max(15, clockRadius * 0.12);
+
+            if ((dHour <= hitTolerance && dHour <= dMinute) || (dMinute <= hitTolerance && dMinute < dHour)) {
+                canvas.style.cursor = 'grab';
+            } else {
+                canvas.style.cursor = 'pointer';
+            }
+        }
+        
         if (!isDraggingHour && !isDraggingMinute) return;
         
-        const mouse = getMousePos(e);
         const angle = getAngle(mouse.x, mouse.y); 
 
         if (isDraggingMinute) {
             minuteAngle = angle;
-            
         } else if (isDraggingHour) {
             hourAngle = angle;
         }
@@ -192,6 +227,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener('mouseup', () => {
         isDraggingHour = false;
         isDraggingMinute = false;
+        canvas.style.cursor = 'pointer';
         
         snapHands();
         drawClock();

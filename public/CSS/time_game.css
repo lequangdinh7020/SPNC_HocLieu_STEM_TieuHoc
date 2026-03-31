@@ -84,7 +84,15 @@
     border: 3px solid #90caf9;
 }
 
-#clockCanvas { cursor: pointer; border-radius: 50%; }
+#clockCanvas { 
+    cursor: pointer; 
+    border-radius: 50%;
+    transition: box-shadow 0.3s ease;
+}
+
+#clockCanvas:hover {
+    filter: brightness(1.02);
+}
 
 .controls { text-align: center; margin-top: 20px; }
 
