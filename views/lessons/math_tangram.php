@@ -18,7 +18,7 @@
 
 <div class="game-wrapper tangram-game"><br><br><br>
     <div class="game-header">
-        <h1>🧩 <?= $currentLevel['title'] ?></h1>
+        <h1><?= $currentLevel['title'] ?></h1>
         <p class="game-subtitle">Thử thách hình học - Rèn luyện tư duy không gian</p>
     </div>
     
@@ -52,7 +52,7 @@
     <div class="game-instructions">
         <div class="instruction-box">
             <i class="fas fa-lightbulb"></i>
-            <span><strong>Cách chơi:</strong> <?= $currentLevel['desc'] ?> | Kéo thả để di chuyển | Nhấn chuột để xoay</span>
+            <span><strong>Cách chơi:</strong> <?= $currentLevel['desc'] ?> | Kéo thả để di chuyển | Nhấn 2 lần chuột để xoay</span>
         </div>
     </div>
     
@@ -84,7 +84,6 @@
 <script src="<?= $base_url ?>/public/JS/tangram.js?v=<?= time() ?>"></script>
 
 <script>
-    // Intro modal handling
     document.addEventListener('DOMContentLoaded', () => {
         const introModal = document.getElementById('intro-modal');
         const startGameButton = document.getElementById('startGameButton');

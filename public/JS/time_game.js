@@ -67,12 +67,10 @@ document.addEventListener("DOMContentLoaded", () => {
         ctx.fillStyle = 'white';
         ctx.fill();
         
-        // Viền đồng hồ
         ctx.strokeStyle = '#34495e';
         ctx.lineWidth = radius * 0.05;
         ctx.stroke();
         
-        // Vẽ vạch phút
         for(let i=0; i<60; i++) {
             const ang = (i * 6) * Math.PI / 180;
             const len = (i % 5 === 0) ? radius * 0.15 : radius * 0.05;
@@ -221,7 +219,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const hourDiff = Math.abs(userHourDeg - targetHourDeg);
 
         const MINUTE_TOLERANCE = 7;
-        // Nới nhẹ sai số kim giờ để giảm trường hợp người học đặt "gần đúng" nhưng bị trượt.
         const HOUR_TOLERANCE = 23;
         const isMinCorrect = minDiff < MINUTE_TOLERANCE || (360 - minDiff) < MINUTE_TOLERANCE;
         const isHourCorrect = hourDiff < HOUR_TOLERANCE || (360 - hourDiff) < HOUR_TOLERANCE;

@@ -92,7 +92,6 @@
 <script src="<?= $base_url ?>/public/JS/math_angle_game.js?v=<?= time() ?>"></script>
 
 <script>
-    // Intro modal handling
     document.addEventListener('DOMContentLoaded', () => {
         const introModal = document.getElementById('intro-modal');
         const nextStoryButton = document.getElementById('nextStoryButton');

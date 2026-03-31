@@ -242,7 +242,7 @@ if (!empty($_SESSION['user_id'])) {
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 STEM Universe. Được phát triển với ❤️ dành cho giáo dục STEM Việt Nam.</p>
+                <p>&copy; 2026 STEM Universe. Được phát triển với dành cho giáo dục STEM Việt Nam.</p>
             </div>
         </div>
     </footer>

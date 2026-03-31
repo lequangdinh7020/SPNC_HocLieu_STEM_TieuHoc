@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Các phần tử DOM
     const canvas = document.getElementById('shapeCanvas');
     const ctx = canvas.getContext('2d');
     const currentChallengeElement = document.getElementById('currentChallenge');
@@ -11,14 +10,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const targetShapeName = document.getElementById('targetShapeName');
     const feedbackText = document.getElementById('feedbackText');
     
-    // Game state
     let currentChallengeIndex = 0;
     let score = 0;
     let completedChallenges = 0;
     let points = [];
     let currentChallenge = null;
     
-    // Biểu tượng hình
     const shapeIcons = {
         'square': '□',
         'rectangle': '▭',
@@ -28,7 +25,6 @@ document.addEventListener('DOMContentLoaded', function() {
         'rhombus': '◇'
     };
     
-    // Tên hình
     const shapeNames = {
         'square': 'Hình vuông',
         'rectangle': 'Hình chữ nhật',
@@ -38,24 +34,20 @@ document.addEventListener('DOMContentLoaded', function() {
         'rhombus': 'Hình thoi'
     };
     
-    // Khởi tạo game
     function initGame() {
         loadChallenge(currentChallengeIndex);
         initDraggablePoints();
         
-        // Thêm sự kiện
         document.getElementById('checkBtn').addEventListener('click', checkSolution);
         document.getElementById('resetBtn').addEventListener('click', resetPoints);
     }
     
-    // Tải thử thách
     function loadChallenge(index) {
         if (!window.gameData || !window.gameData.challenges[index]) return;
         
         currentChallengeIndex = index;
         currentChallenge = window.gameData.challenges[index];
         
-        // Cập nhật giao diện
         currentChallengeElement.textContent = currentChallenge.id;
         shapeIcon.textContent = shapeIcons[currentChallenge.targetShape] || '📐';
         challengeTitle.textContent = currentChallenge.title;
@@ -64,41 +56,31 @@ document.addEventListener('DOMContentLoaded', function() {
         currentShapeName.textContent = shapeNames[currentChallenge.startingShape];
         targetShapeName.textContent = shapeNames[currentChallenge.targetShape];
         
-        // Đặt điểm bắt đầu
         points = JSON.parse(JSON.stringify(currentChallenge.startingPoints));
         
-        // Vẽ lại
         updateCanvas();
         updateDraggablePoints();
         
-        // Feedback
         showFeedback('Kéo các điểm để tạo hình!');
     }
     
-    // Vẽ canvas
     function updateCanvas() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        // Vẽ lưới mờ - 8 ô ngang, 6 ô dọc
         drawGrid();
         
-        // Vẽ hình
         drawShape();
         
-        // Vẽ các điểm
         drawPoints();
     }
     
-    // Vẽ lưới - 8 ô ngang, 6 ô dọc
     function drawGrid() {
         ctx.strokeStyle = '#f0f0f0';
         ctx.lineWidth = 1;
         
-        // Tính toán kích thước ô
-        const cellWidth = canvas.width / 8;  // 8 ô ngang
-        const cellHeight = canvas.height / 6; // 6 ô dọc
+        const cellWidth = canvas.width / 8;
+        const cellHeight = canvas.height / 6;
         
-        // Vẽ đường ngang (7 đường tạo 6 ô dọc)
         for (let y = 0; y <= canvas.height; y += cellHeight) {
             ctx.beginPath();
             ctx.moveTo(0, y);
@@ -106,7 +88,6 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.stroke();
         }
         
-        // Vẽ đường dọc (7 đường tạo 8 ô ngang)
         for (let x = 0; x <= canvas.width; x += cellWidth) {
             ctx.beginPath();
             ctx.moveTo(x, 0);
@@ -115,14 +96,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Vẽ hình
     function drawShape() {
         if (points.length < 2) return;
         
         const uniquePoints = getUniquePoints(10);
         if (uniquePoints.length < 2) return;
         
-        // Màu xanh cho hình
         ctx.fillStyle = 'rgba(106, 158, 245, 0.1)';
         ctx.strokeStyle = '#6a9ef5';
         ctx.lineWidth = 3;
@@ -143,7 +122,6 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.stroke();
     }
     
-    // Vẽ các điểm
     function drawPoints() {
         for (let i = 0; i < points.length; i++) {
             let isUnique = true;
@@ -167,7 +145,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Khởi tạo các điểm kéo
     function initDraggablePoints() {
         ['A', 'B', 'C', 'D'].forEach(point => {
             const element = document.getElementById(`point${point}`);
@@ -197,7 +174,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Kéo điểm
     let isDragging = false;
     let draggedPoint = null;
     
@@ -254,7 +230,6 @@ document.addEventListener('DOMContentLoaded', function() {
         draggedPoint = null;
     }
     
-    // Kiểm tra kết quả
     function checkSolution() {
         const targetShape = currentChallenge.targetShape;
         let isValid = false;
@@ -322,7 +297,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             
-            // Chuyển thử thách tiếp theo
             setTimeout(() => {
                 if (currentChallengeIndex < window.gameData.challenges.length - 1) {
                     currentChallengeIndex++;
@@ -353,7 +327,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return 'quadrilateral';
     }
     
-    // Các hàm kiểm tra hình học
     function checkRectangle() {
         const uniquePoints = getUniquePoints(10);
         if (uniquePoints.length !== 4) return false;
@@ -429,7 +402,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return allRightAngles;
     }
     
-    // Các hàm toán học phụ trợ
     function distance(p1, p2) {
         const dx = p2[0] - p1[0];
         const dy = p2[1] - p1[1];
@@ -583,6 +555,5 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 500);
     }
     
-    // Khởi động game
     initGame();
 });

@@ -33,7 +33,6 @@ body {
     padding: 20px;
 }
 
-/* Intro Modal */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -119,7 +118,6 @@ body {
     box-shadow: 0 8px 20px rgba(26, 115, 232, 0.4);
 }
 
-/* Game Header */
 .game-header {
     text-align: center;
     margin-bottom: 30px;
@@ -140,7 +138,6 @@ body {
     font-weight: 500;
 }
 
-/* Game Stats */
 .game-stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -192,7 +189,6 @@ body {
     color: var(--secondary-blue);
 }
 
-/* Game Controls */
 .game-controls {
     display: flex;
     justify-content: center;
@@ -239,7 +235,6 @@ body {
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 
-/* Game Instructions */
 .game-instructions {
     margin-bottom: 30px;
 }
@@ -266,7 +261,6 @@ body {
     line-height: 1.6;
 }
 
-/* Game Container */
 .game-container {
     background-color: var(--white);
     border-radius: 16px;
@@ -274,7 +268,7 @@ body {
     box-shadow: 0 6px 20px var(--shadow-medium);
     margin-bottom: 30px;
 }
-/* Canvas Container */
+
 #canvas-container {
     display: flex;
     justify-content: center;
@@ -302,7 +296,6 @@ body {
     cursor: grabbing;
 }
 
-/* Result Modal */
 .modal {
     display: none;
     position: fixed;

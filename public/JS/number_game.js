@@ -8,8 +8,8 @@ document.addEventListener('DOMContentLoaded', function() {
         timerInterval: null,
         answers: {},
         correctAnswers: {},
-        checkedItems: {}, // Theo dõi những ô đã kiểm tra (để không tăng lại)
-        gameSaved: false // Theo dõi xem điểm đã lưu chưa
+        checkedItems: {},
+        gameSaved: false
     };
     
     initGame();
@@ -143,9 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (gameState.timeLeft <= 0) {
                     clearInterval(gameState.timerInterval);
                     endGame();
-                    // Thông báo hết giờ rõ ràng
                     showFeedback('⏰ HẾT THỜI GIAN! Đang tự động lưu điểm...', 'wrong');
-                    // Chờ 1 giây rồi lưu điểm
                     setTimeout(() => {
                         saveGameScore('Hết thời gian!');
                     }, 1000);
@@ -177,7 +175,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const userAnswer = gameState.answers[i];
             const correctAnswer = gameState.correctAnswers[i] || 0;
         
-            // Bỏ class highlight cũ
             input.classList.remove('correct', 'wrong');
             
             if (userAnswer !== null && userAnswer !== undefined) {
@@ -185,14 +182,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (userAnswer === correctAnswer) {
                     input.classList.add('correct');
-                    // Chỉ tính là "mới đúng" nếu ô này chưa được kiểm tra trước
                     if (!gameState.checkedItems[i] || gameState.checkedItems[i].result !== 'correct') {
                         newCorrectCount++;
                     }
                     gameState.checkedItems[i] = { result: 'correct', answer: userAnswer };
                 } else {
                     input.classList.add('wrong');
-                    // Chỉ tính là "mới sai" nếu ô này chưa được kiểm tra trước
                     if (!gameState.checkedItems[i] || gameState.checkedItems[i].result !== 'wrong') {
                         newWrongCount++;
                     }
@@ -202,7 +197,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         if (answeredCount > 0) {
-            // Chỉ cộng những ô mới được kiểm tra và đúng
             gameState.correct += newCorrectCount;
             gameState.wrong += newWrongCount;
             
@@ -212,7 +206,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (answeredCount === 0) {
             showFeedback('Hãy nhập ít nhất một câu trả lời trước khi kiểm tra!', 'neutral');
         } else {
-            // Đếm tổng số ô đúng hiện tại
             let totalCorrect = 0;
             for (let i = 1; i <= 20; i++) {
                 if (gameState.checkedItems[i] && gameState.checkedItems[i].result === 'correct') {
@@ -260,20 +253,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    /**
-     * Hàm tổng kết kết quả và lưu điểm
-     */
     function saveGameScore(endMessage) {
         if (gameState.gameSaved) {
-            // Đã lưu rồi, không lưu lại
             if (endMessage) {
                 showFeedback(endMessage + ' (Điểm đã được lưu trước đó)', 'neutral');
             }
             return;
         }
 
-        // Tính số ô đúng từ answers hiện tại (so sánh với correctAnswers)
-        // Không cần phải bấm "Kiểm tra" - tính luôn những ô được nhập
         let correctCount = 0;
         let answeredCount = 0;
         for (let i = 1; i <= 20; i++) {
@@ -288,14 +275,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // Score = (số ô đúng / 20) * 100
         const accuracy = Math.round((correctCount / 20) * 100);
 
-        // Hiển thị tổng kết
         const resultMsg = `Tổng kết: ${correctCount}/20 câu đúng. Độ chính xác: ${accuracy}%`;
         showFeedback(resultMsg, accuracy >= 70 ? 'correct' : 'wrong');
 
-        // Gửi điểm tới server
         try {
             const apiUrl = (window.baseUrl || '') + '/views/lessons/update-number-score';
             fetch(apiUrl, {
@@ -311,7 +295,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         showFeedback('✓ Lưu điểm thành công!', 'correct');
                     }
                 } else {
-                    // show server message if any
                     if (json && json.message) {
                         showFeedback('⚠ Lưu điểm: ' + json.message, 'wrong');
                     }
@@ -342,7 +325,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         endGame();
         
-        // Tự động lưu điểm
         saveGameScore('Hoàn thành game!');
     }
     

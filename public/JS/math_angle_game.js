@@ -8,14 +8,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const fireBtn = document.getElementById('fire-btn');
     const missFeedback = document.getElementById('miss-feedback');
     
-    // Modal elements
     const modal = document.getElementById('result-modal');
     const modalTitle = document.getElementById('modal-title');
     const modalMsg = document.getElementById('modal-message');
     const nextBtn = document.getElementById('next-level-btn');
     const retryBtn = document.getElementById('retry-btn');
 
-    // --- HÀM RESIZE CANVAS ---
     function resizeCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
@@ -30,12 +28,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     window.addEventListener('resize', resizeCanvas);
 
-    // --- ASSETS ---
     const imgHouYi = new Image(); imgHouYi.src = `${baseUrl}/public/images/angle_game/hou_yi.png`;
     const imgSun = new Image(); imgSun.src = `${baseUrl}/public/images/angle_game/sun.png`;
     const imgArrow = new Image(); imgArrow.src = `${baseUrl}/public/images/angle_game/arrow.png`;
 
-    // --- GAME STATE ---
     let currentAngle = 0; 
     let arrow = null; 
     let isFired = false;
@@ -45,7 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     resizeCanvas();
 
-    // --- XỬ LÝ SỰ KIỆN ---
     angleSlider.addEventListener('input', (e) => {
         currentAngle = parseInt(e.target.value);
         angleValue.innerText = currentAngle;
@@ -93,18 +88,16 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!arrow) return;
         arrow.x += arrow.vx;
         arrow.y += arrow.vy;
-        arrow.vy += 0.4; // Trọng lực
+        arrow.vy += 0.4;
 
         arrow.angle = Math.atan2(arrow.vy, arrow.vx);
 
-        // Kiểm tra va chạm với Mặt Trời
         const dist = Math.sqrt((arrow.x - sunX)**2 + (arrow.y - sunY)**2);
         if (dist < sunRadius + 20) {
             endGame(true);
             return;
         }
 
-        // Nếu bắn ra ngoài màn hình -> Trượt
         if (arrow.y > canvas.height + 50 || arrow.x < -50 || arrow.x > canvas.width + 50) {
             endGame(false);
         }
@@ -113,10 +106,8 @@ document.addEventListener("DOMContentLoaded", () => {
     function drawScene() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Vẽ Mặt trời
         ctx.drawImage(imgSun, sunX - sunRadius, sunY - sunRadius, sunRadius*2, sunRadius*2);
 
-        // Vẽ Hậu Nghệ
         ctx.save();
         if (currentAngle > 90) {
             ctx.translate(playerX, playerY);
@@ -127,7 +118,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         ctx.restore();
 
-        // Vẽ Mũi tên
         if (arrow) {
             ctx.save();
             ctx.translate(arrow.x, arrow.y);
@@ -135,7 +125,6 @@ document.addEventListener("DOMContentLoaded", () => {
             ctx.drawImage(imgArrow, -30, -5, 60, 10);
             ctx.restore();
         } else {
-            // Vẽ tia ngắm
             const rad = currentAngle * (Math.PI / 180);
             const aimLen = 150;
             const aimX = playerX + aimLen * Math.cos(rad);
@@ -154,36 +143,29 @@ document.addEventListener("DOMContentLoaded", () => {
     
     imgHouYi.onload = drawScene;
 
-    // --- XỬ LÝ KẾT THÚC ---
     function endGame(isWin) {
         isFired = false;
         arrow = null;
 
         if (isWin) {
-            // === THẮNG ===
             modal.style.display = 'flex';
             modalTitle.innerText = "TRÚNG RỒI!";
             modalTitle.style.color = "green";
             modalMsg.innerText = "Bạn đã bắn rụng mặt trời hung ác!";
             
-            // Ẩn nút thử lại khi thắng
             retryBtn.style.display = 'none';
 
             if (levelData.id < totalLevels) {
-                // CÒN MÀN: Hiện nút "Màn tiếp theo"
                 nextBtn.style.display = 'inline-block';
                 nextBtn.innerText = "Màn tiếp theo";
                 nextBtn.onclick = () => window.location.href = `${baseUrl}/views/lessons/math_angle_game?level=${levelData.id + 1}`;
             } else {
-                    // HẾT MÀN: Hiện nút "Về bài học" và commit điểm
                     nextBtn.style.display = 'inline-block';
                     nextBtn.innerText = 'Về trang bài học';
-                    // Chuyển hướng về trang math.php
                     nextBtn.onclick = () => window.location.href = `${baseUrl}/views/lessons/math.php`;
 
                     modalMsg.innerText += " Bạn đã hoàn thành xuất sắc nhiệm vụ!";
 
-                    // Commit completion to server and show awarded XP
                     try {
                         fetch(`${baseUrl}/views/lessons/update-angle-score`, {
                             method: 'POST',
@@ -206,7 +188,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
             }
         } else {
-            // === THUA ===
             missFeedback.style.display = 'block';
             missFeedback.classList.remove('hidden');
             

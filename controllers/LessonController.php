@@ -1325,7 +1325,6 @@ class LessonController {
         
         $base_url = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
 
-        // Lấy chủ đề từ URL, mặc định là 'free' (Tự vẽ)
         $topic = $_GET['topic'] ?? 'free';
         
         // Cấu hình các chủ đề
@@ -1377,7 +1376,6 @@ class LessonController {
 
         $base_url = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
 
-        // Dữ liệu game 
         $flowerParts = [
             ['id' => 'petal', 'name' => 'Cánh hoa'],
             ['id' => 'stamen', 'name' => 'Nhị hoa'],
@@ -1716,9 +1714,9 @@ class LessonController {
                 'title' => 'Đường Đua Tốc Độ',
                 'desc' => 'Đường bằng phẳng và dài. Hãy chế tạo chiếc xe có Tốc độ cao nhất!',
                 'bg' => 'bg_track.jpg',
-                'req_speed' => 80,    // Yêu cầu Tốc độ
-                'req_power' => 20,    // Yêu cầu Sức mạnh (Leo dốc)
-                'req_grip' => 20      // Yêu cầu Độ bám (Đường trơn)
+                'req_speed' => 80,
+                'req_power' => 20,
+                'req_grip' => 20 
             ],
             2 => [
                 'id' => 2,
@@ -1740,7 +1738,6 @@ class LessonController {
             ]
         ];
 
-        // Dữ liệu các bộ phận xe
         $parts = [
             'body' => [
                 ['id' => 'sport', 'name' => 'Xe Đua', 'img' => 'body_sport.png', 'speed' => 40, 'power' => 10, 'grip' => 10],
@@ -1779,7 +1776,6 @@ class LessonController {
         
         $base_url = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
 
-        // Dữ liệu các màn chơi
         $levels = [
             1 => [
                 'id' => 1,
@@ -1870,7 +1866,7 @@ class LessonController {
     }
 
     /**
-     * Game name: 'Trò chơi Số học'
+     * Trò chơi Số học
      */
     public function updateNumberScore() {
         if (session_status() == PHP_SESSION_NONE) session_start();
@@ -1967,25 +1963,12 @@ class LessonController {
                 'silhouetteShape' => 'cat', 
                 
                 'solution' => [
-                    // 1. Đầu mèo (Hình vuông)
                     'square'        => ['x' => 273, 'y' => -99,  'rot' => 0],
-
-                    // 2. Tai trái (Tam giác nhỏ 1)
                     'small1'        => ['x' => 306, 'y' => -160, 'rot' => 2],
-
-                    // 3. Tai phải (Tam giác nhỏ 2)
                     'small2'        => ['x' => 241, 'y' => -161, 'rot' => 6],
-
-                    // 4. Thân trên (Tam giác lớn 2)
                     'big2'          => ['x' => 212, 'y' => 82,   'rot' => 2],
-
-                    // 5. Lưng/Cổ (Tam giác vừa)
                     'medium'        => ['x' => 359, 'y' => 49,   'rot' => 2],
-
-                    // 6. Thân dưới (Tam giác lớn 1)
                     'big1'          => ['x' => 195, 'y' => 213,  'rot' => 1],
-
-                    // 7. Đuôi (Hình bình hành)
                     'parallelogram' => ['x' => 60,  'y' => 225,  'rot' => 0]
                 ]
             ],
@@ -1995,25 +1978,12 @@ class LessonController {
                 'desc' => 'Sắp xếp các mảnh ghép để tạo hình chú ngựa đang phi nước đại.',
                 'silhouetteShape' => 'horse', 
                 'solution' => [
-                    // 1. Đầu ngựa (Tam giác vừa)
                     'medium'        => ['x' => 312, 'y' => -240, 'rot' => 0],
-
-                    // 2. Cổ ngựa (Hình vuông)
                     'square'        => ['x' => 270, 'y' => -109, 'rot' => 1],
-
-                    // 3. Thân trên (Tam giác lớn 2)
                     'big2'          => ['x' => 271, 'y' => -24,  'rot' => 3],
-
-                    // 4. Thân dưới (Tam giác lớn 1)
                     'big1'          => ['x' => 166, 'y' => 56,   'rot' => 2],
-
-                    // 5. Đuôi (Hình bình hành)
                     'parallelogram' => ['x' => 72,  'y' => 150,  'rot' => 2],
-
-                    // 6. Chân trước (Tam giác nhỏ 1)
                     'small1'        => ['x' => 397, 'y' => -33,  'rot' => 4],
-
-                    // 7. Chân sau (Tam giác nhỏ 2)
                     'small2'        => ['x' => 252, 'y' => 168,  'rot' => 1],
                 ]
             ],
@@ -2023,25 +1993,12 @@ class LessonController {
                 'desc' => 'Hãy ghép các khối hình để tạo thành chú thỏ.',
                 'silhouetteShape' => 'rabbit', 
                 'solution' => [
-                    // 1. Tai thỏ (Hình bình hành) - Nằm cao nhất
                     'parallelogram' => ['x' => 228, 'y' => -196, 'rot' => 3],
-
-                    // 2. Đầu thỏ (Hình vuông)
                     'square'        => ['x' => 148, 'y' => -109, 'rot' => 1],
-
-                    // 3. Thân trên (Tam giác lớn 2)
                     'big2'          => ['x' => 234, 'y' => -24,  'rot' => 1],
-
-                    // 4. Chân trước (Tam giác nhỏ 1)
                     'small1'        => ['x' => 158, 'y' => 20,   'rot' => 2],
-
-                    // 5. Thân dưới (Tam giác lớn 1)
                     'big1'          => ['x' => 319, 'y' => 63,   'rot' => 5],
-
-                    // 6. Đuôi (Tam giác nhỏ 2)
                     'small2'        => ['x' => 207, 'y' => 134,  'rot' => 2],
-
-                    // 7. Chân sau (Tam giác vừa) - Nằm thấp nhất
                     'medium'        => ['x' => 241, 'y' => 192,  'rot' => 5],
                 ]
             ],
@@ -2051,25 +2008,12 @@ class LessonController {
                 'desc' => 'Sắp xếp các mảnh ghép để tạo thành hình chú cá đang bơi.',
                 'silhouetteShape' => 'fish', 
                 'solution' => [
-                    // 1. Thân trước (Hình vuông) - Phần đầu
                     'square'        => ['x' => 221, 'y' => 1,    'rot' => 1],
-
-                    // 2. Thân trên (Tam giác lớn 1) - Lưng cá
                     'big1'          => ['x' => 134, 'y' => -39,  'rot' => 7],
-
-                    // 3. Thân dưới (Tam giác lớn 2) - Bụng cá
                     'big2'          => ['x' => 133, 'y' => 49,   'rot' => 5],
-
-                    // 4. Vây lưng (Tam giác nhỏ 1)
                     'small1'        => ['x' => 201, 'y' => -66,  'rot' => 1],
-
-                    // 5. Vây bụng (Tam giác nhỏ 2)
                     'small2'        => ['x' => 199, 'y' => 68,   'rot' => 3],
-
-                    // 6. Đuôi phần gốc (Tam giác vừa)
                     'medium'        => ['x' => 267, 'y' => -45,  'rot' => 6],
-
-                    // 7. Đuôi phần ngọn (Hình bình hành)
                     'parallelogram' => ['x' => 308, 'y' => 43,   'rot' => 1],
                 ]
             ],
@@ -2079,25 +2023,12 @@ class LessonController {
                 'desc' => 'Hãy ghép hình để tạo thành chú bướm đang bay.',
                 'silhouetteShape' => 'butterfly', 
                 'solution' => [
-                    // 1. Cánh lớn bên trái (Tam giác lớn 1)
                     'big1'          => ['x' => 79,  'y' => -89, 'rot' => 1],
-
-                    // 2. Cánh lớn bên phải (Tam giác lớn 2)
                     'big2'          => ['x' => 342, 'y' => -90, 'rot' => 7],
-
-                    // 3. Đầu/Thân trên (Hình vuông)
                     'square'        => ['x' => 165, 'y' => -1,  'rot' => 1],
-
-                    // 4. Cánh nhỏ dưới trái (Tam giác nhỏ 2)
                     'small2'        => ['x' => 98,  'y' => -22, 'rot' => 5],
-
-                    // 5. Cánh nhỏ dưới phải (Tam giác nhỏ 1)
                     'small1'        => ['x' => 145, 'y' => 66,  'rot' => 3],
-
-                    // 6. Thân dưới (Hình bình hành)
                     'parallelogram' => ['x' => 255, 'y' => 43,  'rot' => 1],
-
-                    // 7. Đuôi (Tam giác vừa)
                     'medium'        => ['x' => 302, 'y' => 42,  'rot' => 4],
                 ]
             ]
@@ -2111,7 +2042,7 @@ class LessonController {
     }
 
     /**
-     * Game name in DB: 'Tangram'
+     * Tangram
      */
     public function updateTangramScore() {
         if (session_status() == PHP_SESSION_NONE) session_start();
@@ -2218,7 +2149,6 @@ class LessonController {
             }
 
             $pct = max(0, min(100, $scorePct));
-            // default xp for tower
             $xpAwarded = 20;
 
             $res = Score::saveAndMark((int)$userId, $gameId, $pct, $xpAwarded);
@@ -2283,7 +2213,6 @@ class LessonController {
             $db = (new Database())->getConnection();
 
             if (empty($gameId)) {
-                // Prefer exact name 'Bộ lọc nước'
                 $stmt = $db->prepare('SELECT id FROM games WHERE game_name = :name LIMIT 1');
                 $stmt->execute([':name' => 'Bộ lọc nước']);
                 $r = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -2384,7 +2313,7 @@ class LessonController {
     }
 
     /**
-     * Game name: 'Trò chơi Thời gian'
+     * Trò chơi Thời gian
      */
     public function updateTimeScore() {
         if (session_status() == PHP_SESSION_NONE) session_start();
@@ -2477,8 +2406,8 @@ class LessonController {
                 'desc' => 'Xây dựng kết cấu chia làm 2 nhánh để chạm cả 2 mục tiêu cùng lúc.',
                 'config' => [
                     'targets' => [ 
-                        ['x' => '30%', 'y' => '45%'], // Trái
-                        ['x' => '70%', 'y' => '45%']  // Phải
+                        ['x' => '30%', 'y' => '45%'],
+                        ['x' => '70%', 'y' => '45%']
                     ], 
                     'anchors' => [ 
                         ['x' => '44%', 'y' => '96%'],
@@ -2494,8 +2423,8 @@ class LessonController {
                 'desc' => 'Một mục tiêu cao, một mục tiêu thấp.',
                 'config' => [
                     'targets' => [ 
-                        ['x' => '30%', 'y' => '55%'], // Trái thấp
-                        ['x' => '60%', 'y' => '30%']  // Phải cao
+                        ['x' => '30%', 'y' => '55%'],
+                        ['x' => '60%', 'y' => '30%']
                     ], 
                     'anchors' => [ 
                         ['x' => '44%', 'y' => '96%'],
@@ -2681,7 +2610,6 @@ class LessonController {
         $base_url = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
         $base_url = str_replace('\\', '/', $base_url);
 
-        // Cấu hình các màn chơi
         // Grid: 0=Rỗng, S=Nguồn, E=Đích (Cây), I=Thẳng, L=Cong, T=Ba ngã, X=Bốn ngã
         $levels = [
             1 => [
@@ -2689,8 +2617,6 @@ class LessonController {
                 'title' => 'Cấp độ 1: Làm quen',
                 'desc' => 'Xoay các ống thẳng để dẫn nước tưới cây.',
                 'grid_size' => 3, // 3x3
-                // Map layout (Mảng 1 chiều, sẽ render thành lưới)
-                // S: Nguồn, E: Cây, I: Ống thẳng
                 'layout' => [
                     '0', '0', '0',
                     'S', 'I', 'E',
@@ -2705,7 +2631,7 @@ class LessonController {
                 'layout' => [
                     'S', 'L', '0', '0',
                     '0', 'I', 'L', 'E',
-                    '0', 'L', 'L', '0', // Đường giả để đánh lạc hướng
+                    '0', 'L', 'L', '0',
                     '0', '0', '0', '0'
                 ]
             ],
@@ -2740,9 +2666,9 @@ class LessonController {
                 'desc' => 'Dùng ống chia nhánh (T) để tưới cho 2 cây cùng lúc.',
                 'grid_size' => 5,
                 'layout' => [
-                    'S', 'I', 'T', 'I', 'E', // Cây 1
+                    'S', 'I', 'T', 'I', 'E',
                     '0', '0', 'I', '0', '0',
-                    '0', '0', 'L', 'I', 'E', // Cây 2
+                    '0', '0', 'L', 'I', 'E',
                     '0', '0', '0', '0', '0',
                     '0', '0', '0', '0', '0'
                 ]
