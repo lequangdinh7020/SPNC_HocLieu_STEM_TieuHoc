@@ -86,7 +86,6 @@
 <script src="<?= $base_url ?>/public/JS/water_pipe.js?v=<?= time() ?>"></script>
 
 <script>
-    // Intro modal handling
     document.addEventListener('DOMContentLoaded', () => {
         const introModal = document.getElementById('intro-modal');
         const startGameButton = document.getElementById('startGameButton');

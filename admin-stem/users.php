@@ -161,7 +161,6 @@
                                 </div>
                             </div>
                             
-                            <!-- status field removed; notes column displayed in table -->
                             
                             <div class="form-group">
                                 <label for="userNotes">Ghi chú</label>

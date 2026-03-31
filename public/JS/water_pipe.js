@@ -3,17 +3,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const checkBtn = document.getElementById('check-flow-btn');
     const gridSize = levelData.grid_size;
     
-    // Modal kết quả
     const resultModal = document.getElementById('result-modal');
     const modalTitle = document.getElementById('modal-title');
     const modalMsg = document.getElementById('modal-message');
     const nextBtn = document.getElementById('next-btn');
     const retryBtn = document.getElementById('retry-btn'); 
 
-    // Modal cốt truyện
     const storyModal = document.getElementById('story-modal');
 
-    // --- 1. SESSION CHECK ---
     if (levelData.id === 1 && !sessionStorage.getItem('hasSeenPipeIntro')) {
         if(storyModal) storyModal.style.display = 'flex';
     } else {
@@ -25,7 +22,6 @@ document.addEventListener("DOMContentLoaded", () => {
         sessionStorage.setItem('hasSeenPipeIntro', 'true');
     }
 
-    // --- 2. LOGIC GAME ---
     let gridState = [];
     let targets = [];  
     let startPos = -1;
@@ -77,7 +73,6 @@ document.addEventListener("DOMContentLoaded", () => {
         element.style.transform = `rotate(${gridState[index].rotation}deg)`;
     }
 
-    // --- 3. FLOW CHECK ---
     checkBtn.addEventListener('click', () => {
         checkBtn.disabled = true;
         simulateFlow();
@@ -181,29 +176,23 @@ document.addEventListener("DOMContentLoaded", () => {
         cell.appendChild(leak);
     }
 
-    // --- 4. HÀM SHOW MODAL (CẬP NHẬT LOGIC) ---
     function showModal(isWin, msg) {
         resultModal.style.display = 'flex';
         modalTitle.innerText = isWin ? "THÀNH CÔNG!" : "CỐ LÊN!";
         modalTitle.style.color = isWin ? "#2ecc71" : "#e74c3c";
         modalMsg.innerText = msg;
         
-        // Mặc định hiện Next, ẩn Retry
         nextBtn.style.display = 'inline-block';
-        retryBtn.style.display = 'none'; // Ẩn mặc định cho trường hợp thắng
+        retryBtn.style.display = 'none'; 
 
         if (isWin) {
-            // --- THẮNG ---
             if (levelData.id < totalLevels) {
-                // Chưa phải màn cuối -> Nút "Màn tiếp theo"
                 nextBtn.innerText = "Màn tiếp theo";
                 nextBtn.onclick = () => window.location.href = `${baseUrl}/views/lessons/engineering_water_pipe?level=${levelData.id + 1}`;
             } else {
-                // Màn cuối (Level 5) -> CHỈ hiện nút "Về Trang Chủ"
                     nextBtn.innerText = "Về Trang Chủ";
                     nextBtn.onclick = () => window.location.href = `${baseUrl}/views/main_lesson.php`;
 
-                    // Auto-commit full score (100%) to server for final-level completion
                     fetch(`${baseUrl}/views/lessons/update-water-pipe-score`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -218,15 +207,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         }
                     }).catch(err => console.error('Water pipe commit error', err));
 
-                    // Đảm bảo nút Retry bị ẩn
                     retryBtn.style.display = 'none';
             }
         } else {
-            // --- THUA ---
-            // Ẩn nút Next
             nextBtn.style.display = 'none';
 
-            // Hiện nút Retry
             retryBtn.style.display = 'inline-block';
             retryBtn.innerText = "Thử lại";
             retryBtn.onclick = () => {

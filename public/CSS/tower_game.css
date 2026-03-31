@@ -33,7 +33,6 @@ body {
     padding: 20px;
 }
 
-/* Modal Overlay for Intro */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -266,7 +265,6 @@ body {
     font-size: 1.05rem;
 }
 
-/* Game Container */
 .game-container {
     position: relative;
     background-color: var(--white);
@@ -283,21 +281,17 @@ html {
     margin: 0;
 }
 
-/* Container chứa Matter.js Canvas */
 #physics-container {
     width: 100%;
     height: 600px;
-    /* Ảnh nền giống trong ví dụ */
     background: linear-gradient(to bottom, #d4e6f1 0%, #87ceeb 100%);
     position: relative;
 }
 
-/* Canvas do Matter.js tạo ra */
 #physics-container canvas {
     display: block;
 }
 
-/* THANH CÔNG CỤ MỚI */
 .build-toolbar {
     position: absolute;
     bottom: 20px;
@@ -314,7 +308,6 @@ html {
     z-index: 100;
 }
 
-/* Kho chứa Node (Inventory) */
 .node-inventory {
     display: flex;
     align-items: center;
@@ -370,7 +363,6 @@ html {
     opacity: 1;
 }
 
-/* Ghost Node (Hình mờ đi theo chuột khi kéo từ UI ra) */
 .node-ghost {
     width: 30px;
     height: 30px;
@@ -381,10 +373,8 @@ html {
     pointer-events: none;
     z-index: 999;
     display: none;
-    /* Mặc định ẩn */
 }
 
-/* Modal */
 .modal {
     display: none;
     position: fixed;
@@ -421,7 +411,6 @@ html {
     color: #e74c3c !important;
 }
 
-/* Container cho các nút bấm trong modal */
 .modal-buttons {
     display: flex;
     justify-content: center;
@@ -455,7 +444,6 @@ html {
     box-shadow: none;
 }
 
-/* Nút về trang chủ */
 .home-btn-ui {
     background: #34495e;
     text-decoration: none;
@@ -466,7 +454,6 @@ html {
     background: #2c3e50;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .game-stats {
         grid-template-columns: repeat(2, 1fr);

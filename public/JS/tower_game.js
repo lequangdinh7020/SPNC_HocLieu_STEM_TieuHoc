@@ -10,13 +10,11 @@ const Engine = Matter.Engine,
       Events = Matter.Events,
       Vector = Matter.Vector;
 
-// --- CẤU HÌNH GAME ---
 const CONF = {
     nodeRadius: 12,
     linkThickness: 6,
     maxLinkLength: levelConfig.connectDistance, 
     
-    // Cấu hình Sức bền vật liệu
     linkStiffness: 0.40,    
     breakThreshold: 0.002, 
     
@@ -37,8 +35,6 @@ let targetSensors = [];
 let isWon = false;
 let isLost = false;
 let remainingNodes = parseInt(document.getElementById('remaining-nodes').innerText);
-
-// Biến điều khiển thao tác chuột
 let isDraggingFromUI = false;
 let isDraggingLooseNode = false;
 let draggedBody = null;
@@ -48,9 +44,7 @@ const ghostNode = document.getElementById('drag-ghost');
 const nodeSource = document.getElementById('node-source');
 const container = document.getElementById('physics-container');
 
-// Khởi chạy
 document.addEventListener("DOMContentLoaded", () => {
-    // Intro modal handling
     const introModal = document.getElementById('intro-modal');
     const startGameButton = document.getElementById('startGameButton');
     
@@ -61,7 +55,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
     
-    // Button event listeners
     const resetBtnMain = document.getElementById('reset-btn-main');
     const giveUpButton = document.getElementById('giveUpButton');
     
@@ -77,7 +70,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-// --- HÀM TIỆN ÍCH: CHUYỂN ĐỔI % SANG PIXEL ---
 function parseVal(val, maxDimension) {
     if (typeof val === 'string' && val.includes('%')) {
         return (parseFloat(val) / 100) * maxDimension;
@@ -89,13 +81,11 @@ function initGame() {
     const width = container.clientWidth;
     const height = container.clientHeight;
 
-    // 1. Setup Engine
     engine = Engine.create();
     world = engine.world;
     engine.positionIterations = 10;
     engine.velocityIterations = 10;
 
-    // 2. Setup Render
     render = Render.create({
         element: container,
         engine: engine,
@@ -105,13 +95,11 @@ function initGame() {
         }
     });
 
-    // 3. TẠO MẶT ĐẤT
     const ground = Bodies.rectangle(width / 2, height + 30, width, 100, { 
         isStatic: true, render: { fillStyle: CONF.colors.ground }
     });
     Composite.add(world, ground);
 
-    // 4. TẠO CÁC MỤC TIÊU
     const targetsData = levelConfig.targets || [levelConfig.targetPos];
 
     targetsData.forEach(pos => {
@@ -128,14 +116,12 @@ function initGame() {
         Composite.add(world, sensor);
     });
 
-    // 5. TẠO ĐIỂM NEO (MÓNG)
     levelConfig.anchors.forEach(pos => {
         const realX = parseVal(pos.x, width);
         const realY = parseVal(pos.y, height);
         createNode(realX, realY, true);
     });
 
-    // 6. ĐIỀU KHIỂN CHUỘT
     const mouse = Mouse.create(render.canvas);
     const mouseConstraint = MouseConstraint.create(engine, {
         mouse: mouse,
@@ -144,7 +130,6 @@ function initGame() {
     Composite.add(world, mouseConstraint);
     render.mouse = mouse;
 
-    // --- LOGIC CHUỘT ---
     Events.on(mouseConstraint, 'startdrag', function(event) {
         if (isWon || isLost) return;
         const body = event.body;
@@ -173,7 +158,6 @@ function initGame() {
 
     setupUIDragLogic();
 
-    // --- VÒNG LẶP GAME ---
     Events.on(engine, 'beforeUpdate', checkStructuralIntegrity);
     Events.on(render, 'afterRender', drawPreviewLinks);
     Events.on(engine, 'collisionStart', checkWin);
@@ -183,7 +167,6 @@ function initGame() {
     Render.run(render);
 }
 
-// --- LOGIC SỨC BỀN & THUA CUỘC ---
 function checkStructuralIntegrity() {
     if (isWon || isLost) return;
 
@@ -226,34 +209,27 @@ function loseGame() {
     }, 1000);
 }
 
-// --- THUẬT TOÁN KIỂM TRA LIÊN KẾT ĐẤT (NEW) ---
-// Kiểm tra xem một node có đường dẫn nối tới bất kỳ Anchor (Móng) nào không
 function isConnectedToAnchor(startNode) {
-    if (startNode.isStatic) return true; // Nếu chính nó là móng thì đúng luôn
+    if (startNode.isStatic) return true; 
 
-    // Thuật toán BFS (Tìm kiếm theo chiều rộng)
     let queue = [startNode];
     let visited = new Set();
     visited.add(startNode);
 
-    // Lấy tất cả các liên kết hiện có
     const constraints = Composite.allConstraints(world);
 
     while (queue.length > 0) {
         let currentNode = queue.shift();
 
-        // Duyệt qua các liên kết để tìm hàng xóm
         for (let c of constraints) {
             if (c.label === "Mouse Constraint") continue;
 
             let neighbor = null;
-            // Tìm node bên kia của liên kết
             if (c.bodyA === currentNode) neighbor = c.bodyB;
             else if (c.bodyB === currentNode) neighbor = c.bodyA;
 
-            // Nếu tìm thấy hàng xóm hợp lệ và chưa duyệt
             if (neighbor && nodes.includes(neighbor) && !visited.has(neighbor)) {
-                if (neighbor.isStatic) return true; // ĐÃ TÌM THẤY MÓNG! -> Kết nối thành công
+                if (neighbor.isStatic) return true;
                 
                 visited.add(neighbor);
                 queue.push(neighbor);
@@ -261,10 +237,9 @@ function isConnectedToAnchor(startNode) {
         }
     }
 
-    return false; // Đã duyệt hết mà không thấy móng nào -> Node đang bay lơ lửng
+    return false; 
 }
 
-// --- LOGIC THẮNG CUỘC (ĐÃ SỬA) ---
 function checkWin(event) {
     if (isWon || isLost) return;
     
@@ -278,18 +253,12 @@ function checkWin(event) {
                 const other = pair.bodyA === sensor ? pair.bodyB : pair.bodyA;
                 
                 if (nodes.includes(other)) {
-                    // --- ĐIỀU KIỆN MỚI: PHẢI CÓ KẾT NỐI VỚI ĐẤT ---
                     if (isConnectedToAnchor(other)) {
                         sensor.isHit = true;
                         sensor.render.fillStyle = "#2ecc71"; 
                         Body.scale(sensor, 1.2, 1.2);
                         setTimeout(() => Body.scale(sensor, 1/1.2, 1/1.2), 200);
                     } else {
-                        // (Tùy chọn) Hiệu ứng báo sai: Nháy đỏ nếu thả trúng mà không tính
-                        /*
-                        sensor.render.strokeStyle = '#e74c3c';
-                        setTimeout(() => sensor.render.strokeStyle = '#f1c40f', 500);
-                        */
                     }
                 }
             }
@@ -301,7 +270,6 @@ function checkWin(event) {
     if (allHit) {
         isWon = true;
         Runner.stop(runner);
-        // If not final level, just show result modal and let user proceed to next level.
         const completedLevels = (typeof currentLevelId !== 'undefined') ? currentLevelId : 1;
         const totalLevels = (typeof totalTowerLevels !== 'undefined') ? totalTowerLevels : 1;
 
@@ -310,7 +278,6 @@ function checkWin(event) {
             return;
         }
 
-        // Final level: compute percentage and commit to server
         const pct = totalLevels > 0 ? Math.round((completedLevels / totalLevels) * 100) : 0;
 
         fetch(`${baseUrl}/views/lessons/update-tower-score`, {
@@ -318,7 +285,6 @@ function checkWin(event) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'commit', score_pct: pct })
         }).then(r => r.json()).then(json => {
-            // Update modal message with server response if available
             const modal = document.getElementById('result-modal');
             const title = modal.querySelector('h2');
             const para = modal.querySelector('p');
@@ -336,8 +302,6 @@ function checkWin(event) {
         });
     }
 }
-
-// --- CÁC HÀM HỖ TRỢ XÂY DỰNG ---
 
 function isNodeLinked(node) {
     return world.constraints.some(c => c.label !== "Mouse Constraint" && (c.bodyA === node || c.bodyB === node));
@@ -384,7 +348,6 @@ function createLink(nodeA, nodeB) {
     Composite.add(world, link);
 }
 
-// --- LOGIC UI ---
 function setupUIDragLogic() {
     nodeSource.addEventListener('mousedown', (e) => {
         if (remainingNodes <= 0 || isWon || isLost) return;

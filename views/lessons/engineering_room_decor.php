@@ -115,7 +115,6 @@ require_once __DIR__ . '/../template/header.php';
 <script src="<?= $base_url ?>/public/JS/room_decor.js?v=<?= time() ?>"></script>
 
 <script>
-    // Intro modal handling
     document.addEventListener('DOMContentLoaded', () => {
         const introModal = document.getElementById('intro-modal');
         const startGameButton = document.getElementById('startGameButton');
@@ -134,7 +133,6 @@ require_once __DIR__ . '/../template/header.php';
         }
     });
     
-    // Complete button: commit full score (100%) for Room Decor
     (function(){
         const btn = document.getElementById('complete-room-btn');
         if (!btn) return;

@@ -22,7 +22,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $error = "Tài khoản không có quyền truy cập quản trị.";
         }
     } else {
-        // allow legacy hardcoded admin fallback
         $admin_username = 'admin';
         $admin_password = '123456';
         if ($username === $admin_username && $password === $admin_password) {

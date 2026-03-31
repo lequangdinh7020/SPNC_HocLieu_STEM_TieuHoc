@@ -33,7 +33,6 @@ body {
     padding: 20px;
 }
 
-/* Modal Overlay for Intro */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -286,7 +285,6 @@ body {
     min-height: 600px;
 }
 
-/* --- SIDEBAR --- */
 .sidebar {
     width: 320px;
     height: 700px;
@@ -310,7 +308,6 @@ body {
     font-size: 1.5em; 
 }
 
-/* Tabs danh mục */
 .category-tabs {
     display: flex; 
     flex-wrap: wrap; 
@@ -351,7 +348,6 @@ body {
     font-size: 1.3em; 
 }
 
-/* Lưới đồ vật */
 .items-grid {
     flex: 1; 
     overflow-y: scroll; 
@@ -385,7 +381,6 @@ body {
     object-fit: contain; 
 }
 
-/* Thùng rác */
 .trash-zone {
     padding: 20px; 
     background: #ffebee; 
@@ -401,7 +396,6 @@ body {
     transform: scale(1.03); 
 }
 
-/* --- MAIN AREA --- */
 .main-area {
     flex: 1; 
     height: 700px;
@@ -499,7 +493,6 @@ body {
     left: 0;
 }
 
-/* Responsive */
 @media (max-width: 992px) {
     .game-container-main {
         flex-direction: column;

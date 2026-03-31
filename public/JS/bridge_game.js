@@ -1,6 +1,3 @@
-// public/JS/bridge_game.js
-
-// --- 1. CẤU HÌNH ĐƯỜNG DẪN ẢNH ---
 const BASE_PATH = (typeof GAME_ASSETS_PATH !== 'undefined') 
                   ? GAME_ASSETS_PATH 
                   : '/SPNC_HocLieu_STEM_TieuHoc/public/images/bridge_game/';
@@ -41,11 +38,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// --- CẤU HÌNH MATTER.JS ---
+if (typeof Matter === 'undefined') {
+    console.error('Matter.js is not loaded. Please check CDN/network/script order.');
+    const statusMsg = document.getElementById('status-msg');
+    if (statusMsg) {
+        statusMsg.textContent = 'Khong tai duoc thu vien vat ly Matter.js. Vui long tai lai trang.';
+        statusMsg.style.display = 'block';
+        statusMsg.style.color = 'red';
+    }
+    throw new Error('Matter.js is not loaded');
+}
+
 const Engine = Matter.Engine, Render = Matter.Render, Runner = Matter.Runner,
       Bodies = Matter.Bodies, Composite = Matter.Composite, Constraint = Matter.Constraint,
       Mouse = Matter.Mouse, MouseConstraint = Matter.MouseConstraint, Events = Matter.Events,
-      Body = Matter.Body, Vector = Matter.Vector;
+    MatterBody = Matter.Body, Vector = Matter.Vector;
 
 const engine = Engine.create();
 engine.gravity.scale = 0.002; 
@@ -63,13 +70,11 @@ const render = Render.create({
     }
 });
 
-// --- DANH MỤC VA CHẠM ---
-const CAT_DEFAULT = 0x0001; // Chuột
-const CAT_CAR     = 0x0002; // Xe
-const CAT_BRIDGE  = 0x0004; // Cầu
-const CAT_GROUND  = 0x0008; // Đất
+const CAT_DEFAULT = 0x0001;
+const CAT_CAR     = 0x0002; 
+const CAT_BRIDGE  = 0x0004;
+const CAT_GROUND  = 0x0008;
 
-// --- CẤU HÌNH KÍCH THƯỚC ---
 const bankWidth = 485;
 const containerHeight = gameContainer ? gameContainer.offsetHeight : window.innerHeight;
 const containerWidth = gameContainer ? gameContainer.offsetWidth : window.innerWidth;
@@ -80,7 +85,6 @@ const defaultGapWidth = rightBankX - leftBankX;
 const CAR_WIDTH = 165;
 const CAR_HEIGHT = 75;
 
-// --- DỮ LIỆU LEVEL ---
 const LEVELS_DATA = [
     {
         name: "Level 1: Xây Cầu Cơ Bản",
@@ -99,25 +103,21 @@ const LEVELS_DATA = [
     */
 ];
 
-// BIẾN QUẢN LÝ
 let currentLevelIndex = 0; 
 let car; 
 let bridgeBars = []; 
 let createdConstraints = []; 
 let isPlaying = false, gameEnded = false;
-let carOnBridge = false; // Theo dõi xe có đang trên cầu không
+let carOnBridge = false;
 
-// --- HÀM TẢI LEVEL ---
+
 function loadLevel(index) {
-    // [SỬA 1] Dừng game và gỡ bỏ sự kiện 'beforeUpdate' cũ để không bị chạy chồng lặp
     isPlaying = false;
     gameEnded = false;
     Events.off(engine, 'beforeUpdate'); 
 
-    // [SỬA 2] Chỉ xóa World, KHÔNG dùng Engine.clear(engine) vì dễ gây lỗi mất hình
     Composite.clear(world); 
     
-    // Reset mảng quản lý
     bridgeBars = [];
     createdConstraints = [];
     
@@ -125,7 +125,6 @@ function loadLevel(index) {
     currentLevelIndex = index;
     const levelData = LEVELS_DATA[index];
 
-    // Reset UI
     const msg = document.getElementById('status-msg');
     const btnNext = document.getElementById('nextButton');
     const currentLevelDisplay = document.getElementById('currentLevel');
@@ -138,19 +137,15 @@ function loadLevel(index) {
     if (currentLevelDisplay) currentLevelDisplay.textContent = (index + 1);
     if (gameStatusDisplay) gameStatusDisplay.textContent = 'Sẵn sàng';
 
-    // Địa hình
     const leftY = baseGroundY;
     const rightY = baseGroundY + levelData.rightBankOffset;
     const anchorLeft = { x: leftBankX, y: leftY };
     const anchorRight = { x: rightBankX, y: rightY };
 
-    // ... (Giữ nguyên code tạo Đất, Móc neo, Biển báo) ...
-    // Copy lại đoạn tạo Đất từ code cũ của bạn vào đây
     const groundVisualOpts = {
         isStatic: true,
         friction: 0.1,
         render: { sprite: { texture: ASSETS.groundTexture } },
-        // Visual layer only, do not use this body for car collision
         collisionFilter: { category: CAT_GROUND, mask: CAT_DEFAULT }
     };
     const groundColliderOpts = {
@@ -161,7 +156,6 @@ function loadLevel(index) {
     Composite.add(world, [
         Bodies.rectangle(bankWidth / 2, leftY + 200, bankWidth, 400, groundVisualOpts),
         Bodies.rectangle(containerWidth - (bankWidth / 2), rightY + 200, bankWidth, 400, groundVisualOpts),
-        // Invisible physical colliders are raised 40px above the drawn grass edge
         Bodies.rectangle(bankWidth / 2, leftY - 40, bankWidth, 20, groundColliderOpts),
         Bodies.rectangle(containerWidth - (bankWidth / 2), rightY - 40, bankWidth, 20, groundColliderOpts),
         Bodies.circle(anchorLeft.x, anchorLeft.y, 8, { isStatic: true, render: { fillStyle: '#333' }, sensor: true }),
@@ -170,7 +164,6 @@ function loadLevel(index) {
     ]);
 
 
-    // Tạo thanh cầu
     const supplyZoneX = containerWidth / 2;
     let supplyZoneY = 95; 
 
@@ -199,7 +192,7 @@ function loadLevel(index) {
         });
         
         if (initialAngle !== 0) {
-            Body.setAngle(bar, initialAngle);
+            MatterBody.setAngle(bar, initialAngle);
         }
         
         bar.barLength = actualLength;
@@ -223,7 +216,6 @@ function createCar(x, y) {
         restitution: 0,        
         render: { sprite: { texture: ASSETS.fullCar, xScale: 0.22, yScale: 0.22 } },
         
-        // Xe va chạm với TẤT CẢ (Đất, Cầu)
         collisionFilter: { 
             category: CAT_CAR, 
             mask: CAT_GROUND | CAT_BRIDGE 
@@ -256,8 +248,8 @@ function setupMouseControl(anchorLeft, anchorRight, levelData) {
         if (isPlaying) return;
         const body = event.body;
         if (bridgeBars.includes(body)) {
-            Body.setStatic(body, false);
-            Body.setInertia(body, Infinity);
+            MatterBody.setStatic(body, false);
+            MatterBody.setInertia(body, Infinity);
             body.render.fillStyle = '#7f8c8d'; 
             removeConstraintsAttachedTo(body);
         }
@@ -267,8 +259,8 @@ function setupMouseControl(anchorLeft, anchorRight, levelData) {
         if (isPlaying) return;
         const body = event.body;
         if (bridgeBars.includes(body)) {
-            Body.setStatic(body, true);
-            Body.setAngle(body, body.angle);
+            MatterBody.setStatic(body, true);
+            MatterBody.setAngle(body, body.angle);
             body.render.fillStyle = '#555'; 
             checkAndAttach(body, anchorLeft, anchorRight, levelData);
         }
@@ -291,41 +283,30 @@ function removeConstraintsAttachedTo(body) {
 function checkAndAttach(body, anchorLeft, anchorRight, levelData) {
     const snapDist = 60; 
 
-    // Level 1 (Giữ nguyên logic cũ)
     if (levelData.bridgePieces.length === 1 && levelData.bridgePieces[0] === null) {
         const midGapX = (leftBankX + rightBankX) / 2;
         const avgY = (anchorLeft.y + anchorRight.y) / 2;
         const dist = Vector.magnitude(Vector.sub(body.position, {x: midGapX, y: avgY}));
 
         if (dist < 100) {
-            Body.setPosition(body, { x: midGapX, y: avgY });
-            Body.setAngle(body, 0);
+            MatterBody.setPosition(body, { x: midGapX, y: avgY });
+            MatterBody.setAngle(body, 0);
             snapToAnchor(body, { x: -body.barLength/2, y: 0 }, anchorLeft);
             snapToAnchor(body, { x: body.barLength/2, y: 0 }, anchorRight);
             body.render.fillStyle = '#27ae60';
         }
     } 
-    // Level 2 trở đi (SỬA PHẦN NÀY)
     else {
         const ends = getBarEnds(body);
         let attached = false;
 
-        // --- HÀM HỖ TRỢ MỚI ---
-        // Hàm này giúp dịch chuyển ngay lập tức thanh thép để đầu của nó 
-        // trùng khít với điểm neo trước khi tạo khớp.
         const snapBodyPositionToAnchor = (currentEndPos, anchorPos) => {
             const dx = anchorPos.x - currentEndPos.x;
             const dy = anchorPos.y - currentEndPos.y;
-            // Dịch chuyển vật thể
-            Body.translate(body, { x: dx, y: dy });
+            MatterBody.translate(body, { x: dx, y: dy });
         };
-        // ----------------------
-
-        // Kiểm tra đầu TRÁI của thanh thép
         if (Vector.magnitude(Vector.sub(ends.leftEnd, anchorLeft)) < snapDist) {
-            // 1. Dịch chuyển thanh thép vào đúng vị trí neo
             snapBodyPositionToAnchor(ends.leftEnd, anchorLeft);
-            // 2. Tạo khớp nối (lúc này khoảng cách đã là 0 nên sẽ không bị giật)
             snapToAnchor(body, { x: -body.barLength/2, y: 0 }, anchorLeft);
             attached = true;
         } else if (Vector.magnitude(Vector.sub(ends.leftEnd, anchorRight)) < snapDist) {
@@ -334,12 +315,9 @@ function checkAndAttach(body, anchorLeft, anchorRight, levelData) {
             attached = true;
         }
 
-        // [QUAN TRỌNG] Cập nhật lại toạ độ các đầu vì thanh thép có thể đã bị dịch chuyển ở bước trên
         const newEnds = getBarEnds(body);
 
-        // Kiểm tra đầu PHẢI của thanh thép
         if (Vector.magnitude(Vector.sub(newEnds.rightEnd, anchorLeft)) < snapDist) {
-            // Chỉ cho phép dịch chuyển nếu chưa được gắn vào đâu để tránh xung đột
             if (!attached) { snapBodyPositionToAnchor(newEnds.rightEnd, anchorLeft); }
             snapToAnchor(body, { x: body.barLength/2, y: 0 }, anchorLeft);
             attached = true;
@@ -349,7 +327,6 @@ function checkAndAttach(body, anchorLeft, anchorRight, levelData) {
             attached = true;
         }
 
-        // Đổi màu nếu đã được gắn thành công
         if (attached) {
             body.render.fillStyle = '#27ae60';
         }
@@ -361,9 +338,9 @@ function snapToAnchor(body, bodyPoint, anchorPoint) {
         pointA: anchorPoint, 
         bodyB: body, 
         pointB: bodyPoint,
-        stiffness: 1,      // [SỬA] Đặt stiffness = 1 (cứng tuyệt đối)
+        stiffness: 1,      
         length: 0, 
-        damping: 0.1,      // Giữ damping để giảm rung lắc
+        damping: 0.1,     
         render: { visible: true, lineWidth: 5, strokeStyle: '#e74c3c' }
     });
     Composite.add(world, c);
@@ -375,31 +352,28 @@ function startGame() {
     isPlaying = true;
 
     if (car) {
-        Body.setStatic(car, false);
-        Body.setVelocity(car, { x: 0, y: 0 });
-        Body.setAngularVelocity(car, 0);
+        MatterBody.setStatic(car, false);
+        MatterBody.setVelocity(car, { x: 0, y: 0 });
+        MatterBody.setAngularVelocity(car, 0);
         Matter.Sleeping.set(car, false);
     }
 
     bridgeBars.forEach(bar => {
-        // Giữ thanh thép đứng yên để xe chạy ổn định, chỉ bật va chạm khi bắt đầu chạy
-        Body.set(bar, { 
+        MatterBody.set(bar, { 
             isSensor: false, 
             isStatic: true 
         });
         bar.frictionAir = 0; 
         
-        Body.setDensity(bar, 0.1);
+        MatterBody.setDensity(bar, 0.1);
     });
 
     Events.on(engine, 'beforeUpdate', function gameLoop() {
         if (!gameEnded && isPlaying) {
-            // Di chuyển xe
             if (car.speed < 10) {
-                Body.applyForce(car, car.position, { x: 0.02, y: 0 });
+                MatterBody.applyForce(car, car.position, { x: 0.02, y: 0 });
             }
             
-            // Xử lý xe đi trên thanh thép
             handleCarOnBridge();
             checkWinLoseCondition();
         }
@@ -409,7 +383,6 @@ function startGame() {
 function handleCarOnBridge() {
     if (!car || gameEnded) return;
     
-    // Tính toán vị trí dưới cùng của xe
     const halfCarHeight = CAR_HEIGHT / 2;
     const halfCarWidth = CAR_WIDTH / 2;
     const carBottom = car.position.y + halfCarHeight;
@@ -419,55 +392,45 @@ function handleCarOnBridge() {
     let highestBridgeTop = null;
     carOnBridge = false;
     
-    // Duyệt qua tất cả các thanh thép
     bridgeBars.forEach(bar => {
-        if (bar.isStatic) return; // Bỏ qua thanh chưa được thả xuống
+        // Ignore bars that are still in placement mode; active bars can be static.
+        if (bar.isSensor) return;
         
-        // Lấy tọa độ 4 góc của thanh thép (xoay theo góc)
         const angle = bar.angle;
         const halfWidth = bar.barLength / 2;
-        const halfHeight = 10; // Nửa chiều cao thanh thép (20/2)
+        const halfHeight = 10; 
         
-        // Tính toán các góc của thanh thép
         const cos = Math.cos(angle);
         const sin = Math.sin(angle);
         
-        // 4 góc của hình chữ nhật xoay
         const corners = [
-            { // Góc trên trái
+            { 
                 x: bar.position.x + (-halfWidth * cos - (-halfHeight) * sin),
                 y: bar.position.y + (-halfWidth * sin + (-halfHeight) * cos)
             },
-            { // Góc trên phải
+            {
                 x: bar.position.x + (halfWidth * cos - (-halfHeight) * sin),
                 y: bar.position.y + (halfWidth * sin + (-halfHeight) * cos)
             },
-            { // Góc dưới trái
+            { 
                 x: bar.position.x + (-halfWidth * cos - halfHeight * sin),
                 y: bar.position.y + (-halfWidth * sin + halfHeight * cos)
             },
-            { // Góc dưới phải
+            { 
                 x: bar.position.x + (halfWidth * cos - halfHeight * sin),
                 y: bar.position.y + (halfWidth * sin + halfHeight * cos)
             }
         ];
         
-        // Tìm Y cao nhất (mặt trên) và thấp nhất của thanh thép
         const topY = Math.min(corners[0].y, corners[1].y);
-        const bottomY = Math.max(corners[2].y, corners[3].y);
-        
-        // Tìm X trái nhất và phải nhất
         const leftX = Math.min(corners[0].x, corners[1].x, corners[2].x, corners[3].x);
         const rightX = Math.max(corners[0].x, corners[1].x, corners[2].x, corners[3].x);
         
-        // Kiểm tra xe có nằm trên thanh thép theo trục X không
         const carOverlapsX = carRight > leftX && carLeft < rightX;
         
         if (carOverlapsX) {
-            // Kiểm tra xe có gần mặt trên của thanh thép không
             const distanceToTop = carBottom - topY;
             
-            // Nếu xe đang ở phía trên và gần mặt trên của thanh (trong khoảng 30 pixel)
             if (distanceToTop > -30 && distanceToTop < 30) {
                 if (highestBridgeTop === null || topY < highestBridgeTop) {
                     highestBridgeTop = topY;
@@ -477,16 +440,13 @@ function handleCarOnBridge() {
         }
     });
     
-    // Nếu xe đang trên cầu, giữ xe ở mặt trên
     if (carOnBridge && highestBridgeTop !== null) {
         const targetY = highestBridgeTop - halfCarHeight;
         const currentY = car.position.y;
         
-        // Nếu xe đang chìm xuống dưới mặt cầu, đẩy xe lên
         if (currentY > targetY) {
-            Body.setPosition(car, { x: car.position.x, y: targetY });
-            // Đặt vận tốc Y về 0 để xe không rơi xuống
-            Body.setVelocity(car, { x: car.velocity.x, y: 0 });
+            MatterBody.setPosition(car, { x: car.position.x, y: targetY });
+            MatterBody.setVelocity(car, { x: car.velocity.x, y: 0 });
         }
     }
 }
@@ -518,7 +478,6 @@ function checkWinLoseCondition() {
         isPlaying = false;
     }
     
-    // Điều kiện thắng
     if (car.position.x > containerWidth - 300) {
         gameEnded = true; 
         msg.innerText = "🏆 TUYỆT VỜI! QUA MÀN!"; 
@@ -532,9 +491,7 @@ function checkWinLoseCondition() {
     }
 }
 
-// --- EVENT LISTENERS FOR NEW UI ---
 document.addEventListener('DOMContentLoaded', () => {
-    // Modal close
     const startGameButton = document.getElementById('startGameButton');
     const introModal = document.getElementById('intro-modal');
     if (startGameButton && introModal) {
@@ -543,7 +500,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Button event listeners
     const replayButton = document.getElementById('replayButton');
     const playButton = document.getElementById('playButton');
     const nextButton = document.getElementById('nextButton');

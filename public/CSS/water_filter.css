@@ -33,7 +33,6 @@ body {
     padding: 20px;
 }
 
-/* Modal Overlay for Intro */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -271,7 +270,6 @@ body {
     font-size: 1.05rem;
 }
 
-/* Game Container */
 .game-container-filter {
     background-color: var(--white);
     border-radius: 12px;
@@ -285,7 +283,6 @@ body {
     flex-wrap: wrap;
 }
 
-/* --- KHO VẬT LIỆU --- */
 .materials-panel {
     background: white; 
     padding: 25px; 
@@ -325,7 +322,6 @@ body {
     border-color: var(--primary-blue); 
 }
 
-/* Icon tròn mô phỏng vật liệu */
 .mat-icon {
     width: 60px; 
     height: 60px; 
@@ -343,14 +339,12 @@ body {
     font-weight: 600;
 }
 
-/* Màu nền fallback nếu ảnh lỗi */
 .mat-gravel .mat-icon { background-color: #78716c; }
 .mat-sand .mat-icon { background-color: #fcd34d; }
 .mat-charcoal .mat-icon { background-color: #333; }
 .mat-cotton .mat-icon { background-color: #fff; }
 
 
-/* --- HỆ THỐNG CHAI --- */
 .bottle-system {
     position: relative;
     width: 200px; 
@@ -360,7 +354,6 @@ body {
     align-items: center;
 }
 
-/* Cái chai */
 .bottle {
     width: 100%; 
     height: 300px;
@@ -376,7 +369,6 @@ body {
     z-index: 10;
 }
 
-/* Cổ chai */
 .bottle-neck {
     width: 50px; 
     height: 30px;
@@ -387,7 +379,6 @@ body {
     box-shadow: 0 3px 8px rgba(0,0,0,0.2);
 }
 
-/* Các lớp bên trong chai */
 .layer {
     width: 100%; 
     height: 25%;
@@ -408,7 +399,6 @@ body {
     to { height: 25%; opacity: 1; } 
 }
 
-/* Placeholder khi chai rỗng */
 .layer-placeholder {
     position: absolute; 
     top: 50%; 
@@ -420,7 +410,6 @@ body {
     font-style: italic;
 }
 
-/* Cốc hứng */
 .beaker {
     width: 140px; 
     height: 100px;
@@ -442,7 +431,6 @@ body {
     transition: height 2s ease-out, background-color 1s;
 }
 
-/* --- HIỆU ỨNG NƯỚC RƠI --- */
 .water-container {
     position: absolute; 
     top: -50px; 
@@ -474,7 +462,6 @@ body {
 }
 
 
-/* --- MODAL --- */
 .modal {
     display: none; 
     position: fixed; 
@@ -530,7 +517,6 @@ body {
     text-align: left;
 }
 
-/* Game buttons */
 .game-btn {
     padding: 12px 28px; 
     border: none; 
@@ -555,7 +541,6 @@ body {
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .game-stats {
         grid-template-columns: repeat(2, 1fr);

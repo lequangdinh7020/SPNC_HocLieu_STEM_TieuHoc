@@ -1,6 +1,6 @@
 .car-builder {
     width: 95%; max-width: 1200px; margin: 110px auto 20px auto;
-    background: #2c3e50; /* Màu xưởng tối */
+    background: #2c3e50; 
     padding: 20px; border-radius: 15px;
     font-family: 'Segoe UI', sans-serif;
     color: white;
@@ -11,7 +11,6 @@
 
 #workshop-area { display: flex; gap: 20px; height: 550px; }
 
-/* CỘT TRÁI: DANH SÁCH PHỤ TÙNG */
 .parts-selector {
     width: 40%; background: #34495e;
     border-radius: 10px; padding: 15px;
@@ -37,12 +36,10 @@
 .part-item img { width: 50px; height: 50px; object-fit: contain; }
 .part-item span { font-size: 0.8em; color: #333; font-weight: bold; margin-top: 2px; }
 
-/* CỘT PHẢI: REVIEW & STATS */
 .preview-area {
     width: 60%; display: flex; flex-direction: column; gap: 20px;
 }
 
-/* Khung hiển thị xe lắp ráp */
 .car-preview-box {
     flex: 2; background-color: #555; background-size: cover;
     border-radius: 10px; border: 4px solid #7f8c8d;
@@ -51,16 +48,14 @@
 #car-assembly {
     width: 300px; height: 200px; position: relative;
 }
-/* Các lớp ảnh chồng lên nhau */
 .layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; transition: all 0.3s; }
 .layer.body { z-index: 2; }
 .layer.wheel { z-index: 3; width: 60px; height: 60px; bottom: 10px; top: auto; }
-.layer.wheel.front { left: 200px; } /* Vị trí bánh trước */
-.layer.wheel.back { left: 40px; }   /* Vị trí bánh sau */
-.layer.engine { z-index: 1; opacity: 0.8; } /* Động cơ nằm sau khung */
+.layer.wheel.front { left: 200px; } 
+.layer.wheel.back { left: 40px; } 
+.layer.engine { z-index: 1; opacity: 0.8; } 
 .layer.addon { z-index: 4; }
 
-/* Bảng chỉ số */
 .stats-board {
     flex: 1; background: #ecf0f1; border-radius: 10px; padding: 15px; color: #333;
 }
@@ -83,7 +78,6 @@
 }
 .game-btn.run:active { transform: translateY(4px); box-shadow: none; }
 
-/* Modal Simulation */
 .modal {
     display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.8); z-index: 999;
@@ -99,10 +93,9 @@
 }
 .sim-car {
     position: absolute; bottom: 20px; left: 10px; width: 150px; height: 100px;
-    transition: left 3s linear; /* Animation chạy xe */
+    transition: left 3s linear; 
 }
 .sim-car img { width: 100%; height: 100%; object-fit: contain; position: absolute; }
-/* Chỉnh lại vị trí bánh xe trong sim */
 .sim-car .wheel.front { left: 100px; top: 60px; width: 35px; height: 35px; animation: spin 0.5s linear infinite; }
 .sim-car .wheel.back { left: 20px; top: 60px; width: 35px; height: 35px; animation: spin 0.5s linear infinite; }
 @keyframes spin { 100% { transform: rotate(360deg); } }
