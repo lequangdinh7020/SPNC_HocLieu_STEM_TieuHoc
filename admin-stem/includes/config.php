@@ -1,8 +1,11 @@
 <?php
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'learning_app');
+// Đọc cấu hình từ biến môi trường (Railway sẽ cung cấp):
+// DB_HOST, DB_USER, DB_PASS, DB_NAME
+// Giữ fallback cho môi trường local XAMPP.
+define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
+define('DB_USER', getenv('DB_USER') ?: 'root');
+define('DB_PASS', getenv('DB_PASS') ?: '');
+define('DB_NAME', getenv('DB_NAME') ?: 'learning_app');
 
 function getDBConnection() {
     $conn = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
