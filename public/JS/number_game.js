@@ -9,10 +9,17 @@ document.addEventListener('DOMContentLoaded', function() {
         answers: {},
         correctAnswers: {},
         checkedItems: {},
-        gameSaved: false
+        gameSaved: false,
+        selectedNumbers: []
     };
     
     initGame();
+    
+    function getRandomNumbers() {
+        const numbers = Array.from({ length: 20 }, (_, i) => i + 1);
+        const shuffled = numbers.sort(() => Math.random() - 0.5);
+        return shuffled.slice(0, 10).sort((a, b) => a - b);
+    }
     
     document.getElementById('startGameButton').addEventListener('click', startGame);
     
@@ -32,6 +39,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const introModal = document.getElementById('intro-modal');
         if (introModal.classList.contains('active')) {}
         
+        gameState.selectedNumbers = getRandomNumbers();
+        
         createNumberGrid();
         
         createAnswerGrid();
@@ -46,19 +55,22 @@ document.addEventListener('DOMContentLoaded', function() {
         numberGrid.innerHTML = '';
 
         const numberData = window.numberData || [];
+        const selectedNumbers = gameState.selectedNumbers || [];
         
         numberData.forEach(row => {
             row.forEach(number => {
-                const cell = document.createElement('div');
-                cell.className = 'number-cell';
-                cell.textContent = number;
-                cell.dataset.number = number;
-                
-                cell.addEventListener('click', function() {
-                    highlightAnswerInput(number);
-                });
-                
-                numberGrid.appendChild(cell);
+                if (selectedNumbers.includes(number)) {
+                    const cell = document.createElement('div');
+                    cell.className = 'number-cell';
+                    cell.textContent = number;
+                    cell.dataset.number = number;
+                    
+                    cell.addEventListener('click', function() {
+                        highlightAnswerInput(number);
+                    });
+                    
+                    numberGrid.appendChild(cell);
+                }
             });
         });
     }
@@ -67,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const answerGrid = document.getElementById('answerGrid');
         answerGrid.innerHTML = '';
         
-        for (let i = 1; i <= 20; i++) {
+        gameState.selectedNumbers.forEach(i => {
             const answerItem = document.createElement('div');
             answerItem.className = 'answer-item';
             
@@ -99,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
             answerItem.appendChild(label);
             answerItem.appendChild(input);
             answerGrid.appendChild(answerItem);
-        }
+        });
     }
     
     function calculateCorrectAnswers() {
@@ -170,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let newWrongCount = 0;
         let answeredCount = 0;
         
-        for (let i = 1; i <= 20; i++) {
+        gameState.selectedNumbers.forEach(i => {
             const input = document.getElementById(`answer-${i}`);
             const userAnswer = gameState.answers[i];
             const correctAnswer = gameState.correctAnswers[i] || 0;
@@ -194,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     gameState.checkedItems[i] = { result: 'wrong', answer: userAnswer };
                 }
             }
-        }
+        });
         
         if (answeredCount > 0) {
             gameState.correct += newCorrectCount;
@@ -207,24 +219,25 @@ document.addEventListener('DOMContentLoaded', function() {
             showFeedback('Hãy nhập ít nhất một câu trả lời trước khi kiểm tra!', 'neutral');
         } else {
             let totalCorrect = 0;
-            for (let i = 1; i <= 20; i++) {
+            gameState.selectedNumbers.forEach(i => {
                 if (gameState.checkedItems[i] && gameState.checkedItems[i].result === 'correct') {
                     totalCorrect++;
                 }
-            }
+            });
             showFeedback(`Kiểm tra xong! Hiện tại: ${totalCorrect} ô đúng (từ ${answeredCount} ô đã nhập).`, 
                         totalCorrect === answeredCount ? 'correct' : 'neutral');
         }
     }
     
     function clearAnswers() {
-        for (let i = 1; i <= 20; i++) {
+        gameState.selectedNumbers.forEach(i => {
             const input = document.getElementById(`answer-${i}`);
-            input.value = '';
-            input.classList.remove('correct', 'wrong');
-            
-            gameState.answers[i] = null;
-        }
+            if (input) {
+                input.value = '';
+                input.classList.remove('correct', 'wrong');
+                gameState.answers[i] = null;
+            }
+        });
         
         showFeedback('Đã xóa tất cả câu trả lời.', 'neutral');
     }
@@ -263,7 +276,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         let correctCount = 0;
         let answeredCount = 0;
-        for (let i = 1; i <= 20; i++) {
+        gameState.selectedNumbers.forEach(i => {
             const userAnswer = gameState.answers[i];
             const correctAnswer = gameState.correctAnswers[i] || 0;
             
@@ -273,11 +286,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     correctCount++;
                 }
             }
-        }
+        });
 
-        const accuracy = Math.round((correctCount / 20) * 100);
+        const accuracy = answeredCount > 0 ? Math.round((correctCount / gameState.selectedNumbers.length) * 100) : 0;
 
-        const resultMsg = `Tổng kết: ${correctCount}/20 câu đúng. Độ chính xác: ${accuracy}%`;
+        const resultMsg = `Tổng kết: ${correctCount}/${gameState.selectedNumbers.length} câu đúng. Độ chính xác: ${accuracy}%`;
         showFeedback(resultMsg, accuracy >= 70 ? 'correct' : 'wrong');
 
         try {
@@ -315,7 +328,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        const unanswered = Object.keys(gameState.answers).filter(num => 
+        const unanswered = gameState.selectedNumbers.filter(num => 
             gameState.answers[num] === null || gameState.answers[num] === undefined
         ).length;
         
@@ -340,13 +353,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 answers: {},
                 correctAnswers: gameState.correctAnswers,
                 checkedItems: {},
-                gameSaved: false
+                gameSaved: false,
+                selectedNumbers: getRandomNumbers()
             };
             
             if (gameState.timerInterval) {
                 clearInterval(gameState.timerInterval);
             }
             
+            createAnswerGrid();
             clearAnswers();
             updateUI();
             
